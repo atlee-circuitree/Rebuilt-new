@@ -10,11 +10,13 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.TestCommand;
 import frc.robot.commands.runIntake;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -23,6 +25,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
@@ -77,17 +82,82 @@ public class RobotContainer {
             field.getObject("path").setPoses(poses);
         });
     
-        configureBindings();
+       
 
-        autoChooser = AutoBuilder.buildAutoChooser("default auto"); //pick a default
+     boolean isCompetition = true;
+
+    autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+      (stream) -> isCompetition
+        ? stream.filter(auto -> auto.getName().startsWith("comp"))
+        : stream
+    );
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    autoChooser.setDefaultOption("default auto", MoveForward);
-    autoChooser.addRoutine("SmallTrenchShoot", this::SmallTrenchShoot);
+     // Load the RobotConfig from the GUI settings. You should probably
+    // store this in your Constants file
+    RobotConfig config;
+    try{
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
 
-    SmartDashboard.putData("auto", autoChooser);
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+
+        // Subsystem initialization
+        
+
+        // Register Named Commands
+        NamedCommands.registerCommand("TestCommand", new TestCommand());
+        
 
         
+        
+
+        PathPlannerAuto autoCommand = new PathPlannerAuto("Example Auto");
+        // PathPlannerAuto can also be created with a custom command
+        // autoCommand = new PathPlannerAuto(new CustomAutoCommand());
+
+        // Bind to different auto triggers
+        autoCommand.isRunning().onTrue(Commands.print("Example Auto started"));
+        autoCommand.timeElapsed(5).onTrue(Commands.print("5 seconds passed"));
+        autoCommand.timeRange(6, 8).whileTrue(Commands.print("between 6 and 8 seconds"));
+        autoCommand.event("Example Event Marker").onTrue(Commands.print("passed example event marker"));
+        autoCommand.pointTowardsZone("Speaker").onTrue(Commands.print("aiming at speaker"));
+        autoCommand.activePath("Example Path").onTrue(Commands.print("started following Example Path"));
+        autoCommand.nearFieldPosition(new Translation2d(2, 2), 0.5).whileTrue(Commands.print("within 0.5m of (2, 2)"));
+        autoCommand.inFieldArea(new Translation2d(2, 2), new Translation2d(4, 4)).whileTrue(Commands.print("in area of (2, 2) - (4, 4)"));
+
+
+        
+        
+        // Do all other initialization
+        configureBindings();
+
     }
 
     
@@ -130,13 +200,5 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-     private void configureNamedCommands() {
-    // Pathplanner commands
-    NamedCommands.registerCommand("Intake score", new SlopeShoot(intake).withTimeout(0.5));
-
-  }
-
-    public Command getAutonomousCommand() {
-        return autoChooser.getSelected();    
-    }
+     
 }
