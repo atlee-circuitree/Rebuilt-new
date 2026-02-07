@@ -7,15 +7,19 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Speed;
 
 
 public class intake extends SubsystemBase {
   /** Creates a new intake. */
  
- private TalonFX intake;
+ private TalonFX intakeMotor;
+ private TalonFX deployMotor;
  
   public intake() {
-    intake = new TalonFX(12, "1599-B");
+    intakeMotor = new TalonFX(Constants.CAN_IDS.intakeMotor, "1599-B");
+    deployMotor = new TalonFX(Constants.CAN_IDS.deployMotor, "1599-B");
    
 
   }
@@ -25,11 +29,17 @@ public class intake extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public  void runIntake(double velocity) {
-    intake.set(velocity);
+  public void deploy() {
+    deployMotor.set(1.0);
   }
-  public void stopIntake() {
-    intake.set(0);
+
+  public void spin(double velocity) {
+    intakeMotor.set(velocity);
   }
+
+  public void stop() {
+    intakeMotor.set(0);
+  }
+
   
 }

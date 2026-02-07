@@ -4,31 +4,30 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.util.Limelight;
+import frc.robot.util.ServoSystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TestCommand extends Command {
-  Limelight limelight_left = new Limelight("limelight-left");
-  Limelight limelight_right = new Limelight("limelight-right");
-
-
-  public TestCommand() {
+public class setServoPosition extends Command {
+  /** Creates a new setServoPosition. */
+  private final ServoSystem m_servo;
+  private final double m_targetPosition;
+  public setServoPosition(ServoSystem subsystem, double position) {
+    m_servo = subsystem;
+    m_targetPosition = position;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(subsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_servo.setPosition(m_targetPosition);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    Limelight optimalLimelight = Limelight.getOptimalLimelight(limelight_right, limelight_left);
-    SmartDashboard.putString("Optimal Limelight", optimalLimelight.getName());
-
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
@@ -37,6 +36,6 @@ public class TestCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

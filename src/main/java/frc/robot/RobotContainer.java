@@ -16,10 +16,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.TestCommand;
 import frc.robot.commands.runIntake;
+import frc.robot.commands.setServoPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.util.ServoSystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -39,6 +40,7 @@ public class RobotContainer {
     
     private final Field2d field;
 
+    private final ServoSystem m_servoSubsystem = new ServoSystem();
     private final intake intake = new intake();
     private final SendableChooser<Command> autoChooser;
 
@@ -107,7 +109,7 @@ public class RobotContainer {
     }
 
     // Configure AutoBuilder last
-    AutoBuilder.configure(
+    /*AutoBuilder.configure(
             this::getPose, // Robot pose supplier
             this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
             this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
@@ -129,14 +131,14 @@ public class RobotContainer {
               return false;
             },
             this // Reference to this subsystem to set requirements
-    );
+    );*/
             
         // Subsystem initialization
         
 
         // Register Named Commands
-        NamedCommands.registerCommand("SlopeShoot", Command SlopeShoot());
-        NamedCommands.registerCommand("MoveForwardAuto", Command MoveForwardAuto());
+        //NamedCommands.registerCommand("SlopeShoot", Command SlopeShoot());
+        //NamedCommands.registerCommand("MoveForwardAuto", Command MoveForwardAuto());
         
         
 
@@ -188,11 +190,14 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-
+        
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
+        joystick.x().whileTrue(new setServoPosition(m_servoSubsystem, ServoSystem.k_openPosition));
+        joystick.y().whileTrue(new setServoPosition(m_servoSubsystem, ServoSystem.k_closedPosition));
+
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
