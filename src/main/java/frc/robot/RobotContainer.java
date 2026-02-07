@@ -20,6 +20,7 @@ import frc.robot.commands.TestCommand;
 import frc.robot.commands.runIntake;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +29,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
@@ -92,6 +94,7 @@ public class RobotContainer {
         : stream
     );
     SmartDashboard.putData("Auto Chooser", autoChooser);
+    
 
      // Load the RobotConfig from the GUI settings. You should probably
     // store this in your Constants file
@@ -127,12 +130,14 @@ public class RobotContainer {
             },
             this // Reference to this subsystem to set requirements
     );
-
+            
         // Subsystem initialization
         
 
         // Register Named Commands
-        NamedCommands.registerCommand("TestCommand", new TestCommand());
+        NamedCommands.registerCommand("SlopeShoot", Command SlopeShoot());
+        NamedCommands.registerCommand("MoveForwardAuto", Command MoveForwardAuto());
+        
         
 
         
@@ -160,7 +165,9 @@ public class RobotContainer {
 
     }
 
-    
+    public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
+    }
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
