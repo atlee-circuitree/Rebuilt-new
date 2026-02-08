@@ -4,13 +4,21 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
+import frc.robot.subsystems.intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class runOuttake extends Command {
-  /** Creates a new runOuttake. */
-  public runOuttake() {
+  intake m_outtake;
+    double m_velocity; 
+  /** Creates a new runIntake. */
+  public runOuttake(intake intake, Double Velocity) {
     // Use addRequirements() here to declare subsystem dependencies.
+   m_outtake = intake;
+   m_velocity = Velocity;
+   addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
@@ -19,11 +27,15 @@ public class runOuttake extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_outtake.spin(Constants.Properties.outtakeVelocity);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_outtake.stop();
+  }
 
   // Returns true when the command should end.
   @Override

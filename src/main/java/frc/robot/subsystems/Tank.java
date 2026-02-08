@@ -22,6 +22,17 @@ public class Tank extends SubsystemBase {
 
   }
 
+  public void spin(double speed) {
+    motorLeft.set(speed);
+    motorRight.set(speed);
+  }
+
+
+  public void stop() {
+    motorLeft.set(0);
+    motorRight.set(0);
+  }
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
