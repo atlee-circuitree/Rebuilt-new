@@ -29,6 +29,11 @@ public class Constants {
         public static final double D = 0;
     }
 
+    public class Turret {
+        public static final double minAngle = 0;
+        public static final double maxAngle = 0;
+    }
+
     public class TriggerPositions {
 
     }
