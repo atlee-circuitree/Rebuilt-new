@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,8 +22,12 @@ public class Trigger extends SubsystemBase {
     
   }
 
-  public void changePosition(double position) {
-    motor.set(position);
+  public void shoot() {
+    motor.set(1.0);
+  }
+
+  public void stop() {
+    motor.set(0);
   }
 
   @Override

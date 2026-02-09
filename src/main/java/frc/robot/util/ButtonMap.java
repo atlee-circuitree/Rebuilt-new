@@ -4,5 +4,10 @@
 
 package frc.robot.util;
 
+import java.util.function.Consumer;
+
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
+
 /** Add your docs here. */
 public class ButtonMap {}

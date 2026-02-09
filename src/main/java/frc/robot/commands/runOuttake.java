@@ -7,14 +7,14 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.intake;
+import frc.robot.subsystems.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class runOuttake extends Command {
-  intake m_outtake;
+  Intake m_outtake;
     double m_velocity; 
   /** Creates a new runIntake. */
-  public runOuttake(intake intake, Double Velocity) {
+  public runOuttake(Intake intake, Double Velocity) {
     // Use addRequirements() here to declare subsystem dependencies.
    m_outtake = intake;
    m_velocity = Velocity;

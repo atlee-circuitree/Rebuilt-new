@@ -11,7 +11,8 @@ public class Constants {
     public class CAN_IDS {
         public static final int wristMotor = 31;
         public static final int wristEncoder = 3;
-        public static final int intakeMotor = -1;
+        public static final int intakeMotorLeft = -1;
+        public static final int intakeMotorRight = -1;
         public static final int deployMotor = -1;
         public static final int turretMotorRight = -1;
         public static final int turretMotorLeft = -1;
@@ -19,6 +20,8 @@ public class Constants {
         public static final int triggerMotor = -1;
         public static final int tankMotorLeft = -1;
         public static final int tankMotorRight = -1;
+        public static final int climberMotorLeft = -1;
+        public static final int climberMotorRight = -1;
     }
     
     public class Channels {

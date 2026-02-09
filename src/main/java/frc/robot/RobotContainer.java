@@ -22,6 +22,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.util.ServoSystem;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,14 +35,14 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
-import frc.robot.subsystems.intake;
+import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
     
     private final Field2d field;
 
     private final ServoSystem m_servoSubsystem = new ServoSystem();
-    private final intake intake = new intake();
+    private final Intake intake = new Intake();
     private final SendableChooser<Command> autoChooser;
 
 
@@ -197,6 +198,7 @@ public class RobotContainer {
         ));
         joystick.x().whileTrue(new setServoPosition(m_servoSubsystem, ServoSystem.k_openPosition));
         joystick.y().whileTrue(new setServoPosition(m_servoSubsystem, ServoSystem.k_closedPosition));
+        joystick.setRumble(RumbleType.kBothRumble, 1);
 
 
         // Run SysId routines when holding back/start and X/Y.
