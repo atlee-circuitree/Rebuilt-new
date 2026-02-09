@@ -20,6 +20,11 @@ public class Constants {
         public static final int tankMotorLeft = -1;
         public static final int tankMotorRight = -1;
     }
+    
+    public class Channels {
+        public static final int motorHoodLeft = -1;
+        public static final int motorHoodRight = -1;
+    }
 
     public class Wrist {
         public static final double[] wristLimit =  new double[] {330, 30};

@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,12 +20,17 @@ public class Turret extends SubsystemBase {
   private TalonFX motorLeft;
   private TalonFX motorRight;
   private TalonFX motorRotator;
+  private Servo motorHoodLeft;
+  private Servo motorHoodRight;
 
   /** Creates a new Turret. */
   public Turret() {
     motorLeft = new TalonFX(Constants.CAN_IDS.turretMotorLeft, "1599-B");
     motorRight = new TalonFX(Constants.CAN_IDS.turretMotorRight, "1599-B");
     motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator, "1599-B");
+
+    motorHoodLeft = new Servo(Constants.Channels.motorHoodLeft);
+    motorHoodRight = new Servo(Constants.Channels.motorHoodRight);
     //add servos, motorHood1 and motorHood2
 
     Slot0Configs slot0Configs = new Slot0Configs();
@@ -58,6 +64,11 @@ public class Turret extends SubsystemBase {
     motorRotator.setControl(m_request.withPosition(position));
   }
 
+  public void setHoodPosition(double position) {
+    motorHoodLeft.set(position);
+    motorHoodRight.set(position);
+  }
+
   public void spin(double speed) {
     final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
     double velocity = speed; //TODO replace with math
@@ -73,6 +84,10 @@ public class Turret extends SubsystemBase {
 
   public void stopRotator() {
     motorRotator.set(0);
+  }
+
+  public double getMotorHood() {
+    return motorHoodLeft.get();
   }
 
   public double getAngle() {
