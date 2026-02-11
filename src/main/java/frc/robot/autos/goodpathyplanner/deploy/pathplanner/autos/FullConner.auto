@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ConnerIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ConnerReturn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReturnShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ClimbReturn"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "BottomStart",
+  "choreoAuto": false
+}
