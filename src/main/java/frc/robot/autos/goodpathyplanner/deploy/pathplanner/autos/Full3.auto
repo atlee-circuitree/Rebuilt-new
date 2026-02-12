@@ -7,37 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Trench Shoot1"
+            "pathName": "ShootStart"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchShoot2"
+            "pathName": "IntakePos"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchShoot3"
+            "pathName": "Sweep3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchShoot4"
+            "pathName": "3Return"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchShoot5"
+            "pathName": "ReturnShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ClimbReturn"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "TopStarting",
+  "folder": "BottomStart",
   "choreoAuto": false
 }

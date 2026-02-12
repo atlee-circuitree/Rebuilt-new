@@ -7,25 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Trench Shoot1"
+            "pathName": "ShootStart"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SmallTrenchShoot2"
+            "pathName": "ConnerIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchShoot5"
+            "pathName": "ConnerReturn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReturnShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ClimbReturn"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "TopStarting",
+  "folder": "BottomStart",
   "choreoAuto": false
 }
