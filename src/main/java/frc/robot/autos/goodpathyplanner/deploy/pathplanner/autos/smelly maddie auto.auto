@@ -7,25 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Trench Shoot1"
+            "pathName": "shootBottom"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SmallTrenchShoot2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "TrenchShoot5"
+            "pathName": "intakeBottom"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "TopStarting",
+  "folder": "maddieAutos",
   "choreoAuto": false
 }
