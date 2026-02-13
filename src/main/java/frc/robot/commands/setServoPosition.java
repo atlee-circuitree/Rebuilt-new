@@ -12,11 +12,11 @@ public class setServoPosition extends Command {
   /** Creates a new setServoPosition. */
   private final ServoSystem m_servo;
   private final double m_targetPosition;
-  public setServoPosition(ServoSystem subsystem, double position) {
-    m_servo = subsystem;
+  public setServoPosition(ServoSystem util, double position) {
+    m_servo = util;
     m_targetPosition = position;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+
   }
 
   // Called when the command is initially scheduled.

@@ -35,15 +35,15 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake;
 
 public class RobotContainer {
     
     private final Field2d field;
 
-    private final ServoSystem m_servoSubsystem = new ServoSystem();
-    private final Intake intake = new Intake();
-    private final SendableChooser<Command> autoChooser;
+    private final ServoSystem m_servoSubsystem = new ServoSystem(0, 0, 1);
+    private final intake intake = new intake();
+    //private final SendableChooser<Command> autoChooser;
 
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) / 4; // kSpeedAt12Volts desired top speed
@@ -60,7 +60,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController joystick = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -91,12 +91,12 @@ public class RobotContainer {
 
      boolean isCompetition = true;
 
-    autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+    /*autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
       (stream) -> isCompetition
         ? stream.filter(auto -> auto.getName().startsWith("comp"))
         : stream
     );
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);*/
     
 
      // Load the RobotConfig from the GUI settings. You should probably
@@ -146,7 +146,7 @@ public class RobotContainer {
         
         
 
-        PathPlannerAuto autoCommand = new PathPlannerAuto("Example Auto");
+        /*PathPlannerAuto autoCommand = new PathPlannerAuto("Example Auto");
         // PathPlannerAuto can also be created with a custom command
         // autoCommand = new PathPlannerAuto(new CustomAutoCommand());
 
@@ -159,7 +159,7 @@ public class RobotContainer {
         autoCommand.activePath("Example Path").onTrue(Commands.print("started following Example Path"));
         autoCommand.nearFieldPosition(new Translation2d(2, 2), 0.5).whileTrue(Commands.print("within 0.5m of (2, 2)"));
         autoCommand.inFieldArea(new Translation2d(2, 2), new Translation2d(4, 4)).whileTrue(Commands.print("in area of (2, 2) - (4, 4)"));
-
+*/
 
         
         
@@ -169,7 +169,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+        return null;
+        //return autoChooser.getSelected();
     }
 
     private void configureBindings() {
@@ -196,8 +197,8 @@ public class RobotContainer {
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
-        joystick.x().whileTrue(new setServoPosition(m_servoSubsystem, ServoSystem.k_openPosition));
-        joystick.y().whileTrue(new setServoPosition(m_servoSubsystem, ServoSystem.k_closedPosition));
+        joystick.x().onTrue(new setServoPosition(m_servoSubsystem, 0.0));
+        joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 1.0));
         joystick.setRumble(RumbleType.kBothRumble, 1);
 
 

@@ -11,17 +11,17 @@ import frc.robot.Constants;
 import frc.robot.Constants.Speed;
 
 
-public class Intake extends SubsystemBase {
+public class intake extends SubsystemBase{
   /** Creates a new intake. */
  
  private TalonFX motorLeft;
  private TalonFX motorRight;
  private TalonFX deployMotor;
  
-  public Intake() {
-    motorLeft = new TalonFX(Constants.CAN_IDS.intakeMotorLeft, "1599-B");
-    motorRight = new TalonFX(Constants.CAN_IDS.intakeMotorRight, "1599-B");
-    deployMotor = new TalonFX(Constants.CAN_IDS.deployMotor, "1599-B");
+  public intake() {
+    //motorLeft = new TalonFX(Constants.CAN_IDS.intakeMotorLeft, "1599-B");
+    //motorRight = new TalonFX(Constants.CAN_IDS.intakeMotorRight, "1599-B");
+    //deployMotor = new TalonFX(Constants.CAN_IDS.deployMotor, "1599-B");
    
 
   }

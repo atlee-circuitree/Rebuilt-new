@@ -1,39 +1,74 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.util;
 
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 
-public class ServoSystem extends SubsystemBase {
-  /** Creates a new Servo. */
 
-  // Create a Servo object for port 0
-  private final Servo m_exampleServo = new Servo(0);
-  
-   // Define constants for specific positions (optional, but good practice)
-  public static final double k_openPosition = 0.0; // 0 degrees
-  public static final double k_closedPosition = 1.0; // 180 degrees
-  public static final double k_midPosition = 0.5; // 90 degrees
-
-  public ServoSystem() {}
-
-  public void setPosition(double position) {
-    m_exampleServo.set(position);
+public class ServoSystem extends Servo{
+ double m_speed;
+ double m_length;
+ double setPos;
+ double curPos;
+ /**
+ * Parameters for L16-R Actuonix Linear Actuators
+ *
+ * @param channel PWM channel used to control the servo
+ * @param length max length of the servo [mm]
+ * @param speed max speed of the servo [mm/second]
+ */
+ public ServoSystem(int channel, int length, int speed) {
+ super(0);
+ //setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+  m_length = length;
+  m_speed = speed;
   }
+ 
+ /**
+ * Run this method in any periodic function to update the position estimation of your
+servo
+ *
+ * @param setpoint the target position of the servo [mm]
+ */
+ public void setPosition(double setpoint){
+ setPos = MathUtil.clamp(setpoint, 0, m_length);
+ setSpeed( (setPos/m_length *2)-1);
+ }
+ double lastTime = 0;
+ /**
+ * Run this method in any periodic function to update the position estimation of your
+servo
+ */
+ public void updateCurPos(){
+ double dt = Timer.getFPGATimestamp() - lastTime;
+ if (curPos > setPos + m_speed *dt){
+ curPos -= m_speed *dt;
+ } else if(curPos < setPos - m_speed *dt){
+ curPos += m_speed *dt;
+ }else{
+ curPos = setPos;
+ }
+ }
+ /**
+ * Current position of the servo, must be calling {@link #updateCurPos()
+updateCurPos()} periodically
+ *
+ * @return Servo Position [mm]
+ */
+ public double getPosition(){
+ return curPos;
+ }
+ /**
+ * Checks if the servo is at its target position, must be calling {@link #updateCurPos()
+updateCurPos()} periodically
+ * @return true when servo is at its target
+ */
+ public boolean isFinished(){
+ return curPos == setPos;
+ }
 
-   public void setAngle(double angle) {
-    m_exampleServo.setAngle(angle);
-  }
-
-  public double getPosition() {
-    return m_exampleServo.get();
-  }
-
-
-  @Override
-  public void periodic() {
-  }
+ public void periodic() {
+  SmartDashboard.putNumber("Servo", getPosition());
+ }
 }

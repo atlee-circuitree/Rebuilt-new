@@ -19,8 +19,8 @@ public class WristSystem extends SubsystemBase {
   /** Creates a new WristSystem. */
   public WristSystem() {
 
-    wristMotor = new TalonFX(Constants.CAN_IDS.wristMotor, "1599-B");
-    wristEncoder = new DutyCycleEncoder(Constants.CAN_IDS.wristEncoder);
+    //wristMotor = new TalonFX(Constants.CAN_IDS.wristMotor, "1599-B");
+    //wristEncoder = new DutyCycleEncoder(Constants.CAN_IDS.wristEncoder);
 
     pid = new PIDController(Constants.Wrist.P, Constants.Wrist.I, Constants.Wrist.D);
 
