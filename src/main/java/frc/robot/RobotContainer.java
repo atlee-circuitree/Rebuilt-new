@@ -41,7 +41,7 @@ public class RobotContainer {
     
     private final Field2d field;
 
-    private final ServoSystem m_servoSubsystem = new ServoSystem(0, 0, 1);
+    private final ServoSystem m_servoSubsystem = new ServoSystem(0, 100, 32);
     private final intake intake = new intake();
     //private final SendableChooser<Command> autoChooser;
 

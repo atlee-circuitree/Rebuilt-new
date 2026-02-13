@@ -33,6 +33,7 @@ servo
  */
  public void setPosition(double setpoint){
  setPos = MathUtil.clamp(setpoint, 0, m_length);
+ System.out.println("Speed " + ((setPos/m_length *2)-1));
  setSpeed( (setPos/m_length *2)-1);
  }
  double lastTime = 0;
