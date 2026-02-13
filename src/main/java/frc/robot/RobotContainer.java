@@ -198,7 +198,7 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
         joystick.x().onTrue(new setServoPosition(m_servoSubsystem, 0.0));
-        joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 1.0));
+        joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 0.4));
         joystick.setRumble(RumbleType.kBothRumble, 1);
 
 
