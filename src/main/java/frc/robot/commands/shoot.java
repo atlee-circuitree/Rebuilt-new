@@ -1,32 +1,34 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Trigger;
+import frc.robot.subsystems.Turret;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class shoot extends Command {
-  /** Creates a new shoot. */
-  public shoot() {
-    // Use addRequirements() here to declare subsystem dependencies.
+public class Shoot extends Command {
+  private Turret turret;
+  private Trigger trigger;
+  
+  public Shoot(Turret turret, Trigger trigger) {
+    this.turret = turret;
+    this.trigger = trigger;
+    addRequirements(trigger);
+    // not requiring turret because we are using it as read only
+    // requiring it would prvent shooting if another command is working on turret
   }
 
-  // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void execute() {
+    if (turret.isAtSpeed())
+      trigger.shoot();
+    else
+      trigger.stop();
+  }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void end(boolean interrupted) {
+    trigger.stop();
+  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;

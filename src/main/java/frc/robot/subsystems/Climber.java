@@ -12,12 +12,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
-
   private TalonFX motorLeft;
   private TalonFX motorRight;
-  /** Creates a new Climber. */
-  public Climber() {
 
+  public Climber() {
     motorLeft = new TalonFX(Constants.CAN_IDS.climberMotorLeft, "1599-B");
     motorRight = new TalonFX(Constants.CAN_IDS.climberMotorRight, "1599-B");
 
@@ -28,22 +26,16 @@ public class Climber extends SubsystemBase {
 
     motorLeft.getConfigurator().apply(slot0Configs);
     motorRight.getConfigurator().apply(slot0Configs);
-
   }
 
   public void setPosition(double position) {
-    final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
     position = position; // TODO replace with math
-    motorLeft.setControl(m_request.withPosition(position));
-    motorRight.setControl(m_request.withPosition(position));
+    final PositionVoltage m_request = new PositionVoltage(position).withSlot(0);
+    motorLeft.setControl(m_request);
+    motorRight.setControl(m_request);
   }
 
   public double getPosition() {
-    return 0;
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+    return motorLeft.getPosition().getValueAsDouble(); // TODO replace with math
   }
 }

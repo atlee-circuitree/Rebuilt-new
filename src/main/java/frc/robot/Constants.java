@@ -40,6 +40,21 @@ public class Constants {
     public class Turret {
         public static final double minAngle = 0;
         public static final double maxAngle = 0;
+        public static final double shooterThreshold = 0;
+    }
+
+    public class Intake {
+        public static final double deployPosition = 0;
+        public static final double homePosition = 0;
+        public static final double intakeSpeed = 0;
+    }
+
+    public class Climber {
+        public static final double homePosition = 0;
+        public static final double lvl1Position = 0;
+        public static final double lvl2Position = 0;
+        public static final double lvl3Position = 0;
+        public static final double climbThreshold = 0;
     }
 
     public class TriggerPositions {

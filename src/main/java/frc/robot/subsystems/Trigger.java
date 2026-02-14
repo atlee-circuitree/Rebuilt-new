@@ -12,14 +12,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Trigger extends SubsystemBase {
-  /** Creates a new Trigger. */
-
   private TalonFX motor;
 
   public Trigger() {
-
     motor = new TalonFX(Constants.CAN_IDS.triggerMotor, "1599-B");
-    
   }
 
   public void shoot() {
@@ -28,10 +24,5 @@ public class Trigger extends SubsystemBase {
 
   public void stop() {
     motor.set(0);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
   }
 }

@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -22,8 +21,8 @@ public class Turret extends SubsystemBase {
   private TalonFX motorRotator;
   private Servo motorHoodLeft;
   private Servo motorHoodRight;
+  private double targetVelocity;
 
-  /** Creates a new Turret. */
   public Turret() {
     motorLeft = new TalonFX(Constants.CAN_IDS.turretMotorLeft, "1599-B");
     motorRight = new TalonFX(Constants.CAN_IDS.turretMotorRight, "1599-B");
@@ -31,7 +30,6 @@ public class Turret extends SubsystemBase {
 
     motorHoodLeft = new Servo(Constants.Channels.motorHoodLeft);
     motorHoodRight = new Servo(Constants.Channels.motorHoodRight);
-    //add servos, motorHood1 and motorHood2
 
     Slot0Configs slot0Configs = new Slot0Configs();
     slot0Configs.kP = 2.4; // An error of 1 rotation results in 2.4 V output
@@ -47,6 +45,8 @@ public class Turret extends SubsystemBase {
 
     motorLeft.getConfigurator().apply(spinMotorConfigs);
     motorRight.getConfigurator().apply(spinMotorConfigs);
+
+    targetVelocity = 0;
   }
 
   public void rotate(double speed) {
@@ -59,22 +59,27 @@ public class Turret extends SubsystemBase {
   }
 
   public void rotateTo(double degree) {
-    final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
     double position = degree; // TODO replace with math
-    motorRotator.setControl(m_request.withPosition(position));
+    final PositionVoltage m_request = new PositionVoltage(position).withSlot(0);
+    motorRotator.setControl(m_request);
   }
 
   public void setHoodPosition(double position) {
-    motorHoodLeft.set(position);
-    motorHoodRight.set(position);
+    motorHoodLeft.setPosition(position);
+    motorHoodRight.setPosition(position);
   }
 
   public void spin(double speed) {
-    final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
     double velocity = speed; //TODO replace with math
-    // set velocity to 8 rps, add 0.5 V to overcome gravity
+    targetVelocity = velocity;
+    final VelocityVoltage m_request = new VelocityVoltage(velocity).withSlot(0);
     motorLeft.setControl(m_request.withVelocity(velocity).withFeedForward(0.5));
     motorRight.setControl(m_request.withVelocity(velocity).withFeedForward(0.5));
+  }
+
+  public boolean isAtSpeed()
+  {
+    return Math.abs(getSpeed() - targetVelocity) < Constants.Turret.shooterThreshold;
   }
 
   public void stopShooter() {
@@ -86,19 +91,13 @@ public class Turret extends SubsystemBase {
     motorRotator.set(0);
   }
 
-  public double getMotorHood() {
-    return motorHoodLeft.get();
-  }
-
   public double getAngle() {
-    return 0;
+    return motorRotator.getPosition().getValueAsDouble(); // TODO replace with math
   }
 
   public double getSpeed() {
-    return motorLeft.getVelocity().getValueAsDouble();
+    return motorLeft.getVelocity().getValueAsDouble(); // TODO replace with math
   }
-
-  //add change hood position when servos are added.
 
   @Override
   public void periodic() {

@@ -9,35 +9,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Intake;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class runOuttake extends Command {
-  Intake m_outtake;
-    double m_velocity; 
-  /** Creates a new runIntake. */
-  public runOuttake(Intake intake, Double Velocity) {
-    // Use addRequirements() here to declare subsystem dependencies.
-   m_outtake = intake;
-   m_velocity = Velocity;
-   addRequirements(intake);
+public class RunOuttake extends Command {
+  Intake intake;
+  
+  public RunOuttake(Intake in) {
+   intake = in;
+   addRequirements(in);
   }
 
-  // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_outtake.spin(Constants.Properties.outtakeVelocity);
+  public void initialize() {
+    intake.outtake();
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_outtake.stop();
+    intake.stop();
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
