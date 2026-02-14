@@ -137,20 +137,20 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // actual buttons
-        joystick.leftTrigger().whileTrue(new ClimbDown(climber));
-        joystick.rightTrigger().whileTrue(new ClimbLvl1(climber));
-        joystick.leftBumper().whileTrue(new ClimbLvl2(climber));
-        joystick.rightBumper().whileTrue(new ClimbLvl3(climber));
+        joystick.leftTrigger().onTrue(new ClimbDown(climber));
+        joystick.rightTrigger().onTrue(new ClimbLvl1(climber));
+        joystick.leftBumper().onTrue(new ClimbLvl2(climber));
+        joystick.rightBumper().onTrue(new ClimbLvl3(climber));
         
         joystick.y().onTrue(new DeployIntake(intake));
         joystick.x().onTrue(new RetractIntake(intake));
         joystick.a().whileTrue(new RunIntake(intake));
         joystick.b().whileTrue(new RunOuttake(intake));
 
-        joystick.povDown().onTrue(new SpinToSpeed(turret, 200));
-        joystick.povLeft().onTrue(new SpinToSpeed(turret, 500));
+        joystick.povDown().onTrue(new SpinToSpeed(turret, 0));
+        joystick.povLeft().onTrue(new SpinToSpeed(turret, 400));
         joystick.povRight().onTrue(new SpinToSpeed(turret, 800));
-        joystick.povUp().onTrue(new Shoot(turret, trigger));
+        joystick.povUp().whileTrue(new Shoot(turret, trigger));
 
         turret.setDefaultCommand(new ManualTurret(turret, joystick::getLeftX));
     }
