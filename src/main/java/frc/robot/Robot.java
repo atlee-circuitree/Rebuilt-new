@@ -54,7 +54,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.Periodic();
+    
+  }
 
   @Override
   public void teleopExit() {}

@@ -7,12 +7,13 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
-
-
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -39,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LimelightHelpers {
 
     private static final Map<String, DoubleArrayEntry> doubleArrayEntries = new ConcurrentHashMap<>();
-
+    private static PoseEstimator m_PoseEstimator = new PoseEstimator<>(null, null, null, null)
     /**
      * Represents a Color/Retroreflective Target Result extracted from JSON Output
      */
@@ -1643,5 +1644,28 @@ public class LimelightHelpers {
         }
 
         return results;
+    }
+  
+    public LimelightHelpers.PoseEstimate localize()
+    {
+        int[] validIDs = {1};
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
+        
+        LimelightHelpers.SetRobotOrientation("limelight", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+        return mt2;
+        // if our angular velocity is greater than 360 degrees per second, ignore vision updates
+        /*boolean doRejectUpdate = false;
+        if(Math.abs(m_gyro.getRate()) > 360)
+        {
+            doRejectUpdate = true;
+        }
+        if(mt2.tagCount == 0)
+        {
+            doRejectUpdate = true;
+        }
+        if(!doRejectUpdate)
+        {*/
+        //}
     }
 }

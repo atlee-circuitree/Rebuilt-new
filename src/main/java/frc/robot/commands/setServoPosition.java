@@ -5,14 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.util.ServoSystem;
+import frc.robot.util.LRServo;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class setServoPosition extends Command {
   /** Creates a new setServoPosition. */
-  private final ServoSystem m_servo;
+  private final LRServo m_servo;
   private final double m_targetPosition;
-  public setServoPosition(ServoSystem util, double position) {
+  public setServoPosition(LRServo util, double position) {
     m_servo = util;
     m_targetPosition = position;
     // Use addRequirements() here to declare subsystem dependencies.

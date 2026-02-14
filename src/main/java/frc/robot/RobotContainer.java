@@ -8,7 +8,10 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,7 +23,8 @@ import frc.robot.commands.runIntake;
 import frc.robot.commands.setServoPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.util.ServoSystem;
+import frc.robot.subsystems.LimelightHelpers;
+import frc.robot.util.LRServo;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -36,12 +40,13 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
 import frc.robot.subsystems.intake;
+import frc.robot.subsystems.LimelightHelpers.PoseEstimate;
 
 public class RobotContainer {
     
     private final Field2d field;
 
-    private final ServoSystem m_servoSubsystem = new ServoSystem(0, 100, 32);
+    private final LRServo m_servoSubsystem = new LRServo(0);
     private final intake intake = new intake();
     //private final SendableChooser<Command> autoChooser;
 
@@ -66,7 +71,9 @@ public class RobotContainer {
 
     public RobotContainer() {
 
+    SwerveDriveState currentState = drivetrain.getState();
     field = new Field2d();
+    field.setRobotPose(currentState.Pose);
         SmartDashboard.putData("Field", field);
 
         // Logging callback for current robot pose
@@ -167,6 +174,17 @@ public class RobotContainer {
         configureBindings();
 
     }
+    public void Periodic() {
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.localize();
+        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        drivetrain.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+
+        
+        field.setRobotPose(drivetrain.getState().Pose);
+        SmartDashboard.putData("Field", field);
+    }
 
     public Command getAutonomousCommand() {
         return null;
@@ -198,17 +216,17 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
         joystick.x().onTrue(new setServoPosition(m_servoSubsystem, 0.0));
-        joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 0.4));
+        joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 1.0));
         joystick.setRumble(RumbleType.kBothRumble, 1);
 
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        /*joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
+        */
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(new runIntake(intake, 0.5));
 

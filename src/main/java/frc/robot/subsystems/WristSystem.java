@@ -55,7 +55,6 @@ public class WristSystem extends SubsystemBase {
   public void clearPID() {
     pid.reset();
   }
-
   public double getPID(double angle) {
     pid.setSetpoint(angle);
     double out = pid.calculate(getAngle());
