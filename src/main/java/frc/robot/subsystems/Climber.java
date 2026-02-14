@@ -16,8 +16,8 @@ public class Climber extends SubsystemBase {
   private TalonFX motorRight;
 
   public Climber() {
-    motorLeft = new TalonFX(Constants.CAN_IDS.climberMotorLeft, "1599-B");
-    motorRight = new TalonFX(Constants.CAN_IDS.climberMotorRight, "1599-B");
+    motorLeft = new TalonFX(Constants.CAN_IDS.climberMotorLeft);
+    motorRight = new TalonFX(Constants.CAN_IDS.climberMotorRight);
 
     Slot0Configs slot0Configs = new Slot0Configs();
     slot0Configs.kP = 2.4; // An error of 1 rotation results in 2.4 V output

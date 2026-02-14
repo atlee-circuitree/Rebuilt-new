@@ -15,7 +15,7 @@ public class Trigger extends SubsystemBase {
   private TalonFX motor;
 
   public Trigger() {
-    motor = new TalonFX(Constants.CAN_IDS.triggerMotor, "1599-B");
+    motor = new TalonFX(Constants.CAN_IDS.triggerMotor);
   }
 
   public void shoot() {
