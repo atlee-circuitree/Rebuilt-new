@@ -40,7 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LimelightHelpers {
 
     private static final Map<String, DoubleArrayEntry> doubleArrayEntries = new ConcurrentHashMap<>();
-    private static PoseEstimator m_PoseEstimator = new PoseEstimator<>(null, null, null, null)
     /**
      * Represents a Color/Retroreflective Target Result extracted from JSON Output
      */
@@ -618,7 +617,7 @@ public class LimelightHelpers {
 
     static final String sanitizeName(String name) {
         if (name == "" || name == null) {
-            return "limelight";
+            return "limelight-left";
         }
         return name;
     }
@@ -1646,13 +1645,13 @@ public class LimelightHelpers {
         return results;
     }
   
-    public LimelightHelpers.PoseEstimate localize()
+    public static LimelightHelpers.PoseEstimate localize(CommandSwerveDrivetrain drivetrain)
     {
         int[] validIDs = {1};
-        LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
         
-        LimelightHelpers.SetRobotOrientation("limelight", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+        LimelightHelpers.SetRobotOrientation("limelight-left", drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         return mt2;
         // if our angular velocity is greater than 360 degrees per second, ignore vision updates
         /*boolean doRejectUpdate = false;

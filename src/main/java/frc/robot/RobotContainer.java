@@ -24,7 +24,7 @@ import frc.robot.commands.setServoPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LimelightHelpers;
-import frc.robot.util.LRServo;
+//import frc.robot.util.LRServo;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -46,7 +46,7 @@ public class RobotContainer {
     
     private final Field2d field;
 
-    private final LRServo m_servoSubsystem = new LRServo(0);
+    //private final LRServo m_servoSubsystem = new LRServo(0);
     private final intake intake = new intake();
     //private final SendableChooser<Command> autoChooser;
 
@@ -175,12 +175,8 @@ public class RobotContainer {
 
     }
     public void Periodic() {
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.localize();
-        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-        drivetrain.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
-
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.localize(drivetrain);
+        drivetrain.savePose(mt2);
         
         field.setRobotPose(drivetrain.getState().Pose);
         SmartDashboard.putData("Field", field);
@@ -215,9 +211,9 @@ public class RobotContainer {
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
-        joystick.x().onTrue(new setServoPosition(m_servoSubsystem, 0.0));
-        joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 1.0));
-        joystick.setRumble(RumbleType.kBothRumble, 1);
+        //joystick.x().onTrue(new setServoPosition(m_servoSubsystem, 0.0));
+        //joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 1.0));
+        //joystick.setRumble(RumbleType.kBothRumble, 1);
 
 
         // Run SysId routines when holding back/start and X/Y.
