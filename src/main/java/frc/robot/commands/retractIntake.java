@@ -4,13 +4,15 @@
 
 package frc.robot.commands;
 
+import java.util.HashMap;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake;
 
-public class RetractIntake extends Command {
-  private Intake intake;
+public class retractIntake extends Command {
+  private intake intake;
 
-  public RetractIntake(Intake in) {
+  public retractIntake(intake in) {
     intake = in;
     addRequirements(in);
   }

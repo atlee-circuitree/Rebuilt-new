@@ -11,12 +11,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Intake extends SubsystemBase {
+public class intake extends SubsystemBase {
   private TalonFX motorLeft;
   private TalonFX motorRight;
   private TalonFX deployMotor;
 
-  public Intake() {
+  public intake() {
     motorLeft = new TalonFX(Constants.CAN_IDS.intakeMotorLeft);
     motorRight = new TalonFX(Constants.CAN_IDS.intakeMotorRight);
     deployMotor = new TalonFX(Constants.CAN_IDS.deployMotor);

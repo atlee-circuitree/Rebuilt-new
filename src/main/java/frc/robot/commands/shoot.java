@@ -4,11 +4,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Trigger;
 import frc.robot.subsystems.Turret;
 
-public class Shoot extends Command {
+public class shoot extends Command {
   private Turret turret;
   private Trigger trigger;
   
-  public Shoot(Turret turret, Trigger trigger) {
+  public shoot(Turret turret, Trigger trigger) {
     this.turret = turret;
     this.trigger = trigger;
     addRequirements(trigger);

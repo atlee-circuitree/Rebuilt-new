@@ -5,10 +5,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Climber;
 
-public class ClimbDown extends Command {
+public class climbDown extends Command {
   private Climber climb;
 
-  public ClimbDown(Climber climber) {
+  public climbDown(Climber climber) {
     climb = climber;
     addRequirements(climb);
   }

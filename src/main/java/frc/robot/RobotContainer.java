@@ -34,7 +34,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake;
 import frc.robot.subsystems.Trigger;
 import frc.robot.subsystems.Turret;
 
@@ -43,7 +43,7 @@ public class RobotContainer {
     // subsystems
     private Climber climber;
     private CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    private Intake intake;
+    private intake intake;
     private Trigger trigger;
     private Turret turret;
 
@@ -91,7 +91,7 @@ public class RobotContainer {
         }
 
         climber = new Climber();
-        intake = new Intake();
+        intake = new intake();
         trigger = new Trigger();
         turret = new Turret();
 
@@ -137,20 +137,20 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // actual buttons
-        joystick.leftTrigger().onTrue(new ClimbDown(climber));
+        joystick.leftTrigger().onTrue(new climbDown(climber));
         joystick.rightTrigger().onTrue(new ClimbLvl1(climber));
         joystick.leftBumper().onTrue(new ClimbLvl2(climber));
         joystick.rightBumper().onTrue(new ClimbLvl3(climber));
         
-        joystick.y().onTrue(new DeployIntake(intake));
-        joystick.x().onTrue(new RetractIntake(intake));
-        joystick.a().whileTrue(new RunIntake(intake));
-        joystick.b().whileTrue(new RunOuttake(intake));
+        joystick.y().onTrue(new deployIntake(intake));
+        joystick.x().onTrue(new retractIntake(intake));
+        joystick.a().whileTrue(new runIntake(intake));
+        joystick.b().whileTrue(new runOuttake(intake));
 
-        joystick.povDown().onTrue(new SpinToSpeed(turret, 0));
-        joystick.povLeft().onTrue(new SpinToSpeed(turret, 400));
-        joystick.povRight().onTrue(new SpinToSpeed(turret, 800));
-        joystick.povUp().whileTrue(new Shoot(turret, trigger));
+        joystick.povDown().onTrue(new spinToSpeed(turret, 0));
+        joystick.povLeft().onTrue(new spinToSpeed(turret, 400));
+        joystick.povRight().onTrue(new spinToSpeed(turret, 800));
+        joystick.povUp().whileTrue(new shoot(turret, trigger));
 
         turret.setDefaultCommand(new ManualTurret(turret, joystick::getLeftX));
     }
