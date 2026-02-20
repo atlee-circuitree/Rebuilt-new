@@ -99,6 +99,12 @@ public class Turret extends SubsystemBase {
     return motorLeft.getVelocity().getValueAsDouble(); // TODO replace with math
   }
 
+  public void runAtPower(double power)
+  {
+    motorLeft.set(power);
+    motorRight.set(power);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
