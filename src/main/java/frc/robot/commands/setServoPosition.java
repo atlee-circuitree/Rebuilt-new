@@ -6,15 +6,14 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.util.HitecServo;
-import frc.robot.util.LRServo;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class setServoPosition extends Command {
   /** Creates a new setServoPosition. */
-  private final HitecServo m_servo;
   private final double m_targetPosition;
-  public setServoPosition(HitecServo hitecServo, double position) {
-    m_servo = hitecServo;
+  
+  public setServoPosition(HitecServo util, double position) {
+    //m_servo = util;
     m_targetPosition = position;
     // Use addRequirements() here to declare subsystem dependencies.
 
@@ -23,7 +22,7 @@ public class setServoPosition extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_servo.setPosition(m_targetPosition);
+   // m_servo.setPosition(m_targetPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

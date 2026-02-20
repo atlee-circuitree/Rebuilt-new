@@ -8,10 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,8 +20,8 @@ import frc.robot.commands.runIntake;
 import frc.robot.commands.setServoPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LimelightHelpers;
-//import frc.robot.util.LRServo;
+import frc.robot.util.HitecServo;
+import frc.robot.util.ServoSystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -40,16 +37,13 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
 import frc.robot.subsystems.intake;
-import frc.robot.subsystems.LimelightHelpers.PoseEstimate;
-import frc.robot.util.HitecServo;
 
 public class RobotContainer {
     
     private final Field2d field;
 
-    //private final LRServo m_servoSubsystem = new LRServo(0);
+    private final ServoSystem m_servoSubsystem = new ServoSystem();
     private final intake intake = new intake();
-    private final HitecServo hitecServo = new HitecServo(1);
     //private final SendableChooser<Command> autoChooser;
 
 
@@ -67,15 +61,18 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(1);
+    private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
 
-    SwerveDriveState currentState = drivetrain.getState();
     field = new Field2d();
-    field.setRobotPose(currentState.Pose);
+
+    // Define zones as bounding boxes
+    //boolean Zone0 = pose.getX() >= 491 && pose.getY() > 108;
+    //boolean Zone1 = pose.getX() > 14.0;
+
         SmartDashboard.putData("Field", field);
 
         // Logging callback for current robot pose
@@ -106,6 +103,8 @@ public class RobotContainer {
         : stream
     );
     SmartDashboard.putData("Auto Chooser", autoChooser);*/
+
+    
     
 
      // Load the RobotConfig from the GUI settings. You should probably
@@ -155,12 +154,12 @@ public class RobotContainer {
         
         
 
-        /*PathPlannerAuto autoCommand = new PathPlannerAuto("Example Auto");
+       // PathPlannerAuto autoCommand = new PathPlannerAuto("Example Auto");
         // PathPlannerAuto can also be created with a custom command
         // autoCommand = new PathPlannerAuto(new CustomAutoCommand());
 
         // Bind to different auto triggers
-        autoCommand.isRunning().onTrue(Commands.print("Example Auto started"));
+       /*  autoCommand.isRunning().onTrue(Commands.print("Example Auto started"));
         autoCommand.timeElapsed(5).onTrue(Commands.print("5 seconds passed"));
         autoCommand.timeRange(6, 8).whileTrue(Commands.print("between 6 and 8 seconds"));
         autoCommand.event("Example Event Marker").onTrue(Commands.print("passed example event marker"));
@@ -168,7 +167,7 @@ public class RobotContainer {
         autoCommand.activePath("Example Path").onTrue(Commands.print("started following Example Path"));
         autoCommand.nearFieldPosition(new Translation2d(2, 2), 0.5).whileTrue(Commands.print("within 0.5m of (2, 2)"));
         autoCommand.inFieldArea(new Translation2d(2, 2), new Translation2d(4, 4)).whileTrue(Commands.print("in area of (2, 2) - (4, 4)"));
-*/
+        */
 
         
         
@@ -176,18 +175,10 @@ public class RobotContainer {
         configureBindings();
 
     }
-    public void Periodic() {
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.localize(drivetrain);
-        drivetrain.savePose(mt2);
-        
-        field.setRobotPose(drivetrain.getState().Pose);
-        SmartDashboard.putData("Field", field);
-    }
 
-    public Command getAutonomousCommand() {
-        return null;
-        //return autoChooser.getSelected();
-    }
+    //public Command getAutonomousCommand() {
+   // return autoChooser.getSelected();
+    //}
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
@@ -213,23 +204,20 @@ public class RobotContainer {
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
-        //joystick.x().onTrue(new setServoPosition(m_servoSubsystem, 0.0));
-        //joystick.y().onTrue(new setServoPosition(m_servoSubsystem, 1.0));
-        //joystick.setRumble(RumbleType.kBothRumble, 1);
+        //  joystick.x().whileTrue(new setServoPosition(Util, HitecServo));
+        //joystick.y().whileTrue(new setServoPosition(, HitecServo.k_closedPosition));
+        joystick.setRumble(RumbleType.kBothRumble, 1);
 
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        /*joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        */
-        // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(new runIntake(intake, 0.5));
 
-        joystick.x().onTrue(new setServoPosition(hitecServo, 0));
-        joystick.y().onTrue(new setServoPosition(hitecServo, 1));
+        // reset the field-centric heading on left bumper press
+        //joystick.leftBumper().onTrue(new runIntake(intake, 0.5));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
