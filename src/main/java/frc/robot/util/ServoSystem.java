@@ -11,7 +11,7 @@ public class ServoSystem extends SubsystemBase {
   /** Creates a new Servo. */
 
   // Create a Servo object for port 0
-  private final Servo m_exampleServo = new Servo(0);
+  private final Servo m_exampleServo = new Servo(1);
   
    // Define constants for specific positions (optional, but good practice)
   public static final double k_openPosition = 0.0; // 0 degrees

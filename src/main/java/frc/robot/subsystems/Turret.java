@@ -25,9 +25,9 @@ public class Turret extends SubsystemBase {
 
   /** Creates a new Turret. */
   public Turret() {
-    motorLeft = new TalonFX(Constants.CAN_IDS.turretMotorLeft, "1599-B");
-    motorRight = new TalonFX(Constants.CAN_IDS.turretMotorRight, "1599-B");
-    motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator, "1599-B");
+    //motorLeft = new TalonFX(Constants.CAN_IDS.turretMotorLeft, "1599-B");
+    //motorRight = new TalonFX(Constants.CAN_IDS.turretMotorRight, "1599-B");
+    //motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator, "1599-B");
 
     motorHoodLeft = new Servo(Constants.Channels.motorHoodLeft);
     motorHoodRight = new Servo(Constants.Channels.motorHoodRight);
