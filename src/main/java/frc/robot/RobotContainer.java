@@ -13,14 +13,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.runIntake;
-import frc.robot.commands.setServoPosition;
+import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.util.HitecServo;
+import frc.robot.subsystems.*;
 import frc.robot.util.ServoSystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -36,14 +38,21 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
-import frc.robot.subsystems.intake;
+import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
-    
+
+    // subsystems
+    private Climber climber;
+    private CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private Intake intake;
+    private Trigger trigger;
+    private Turret turret;
+
+    // drivetrain
     private final Field2d field;
 
     private final ServoSystem m_servoSubsystem = new ServoSystem();
-    private final intake intake = new intake();
     //private final SendableChooser<Command> autoChooser;
 
 
@@ -58,140 +67,40 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
+    // IO devices
     private final CommandXboxController joystick = new CommandXboxController(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
     public RobotContainer() {
+        field = new Field2d();
+        climber = new Climber();
+        intake = new Intake();
+        trigger = new Trigger();
+        turret = new Turret();
 
-    field = new Field2d();
-
-    // Define zones as bounding boxes
-    //boolean Zone0 = pose.getX() >= 491 && pose.getY() > 108;
-    //boolean Zone1 = pose.getX() > 14.0;
-
-        SmartDashboard.putData("Field", field);
-
-        // Logging callback for current robot pose
-        PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
-            // Do whatever you want with the pose here
-            field.setRobotPose(pose);
-        });
-
-        // Logging callback for target robot pose
-        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-            // Do whatever you want with the pose here
-            field.getObject("target pose").setPose(pose);
-        });
-
-        // Logging callback for the active path, this is sent as a list of poses
-        PathPlannerLogging.setLogActivePathCallback((poses) -> {
-            // Do whatever you want with the poses here
-            field.getObject("path").setPoses(poses);
-        });
-    
-       
-
-     boolean isCompetition = true;
-
-    /*autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
-      (stream) -> isCompetition
-        ? stream.filter(auto -> auto.getName().startsWith("comp"))
-        : stream
-    );
-    SmartDashboard.putData("Auto Chooser", autoChooser);*/
-
-    
-    
-
-     // Load the RobotConfig from the GUI settings. You should probably
-    // store this in your Constants file
-    RobotConfig config;
-    try{
-      config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-    }
-
-    // Configure AutoBuilder last
-    /*AutoBuilder.configure(
-            this::getPose, // Robot pose supplier
-            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-            ),
-            config, // The robot configuration
-            () -> {
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this // Reference to this subsystem to set requirements
-    );*/
-            
-        // Subsystem initialization
-        
-
-        // Register Named Commands
-        //NamedCommands.registerCommand("SlopeShoot", Command SlopeShoot());
-        //NamedCommands.registerCommand("MoveForwardAuto", Command MoveForwardAuto());
-        
-        
-
-        
-        
-
-       // PathPlannerAuto autoCommand = new PathPlannerAuto("Example Auto");
-        // PathPlannerAuto can also be created with a custom command
-        // autoCommand = new PathPlannerAuto(new CustomAutoCommand());
-
-        // Bind to different auto triggers
-       /*  autoCommand.isRunning().onTrue(Commands.print("Example Auto started"));
-        autoCommand.timeElapsed(5).onTrue(Commands.print("5 seconds passed"));
-        autoCommand.timeRange(6, 8).whileTrue(Commands.print("between 6 and 8 seconds"));
-        autoCommand.event("Example Event Marker").onTrue(Commands.print("passed example event marker"));
-        autoCommand.pointTowardsZone("Speaker").onTrue(Commands.print("aiming at speaker"));
-        autoCommand.activePath("Example Path").onTrue(Commands.print("started following Example Path"));
-        autoCommand.nearFieldPosition(new Translation2d(2, 2), 0.5).whileTrue(Commands.print("within 0.5m of (2, 2)"));
-        autoCommand.inFieldArea(new Translation2d(2, 2), new Translation2d(4, 4)).whileTrue(Commands.print("in area of (2, 2) - (4, 4)"));
-        */
-
-        
-        
         // Do all other initialization
         configureBindings();
-
     }
 
-    //public Command getAutonomousCommand() {
-   // return autoChooser.getSelected();
-    //}
+    public Command getAutonomousCommand() {
+        return null;
+    }
 
-    private void configureBindings() {
+    private void configureDrivetrain()
+    {
+        // drivetrain
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
+                                                                                                   // negative Y
+                                                                                                   // (forward)
+                        .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with
+                                                                                    // negative X (left)
+        ));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -222,5 +131,28 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-     
+    private void configureBindings() {
+        //configureDrivetrain();
+
+        // actual buttons for systems testing
+        joystick.leftTrigger().onTrue(new climbDown(climber));
+        joystick.rightTrigger().onTrue(new ClimbLvl1(climber));
+        joystick.leftBumper().onTrue(new ClimbLvl2(climber));
+        joystick.rightBumper().onTrue(new ClimbLvl3(climber));
+        
+        joystick.y().onTrue(new deployIntake(intake));
+        joystick.x().onTrue(new retractIntake(intake));
+        joystick.a().whileTrue(new runIntake(intake));
+        joystick.b().whileTrue(new runOuttake(intake));
+
+        joystick.povDown().onTrue(new spinToSpeed(turret, 0));
+        joystick.povRight().onTrue(new spinToSpeed(turret, 800));
+        joystick.povUp().whileTrue(new shoot(turret, trigger));
+
+        joystick.povLeft().onTrue(new ClimberDoor(climber, !climber.doorStatus()));
+        joystick.start().onTrue(new DeployClimber(climber, !climber.deployStatus()));
+
+        turret.setDefaultCommand(new ManualTurret(turret, joystick::getLeftX));
+    }
+
 }

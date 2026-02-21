@@ -4,27 +4,30 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
-import frc.robot.subsystems.Intake;
+import java.util.function.Supplier;
 
-public class runIntake extends Command {
-  Intake intake;
-  
-  public runIntake(Intake in) {
-   intake = in;
-   addRequirements(in);
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Turret;
+
+public class ManualTurret extends Command {
+  private Turret turret;
+  private Supplier<Double> speed;
+
+  public ManualTurret(Turret turret, Supplier<Double> speed) {
+    this.turret = turret;
+    this.speed = speed;
+    addRequirements(turret);
   }
 
   @Override
-  public void initialize() {
-    intake.intake();
+  public void execute()
+  {
+    turret.rotate(speed.get());
   }
 
   @Override
   public void end(boolean interrupted) {
-    intake.stopWheels();
+    turret.stopRotator();
   }
 
   @Override

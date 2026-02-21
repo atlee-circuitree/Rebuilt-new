@@ -8,18 +8,25 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
-
   private TalonFX motorLeft;
   private TalonFX motorRight;
-  /** Creates a new Climber. */
-  public Climber() {
+  private Servo door;
+  private Servo deploy;
+  private boolean doorStatus; // true = open
+  private boolean deployStatus; // true = out
 
-    //motorLeft = new TalonFX(Constants.CAN_IDS.climberMotorLeft, "1599-B");
-    //motorRight = new TalonFX(Constants.CAN_IDS.climberMotorRight, "1599-B");
+  public Climber() {
+    motorLeft = new TalonFX(Constants.CAN_IDS.climberMotorLeft);
+    motorRight = new TalonFX(Constants.CAN_IDS.climberMotorRight);
+    door = new Servo(Constants.Channels.door);
+    deploy = new Servo(Constants.Channels.deploy);
+    doorStatus = false;
+    deployStatus = false;
 
     Slot0Configs slot0Configs = new Slot0Configs();
     slot0Configs.kP = 2.4; // An error of 1 rotation results in 2.4 V output
@@ -28,22 +35,47 @@ public class Climber extends SubsystemBase {
 
     motorLeft.getConfigurator().apply(slot0Configs);
     motorRight.getConfigurator().apply(slot0Configs);
-
   }
 
   public void setPosition(double position) {
-    final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
     position = position; // TODO replace with math
-    motorLeft.setControl(m_request.withPosition(position));
-    motorRight.setControl(m_request.withPosition(position));
+    final PositionVoltage m_request = new PositionVoltage(position).withSlot(0);
+    motorLeft.setControl(m_request);
+    motorRight.setControl(m_request);
   }
 
   public double getPosition() {
-    return 0;
+    return motorLeft.getPosition().getValueAsDouble(); // TODO replace with math
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void setDoor(boolean open)
+  {
+    if (open)
+      door.set(1);
+    else
+      door.set(0);
+    doorStatus = open;
+    
+  }
+
+   public void setDeploy(boolean out)
+  {
+    if (out)
+      deploy.set(1);
+    else
+      deploy.set(0);
+    deployStatus = out;
+  }
+
+  public boolean doorStatus()
+  {
+    return doorStatus;
+  }
+  
+  public boolean deployStatus()
+  {
+    return deployStatus;
   }
 }
+
+

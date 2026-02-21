@@ -5,21 +5,23 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Climber;
 
-public class climbDown extends Command {
+public class DeployClimber extends Command {
   private Climber climb;
+  private boolean out;
 
-  public climbDown(Climber climber) {
+  public DeployClimber(Climber climber, boolean out) {
     climb = climber;
+    this.out = out;
     addRequirements(climb);
   }
 
   @Override
   public void initialize() {
-    climb.setPosition(Constants.Climber.homePosition);
+    climb.setDeploy(out);
   }
 
   @Override
   public boolean isFinished() {
-    return Math.abs(climb.getPosition() - Constants.Climber.homePosition) < Constants.Climber.climbThreshold;
+    return true;
   }
 }
