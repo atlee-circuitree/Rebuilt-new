@@ -17,7 +17,8 @@ public class AutoTurret extends Command {
   private Rectangle2d Zone1 = new Rectangle2d(new Translation2d(204,216), new Translation2d(447, 108));
   private Rectangle2d Zone2 = new Rectangle2d(new Translation2d(204,108), new Translation2d(447, 0));
   private Rectangle2d Zone3 = new Rectangle2d(new Translation2d(491,108), new Translation2d(651, 0));
-
+  private Rectangle2d DeadZone1 = new Rectangle2d(new Translation2d(211, 187), new Translation2d(258,128));
+  private Rectangle2d DeadZone2 = new Rectangle2d(new Translation2d(498, 187), new Translation2d(545,128));
 
 
     private class Point {
@@ -45,11 +46,9 @@ public class AutoTurret extends Command {
     addRequirements(trigger);
 
     table = new HashMap<>();
-    table.put(0, new Point(0, 0));
-    table.put(1, new Point(0, 0));
-    table.put(2, new Point(0, 0));
-    table.put(3, new Point(0, 0));
-    table.put(4, new Point(0, 0));
+    table.put(0, new Point(91, 269));
+    table.put(1, new Point(91, 47));
+    table.put(2, new Point(182, 158));
   }
 
   private int getZone(Pose2d pose)
@@ -73,7 +72,17 @@ public class AutoTurret extends Command {
 
   private boolean isInDeadZone (Pose2d pose)
   {
-    return false;  
+  
+    double x = pose.getX();
+    double y = pose.getY();
+    
+    if (DeadZone1.contains(new Translation2d(x, y))) {
+      return true;
+    } else if (DeadZone2.contains(new Translation2d(x, y))) {
+      return true;
+    }
+    
+    return false;
   }
 
   @Override
@@ -81,17 +90,21 @@ public class AutoTurret extends Command {
   {
     Pose2d pose = drivetrain.getState().Pose;
     int zone = getZone(pose);
-    table.put(0, new Point(91, 269));
-    table.put(1, new Point(91, 47));
-    table.put(2, new Point(182, 158));
+    
     Point target = table.get(zone);
     if (isInDeadZone(pose))
     {
         turret.runAtPower(0.2);
+        
         trigger.stop();
     }
     else
     {
+        if (getZone(pose) == 4) {
+          turret.setHoodPosition(0);
+        } else {
+          turret.setHoodPosition(1);
+        }
         double dist = Math.sqrt(Math.pow(pose.getX() - target.x, 2) + Math.pow(pose.getY() - target.y, 2));
         double angle = Math.atan2(pose.getY() - target.y, pose.getX() - target.x);
         angle -= pose.getRotation().getRadians();

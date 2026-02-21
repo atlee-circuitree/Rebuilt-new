@@ -9,26 +9,26 @@ package frc.robot;
 public class Constants {
 
     public class CAN_IDS {
-        public static final int wristMotor = 31;
-        public static final int wristEncoder = 3;
-        public static final int intakeMotorLeft = 4;
-        public static final int intakeMotorRight = 6;
+        public static final int wristMotor = 1;
+        public static final int wristEncoder = 2;
+        public static final int intakeMotorLeft = 3;
+        public static final int intakeMotorRight = 4;
         public static final int deployMotor = 5;
-        public static final int turretMotorRight = 7;
-        public static final int turretMotorLeft = 8;
-        public static final int turretMotorRotator = 9;
-        public static final int triggerMotor = 10;
-        public static final int tankMotorLeft = 11;
-        public static final int tankMotorRight = 12;
-        public static final int climberMotorLeft = 13;
-        public static final int climberMotorRight = 14;
+        public static final int turretMotorRight = 6;
+        public static final int turretMotorLeft = 7;
+        public static final int turretMotorRotator = 8;
+        public static final int triggerMotor = 9;
+        public static final int tankMotorLeft = 10;
+        public static final int tankMotorRight = 11;
+        public static final int climberMotorLeft = 12;
+        public static final int climberMotorRight = 13;
     }
     
     public class Channels {
         public static final int motorHoodLeft = 1;
         public static final int motorHoodRight = 2;
-        public static final int door = -1;
-        public static final int deploy = -1;
+        public static final int door = 3;
+        public static final int deploy = 4;
     }
 
     public class Wrist {
