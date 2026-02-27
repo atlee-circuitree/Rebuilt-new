@@ -10,9 +10,10 @@ public class LinearServo extends Servo {
     double curPos;
 
     public LinearServo(int channel, int minPulse, int maxPulse) {
-        super(0);
+        super(channel);
         setBoundsMicroseconds(maxPulse, 0, 0, 0, minPulse);
         curPos = 0;
+        
         setPosition(curPos);
     }
 

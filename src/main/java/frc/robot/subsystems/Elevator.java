@@ -173,8 +173,8 @@ public class Elevator extends SubsystemBase {
             startSimThread();
         }
 
-        door = new ActuonixServo(Constants.Channels.door);
-        deploy = new ActuonixServo(Constants.Channels.deploy);
+        //door = new ActuonixServo(Constants.Channels.door);
+        //deploy = new ActuonixServo(Constants.Channels.deploy);
         doorStatus = false;
         deployStatus = false;
     }

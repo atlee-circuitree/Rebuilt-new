@@ -4,6 +4,6 @@ public class ActuonixServo extends LinearServo
 {
     public ActuonixServo(int channel)
     {
-        super(channel, 1000, 2000);
+        super(1, 1000, 2000);
     }
 }

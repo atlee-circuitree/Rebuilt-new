@@ -9,26 +9,26 @@ package frc.robot;
 public class Constants {
 
     public class CAN_IDS {
-        public static final int wristMotor = 13;
-        public static final int wristEncoder = 14;
-        public static final int intakeMotorLeft = 15;
-        public static final int intakeMotorRight = 16;
-        public static final int deployMotor = 17;
-        public static final int turretMotorRight = 18;
-        public static final int turretMotorLeft = 19;
-        public static final int turretMotorRotator = 20;
-        public static final int triggerMotor = 21;
-        public static final int tankMotorLeft = 22;
-        public static final int tankMotorRight = 23;
-        public static final int climberMotorLeft = 24;
-        public static final int climberMotorRight = 25;
+        public static final int wristMotor = 20;
+        public static final int wristEncoder = 21;
+        public static final int intakeMotorLeft = 22;
+        public static final int intakeMotorRight = 23;
+        public static final int deployMotor = 24;
+        public static final int turretMotorRight = 25;
+        public static final int turretMotorLeft = 26;
+        public static final int turretMotorRotator = 27;
+        public static final int triggerMotor = 28;
+        public static final int tankMotorLeft = 29;
+        public static final int tankMotorRight = 30;
+        public static final int climberMotorLeft = 31;
+        public static final int climberMotorRight = 32;
     }
     
     public class Channels {
-        public static final int motorHoodLeft = 1;
-        public static final int motorHoodRight = 2;
-        public static final int door = 3;
-        public static final int deploy = 4;
+        public static final int motorHoodLeft = 0;
+        public static final int motorHoodRight = 1;
+        public static final int door = 2;
+        public static final int deploy = 3;
     }
 
     public class Wrist {

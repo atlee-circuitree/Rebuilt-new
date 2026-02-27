@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.util.LinearServo;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -37,7 +36,6 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
-import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
 
@@ -81,9 +79,12 @@ public class RobotContainer {
         configureBindings();
     }
 
-    public Command getAutonomousCommand() {
-        return null;
-    }
+    /*public Command getAutonomousCommand() {
+    // This method loads the auto when it is called, however, it is recommended
+    // to first load your paths/autos when code starts, then return the
+    // pre-loaded auto/path
+    return new PathPlannerAuto("FullNudge");
+    }*/
 
     private void configureDrivetrain()
     {
@@ -111,8 +112,7 @@ public class RobotContainer {
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
-        //  joystick.x().whileTrue(new setServoPosition(Util, HitecServo));
-        //joystick.y().whileTrue(new setServoPosition(, HitecServo.k_closedPosition));
+        
         joystick.setRumble(RumbleType.kBothRumble, 1);
 
 
