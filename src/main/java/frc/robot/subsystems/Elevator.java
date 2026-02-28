@@ -13,7 +13,9 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -28,6 +30,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -61,8 +64,9 @@ public class Elevator extends SubsystemBase {
             this.targetDist = target;
         }
     }
-
-    private LinearServo door;
+    
+    private CANcoder climberEncoder;
+    private Servo door;
     private LinearServo deploy;
     private boolean doorStatus; // true = open
     private boolean deployStatus; // true = out
@@ -155,7 +159,14 @@ public class Elevator extends SubsystemBase {
                             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(4.7407407407407405))
                             .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(23.703703703703702)));
 
+        private CANcoder cancoder;
+
     public Elevator() {
+
+        cancoder = new CANcoder(Constants.CAN_IDS.climberEncoder);
+
+        motor_id_20Configs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        motor_id_20Configs.Feedback.FeedbackRemoteSensorID = climberEncoder.getDeviceID();
         for (int i = 0; i < kNumConfigAttempts; ++i) {
             var status = motor_id_20.getConfigurator().apply(motor_id_20Configs);
             if (status.isOK())
@@ -173,10 +184,16 @@ public class Elevator extends SubsystemBase {
             startSimThread();
         }
 
-        //door = new ActuonixServo(Constants.Channels.door);
-        //deploy = new ActuonixServo(Constants.Channels.deploy);
+        door = new Servo(Constants.Channels.door);
+        deploy = new ActuonixServo(Constants.Channels.deploy);
+        climberEncoder = new CANcoder(Constants.CAN_IDS.climberEncoder);
+        //motor_id_20.setPosition(climberEncoder.getAbsolutePosition().getValue());
         doorStatus = false;
         deployStatus = false;
+        setDeploy(false);
+        setDoor(false);
+
+
     }
 
     /**
@@ -304,9 +321,9 @@ public class Elevator extends SubsystemBase {
 
     public void setDoor(boolean open) {
         if (open)
-            door.set(1);
-        else
             door.set(0);
+        else
+            door.set(0.333333333333333333333333333);
         doorStatus = open;
 
     }

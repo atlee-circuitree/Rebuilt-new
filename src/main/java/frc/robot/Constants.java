@@ -23,6 +23,7 @@ public class Constants {
         public static final int climberMotor = 31;
         public static final int deployEncoder = 32;
         public static final int climberEncoder = 33;
+        public static final int turretEncoder = -1;
     }
     
     public class Channels {

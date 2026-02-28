@@ -5,9 +5,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,6 +26,7 @@ public class Turret extends SubsystemBase {
   private TalonFX motorRotator;
   private LinearServo motorHoodLeft;
   private LinearServo motorHoodRight;
+  private CANcoder turretEncoder;
   private double targetVelocity;
   private final double gearRatio;
 
@@ -39,7 +43,13 @@ public class Turret extends SubsystemBase {
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0.1; // A velocity of 1 rps results in 0.1 V output
 
+    turretEncoder = new CANcoder(Constants.CAN_IDS.turretEncoder);
+
     motorRotator.getConfigurator().apply(slot0Configs);
+    TalonFXConfiguration conf = new TalonFXConfiguration();
+    conf.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    conf.Feedback.FeedbackRemoteSensorID = turretEncoder.getDeviceID();
+    motorRotator.getConfigurator().apply(conf);
 
     Slot0Configs spinMotorConfigs = new Slot0Configs();
     spinMotorConfigs.kP = 2.4; // An error of 1 rotation results in 2.4 V output
