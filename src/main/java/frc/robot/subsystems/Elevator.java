@@ -184,8 +184,7 @@ public class Elevator extends SubsystemBase {
             startSimThread();
         }
 
-        door = new Servo(Constants.Channels.door);
-        deploy = new ActuonixServo(Constants.Channels.deploy);
+    
         climberEncoder = new CANcoder(Constants.CAN_IDS.climberEncoder);
         //motor_id_20.setPosition(climberEncoder.getAbsolutePosition().getValue());
         doorStatus = false;

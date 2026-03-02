@@ -15,7 +15,7 @@ public class Constants {
         public static final int kickUpMotor = 23;
         public static final int deployMotor = 24;
         public static final int turretMotorRight = 25;
-        public static final int turretMotorLeft = 26;
+        public static final int turretMotorLeft = 40;
         public static final int turretMotorRotator = 27;
         public static final int triggerMotor = 28;
         public static final int tankMotorLeft = 29;
@@ -28,8 +28,7 @@ public class Constants {
     public class Channels {
         public static final int motorHoodLeft = 0;
         public static final int motorHoodRight = 1;
-        public static final int door = 2;
-        public static final int deploy = 3;
+        public static final int deployEncoder = 7;
     }
 
     public class Wrist {
