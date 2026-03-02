@@ -8,54 +8,33 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6640843373493976,
-        "y": 2.6034698795180726
+        "x": 2.7733614457831326,
+        "y": 2.8329518072289157
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.566,
-        "y": 3.2700602409638555
+        "x": 1.1560602409638552,
+        "y": 2.690891566265061
       },
       "prevControl": {
-        "x": 2.678074340162458,
-        "y": 3.0465891191669896
-      },
-      "nextControl": {
-        "x": 2.453925659837542,
-        "y": 3.4935313627607214
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.4729638554216864,
-        "y": 3.4230481927710845
-      },
-      "prevControl": {
-        "x": 2.161409638554217,
-        "y": 3.335626506024097
+        "x": 1.975638554216867,
+        "y": 2.679963855421686
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.21742738589211738,
-      "rotationDegrees": 90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "climb",
-      "waypointRelativePos": 2.0,
+      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -70,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "BottomStarting",

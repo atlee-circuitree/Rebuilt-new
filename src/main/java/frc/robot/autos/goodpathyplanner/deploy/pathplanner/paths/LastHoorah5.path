@@ -8,27 +8,32 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.942855421686747,
-        "y": 0.691120481927711
+        "x": 1.341831325301205,
+        "y": 0.5272048192771093
       },
       "isLocked": false,
       "linkedName": "Last Hoorah Human"
     },
     {
       "anchor": {
-        "x": 1.7352289156626508,
-        "y": 3.805518072289157
+        "x": 1.123277108433735,
+        "y": 2.6034698795180726
       },
       "prevControl": {
-        "x": 1.6696626506024095,
-        "y": 0.2758674698795174
+        "x": 1.0467831325301202,
+        "y": 1.0954457831325293
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.7278008298755143,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
@@ -55,7 +60,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 1.0050860052542336
   },
   "reversed": false,
   "folder": "MiddleStarting",

@@ -8,36 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6478072289156627,
-        "y": 5.149626506024097
+        "x": 0.4129759036144581,
+        "y": 5.510240963855422
       },
       "isLocked": false,
       "linkedName": "Patch climb"
     },
     {
       "anchor": {
-        "x": 2.532951807228916,
-        "y": 4.799939759036144
+        "x": 1.123277108433735,
+        "y": 4.832722891566265
       },
       "prevControl": {
-        "x": 2.499838737775932,
-        "y": 5.346305405010384
-      },
-      "nextControl": {
-        "x": 2.5766626506024095,
-        "y": 4.078710843373494
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.4620361445783134,
-        "y": 3.9694337349397593
-      },
-      "prevControl": {
-        "x": 2.3471807228915655,
-        "y": 3.9147951807228916
+        "x": 1.2216265060240963,
+        "y": 6.275180722891566
       },
       "nextControl": null,
       "isLocked": false,
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 91.46880071438582
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "TopStarting",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 89.44374777291935
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
