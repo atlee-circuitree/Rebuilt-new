@@ -28,7 +28,6 @@ public class Constants {
     public class Channels {
         public static final int motorHoodLeft = 0;
         public static final int motorHoodRight = 1;
-        public static final int door = 2;
         public static final int deploy = 3;
     }
 

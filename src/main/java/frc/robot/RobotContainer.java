@@ -152,8 +152,6 @@ public class RobotContainer {
         joystick.povUp().whileTrue(new Shoot(turret, trigger));
 
         joystick.rightBumper().onTrue(new LineUpClimb(drivetrain));
-        joystick.povLeft().onTrue(new ClimberDoor(climber, !climber.doorStatus()));
-        joystick.start().onTrue(new DeployClimber(climber, !climber.deployStatus()));
 
 
         turret.setDefaultCommand(new ManualTurret(turret, joystick::getLeftX));
