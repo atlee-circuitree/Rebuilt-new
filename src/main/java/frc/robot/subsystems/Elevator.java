@@ -39,9 +39,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Elevator extends SubsystemBase {
     /** Position setpoints for the elevator. */
     public enum Setpoint {
-        Ground(Rotations.of(0.25)),
+        Starting(Rotations.of(0)),
         Middle(Rotations.of(1)),
-        Top(Rotations.of(2.985));
+        Top(Rotations.of(2.655));
 
         /** The position target of the setpoint in angular units. */
         public final Angle target;
@@ -61,17 +61,17 @@ public class Elevator extends SubsystemBase {
     private static final int kNumConfigAttempts = 2;
 
     private static final double kGearRatio = 45;
-    private static final Distance kDrumRadius = Meters.of(0.030733999999999997);
+    private static final Distance kDrumRadius = Meters.of(3.0734);
     private static final Distance kMaxHeight = Meters.of(0);
 
     /* leader and follower motors */
     private final CANBus kCANBus = new CANBus("1599-B");
-    private final TalonFX motor_id_28 = new TalonFX(28, kCANBus);
+    private final TalonFX motor_id_31 = new TalonFX(31, kCANBus);
 
     /* device status signals */
-    private final StatusSignal<Angle> motor_id_28Position = motor_id_28.getPosition(false);
-    private final StatusSignal<AngularVelocity> motor_id_28Velocity = motor_id_28.getVelocity(false);
-    private final StatusSignal<Current> motor_id_28TorqueCurrent = motor_id_28.getTorqueCurrent(false);
+    private final StatusSignal<Angle> motor_id_31Position = motor_id_31.getPosition(false);
+    private final StatusSignal<AngularVelocity> motor_id_31Velocity = motor_id_31.getVelocity(false);
+    private final StatusSignal<Current> motor_id_31TorqueCurrent = motor_id_31.getTorqueCurrent(false);
 
     /* controls used by the leader motors */
     private final MotionMagicVoltage setpointRequest = new MotionMagicVoltage(0);
@@ -82,12 +82,12 @@ public class Elevator extends SubsystemBase {
 
     /** Trigger to detect when the elevator drives into a hard stop. */
     public final Trigger isHardStop = new Trigger(() -> {
-        return motor_id_28Velocity.getValue().abs(RotationsPerSecond) < 1 &&
-            motor_id_28TorqueCurrent.getValue().abs(Amps) > 10;
+        return motor_id_31Velocity.getValue().abs(RotationsPerSecond) < 1 &&
+            motor_id_31TorqueCurrent.getValue().abs(Amps) > 10;
     }).debounce(0.1);
 
     /* simulation */
-    private final ElevatorSim elevatorSim_motor_id_28 = new ElevatorSim(
+    private final ElevatorSim elevatorSim_motor_id_31 = new ElevatorSim(
         DCMotor.getKrakenX60Foc(1),
         kGearRatio, 5, kDrumRadius.in(Meters),
         0.0, kMaxHeight.in(Meters), true, 0.0
@@ -99,8 +99,8 @@ public class Elevator extends SubsystemBase {
 
     /* Mechanism2d visualization of the elevator */
     private final Mechanism2d mech2d = new Mechanism2d(1, kMaxHeight.in(Meters));
-    private final MechanismLigament2d motor_id_28Mech2d = mech2d.getRoot("motor_id_28 Root", 0.500, 0)
-        .append(new MechanismLigament2d("motor_id_28", elevatorSim_motor_id_28.getPositionMeters(), 90));
+    private final MechanismLigament2d motor_id_31Mech2d = mech2d.getRoot("motor_id_31 Root", 0.500, 0)
+        .append(new MechanismLigament2d("motor_id_31", elevatorSim_motor_id_31.getPositionMeters(), 90));
 
     /** Configs common across all motors. */
     private static final TalonFXConfiguration motorInitialConfigs = new TalonFXConfiguration();
@@ -108,11 +108,11 @@ public class Elevator extends SubsystemBase {
     /** Configs common across just the leader motors. */
     private static final TalonFXConfiguration leaderInitialConfigs = motorInitialConfigs.clone();
 
-    /** Configs for {@link #motor_id_28}. */
-    private final TalonFXConfiguration motor_id_28Configs = leaderInitialConfigs.clone()
+    /** Configs for {@link #motor_id_31}. */
+    private final TalonFXConfiguration motor_id_31Configs = leaderInitialConfigs.clone()
         .withMotorOutput(
             leaderInitialConfigs.MotorOutput.clone()
-                .withNeutralMode(NeutralModeValue.Brake)
+                .withNeutralMode(NeutralModeValue.Coast)
         )
         .withCurrentLimits(
             leaderInitialConfigs.CurrentLimits.clone()
@@ -155,8 +155,9 @@ public class Elevator extends SubsystemBase {
 
     public Elevator() {
         for (int i = 0; i < kNumConfigAttempts; ++i) {
-            var status = motor_id_28.getConfigurator().apply(motor_id_28Configs);
-            if (status.isOK()) break;
+            var status = motor_id_31.getConfigurator().apply(motor_id_31Configs);
+            if (status.isOK()) 
+                break;
         }
 
 
@@ -172,25 +173,27 @@ public class Elevator extends SubsystemBase {
         }
     }
 
+  
+
     /**
      * @return The Position of the elevator
      */
     public Angle getPosition() {
-        return motor_id_28Position.getValue();
+        return motor_id_31Position.getValue();
     }
 
     /**
      * @return The Velocity of the elevator
      */
     public AngularVelocity getVelocity() {
-        return motor_id_28Velocity.getValue();
+        return motor_id_31Velocity.getValue();
     }
 
     /**
      * @return The TorqueCurrent of the elevator
      */
     public Current getTorqueCurrent() {
-        return motor_id_28TorqueCurrent.getValue();
+        return motor_id_31TorqueCurrent.getValue();
     }
 
     /**
@@ -200,9 +203,9 @@ public class Elevator extends SubsystemBase {
      */
     public Command holdPosition() {
         return runOnce(() ->
-            setpointRequest.withPosition(motor_id_28Position.getValue())
+            setpointRequest.withPosition(motor_id_31Position.getValue())
         ).andThen(run(() -> {
-            motor_id_28.setControl(setpointRequest);
+            motor_id_31.setControl(setpointRequest);
         }));
     }
 
@@ -215,7 +218,7 @@ public class Elevator extends SubsystemBase {
     public Command goToSetpoint(Supplier<Setpoint> setpoint) {
         return run(() -> {
             setpointRequest.withPosition(setpoint.get().target);
-            motor_id_28.setControl(setpointRequest);
+            motor_id_31.setControl(setpointRequest);
         });
     }
 
@@ -228,7 +231,7 @@ public class Elevator extends SubsystemBase {
     public Command manualDrive(DoubleSupplier manualOutput) {
         return run(() -> {
             manualRequest.withOutput(manualOutput.getAsDouble());
-            motor_id_28.setControl(manualRequest);
+            motor_id_31.setControl(manualRequest);
         });
     }
 
@@ -241,13 +244,13 @@ public class Elevator extends SubsystemBase {
      */
     public Command calibrateZero() {
         return run(() -> {
-            motor_id_28.setControl(calibrationRequest);
+            motor_id_31.setControl(calibrationRequest);
         })
         .until(isHardStop)
         .andThen(
             manualDrive(() -> 0.0).withTimeout(0.25)
                 .finallyDo(() -> {
-                    motor_id_28.setPosition(Rotations.of(0));
+                    motor_id_31.setPosition(Rotations.of(0));
                 })
         );
     }
@@ -256,19 +259,19 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         /* refresh all status signals */
         BaseStatusSignal.refreshAll(
-            motor_id_28Position,
-            motor_id_28Velocity,
-            motor_id_28TorqueCurrent
+            motor_id_31Position,
+            motor_id_31Velocity,
+            motor_id_31TorqueCurrent
         );
 
-        motor_id_28Mech2d.setLength(
-            motor_id_28Position.getValueAsDouble() * kDrumRadius.in(Meters) * 2 * Math.PI
+        motor_id_31Mech2d.setLength(
+            motor_id_31Position.getValueAsDouble() * kDrumRadius.in(Meters) * 2 * Math.PI
         );
     }
 
     private void startSimThread() {
-        motor_id_28.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
-        motor_id_28.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+        motor_id_31.getSimState().Orientation = ChassisReference.CounterClockwise_Positive;
+        motor_id_31.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 
         lastSimTime = Utils.getCurrentTimeSeconds();
 
@@ -279,21 +282,21 @@ public class Elevator extends SubsystemBase {
             final double deltaTime = currentTime - lastSimTime;
             lastSimTime = currentTime;
 
-            final var motor_id_28Sim = motor_id_28.getSimState();
+            final var motor_id_31Sim = motor_id_31.getSimState();
 
             /* First set the supply voltage of all the devices */
-            motor_id_28Sim.setSupplyVoltage(RobotController.getBatteryVoltage());
+            motor_id_31Sim.setSupplyVoltage(RobotController.getBatteryVoltage());
 
             /* Then calculate the new position and velocity of the simulated elevator */
-            elevatorSim_motor_id_28.setInputVoltage(motor_id_28Sim.getMotorVoltage());
-            elevatorSim_motor_id_28.update(deltaTime);
+            elevatorSim_motor_id_31.setInputVoltage(motor_id_31Sim.getMotorVoltage());
+            elevatorSim_motor_id_31.update(deltaTime);
 
             /* Apply the new rotor position and velocity to the motors (before gear ratio) */
-            motor_id_28Sim.setRawRotorPosition(
-                Radians.of(elevatorSim_motor_id_28.getPositionMeters() / kDrumRadius.in(Meters) * kGearRatio)
+            motor_id_31Sim.setRawRotorPosition(
+                Radians.of(elevatorSim_motor_id_31.getPositionMeters() / kDrumRadius.in(Meters) * kGearRatio)
             );
-            motor_id_28Sim.setRotorVelocity(
-                RadiansPerSecond.of(elevatorSim_motor_id_28.getVelocityMetersPerSecond() / kDrumRadius.in(Meters) * kGearRatio)
+            motor_id_31Sim.setRotorVelocity(
+                RadiansPerSecond.of(elevatorSim_motor_id_31.getVelocityMetersPerSecond() / kDrumRadius.in(Meters) * kGearRatio)
             );
         });
         simNotifier.startPeriodic(kSimLoopPeriod);

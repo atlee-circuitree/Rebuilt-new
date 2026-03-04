@@ -18,12 +18,10 @@ public class Intake extends SubsystemBase {
   private TalonFX feedMotor;
   private TalonFX deployMotor;
   private final double gearRatio;
-  private DutyCycleEncoder pivotEncoder;
 
   public Intake() {
     feedMotor = new TalonFX(Constants.CAN_IDS.feedIntakeMotor, "FRC 1599B");
     deployMotor = new TalonFX(Constants.CAN_IDS.deployMotor, "FRC 1599B");
-    deployEncoder = new DutyCycleEncoder(Constants.Channels.deployEncoder);
 
 
     Slot0Configs slot0Configs = new Slot0Configs();
@@ -53,9 +51,7 @@ public class Intake extends SubsystemBase {
     feedMotor.set(Constants.Intake.intakeSpeed);
   }
 
-  public double getAngleEncoder() {
-    return (pivotEncoder.get() - Constants.) * 360;
-  }
+  
 
   public void outtake() {
     feedMotor.set(-Constants.Intake.intakeSpeed);
