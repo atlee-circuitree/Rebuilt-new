@@ -51,8 +51,8 @@ public class Constants {
         public static final double homePosition = 1;
         public static final double intakeSpeed = 1.0;
         public static final double intakeEncoderOffset = 0;
-        public static final double deployLowThreshold = .24;
-        public static final double deployHighThreshold = -.085;
+        public static final double deployLowThreshold = 0;
+        public static final double deployHighThreshold = .3;
     }
 
     public class Climber {

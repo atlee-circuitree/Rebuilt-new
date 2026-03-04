@@ -29,32 +29,37 @@ public class Intake extends SubsystemBase {
 
 
     Slot0Configs slot0Configs = new Slot0Configs();
-    slot0Configs.kP = 0.8; // An error of 1 rotation results in 2.4 V output
+    slot0Configs.kP = 0.3; // An error of 1 rotation results in 2.4 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0.1; // A velocity of 1 rps results in 0.1 V output
 
     deployMotor.getConfigurator().apply(slot0Configs);
     feedMotor.getConfigurator().apply(slot0Configs);
-    gearRatio = 9;
+    gearRatio = 45;
   }
 
   public void deploy() {
     // position unit is rotations of the motor
     
 
-    if (getAngleEncoder() <= Constants.Intake.deployLowThreshold) {
+    if (getAngleEncoder() >= Constants.Intake.deployLowThreshold) {
       deployMotor.set(0);
-    } else if (getAngleEncoder() >= Constants.Intake.deployHighThreshold) {
+    } else if (getAngleEncoder() <= Constants.Intake.deployHighThreshold) {
       deployMotor.set(0);
     } else {
-    deployMotor.setPosition(.24);
+      deployMotor.setPosition(.285);
     }
   }
 
   public void retract() {
     // no math needed because it is zero
-    final PositionVoltage m_request = new PositionVoltage(.23);
-    deployMotor.setControl(m_request);
+     if (getAngleEncoder() >= Constants.Intake.deployLowThreshold) {
+      deployMotor.set(0);
+    } else if (getAngleEncoder() <= Constants.Intake.deployHighThreshold) {
+      deployMotor.set(0);
+    } else {
+      deployMotor.setPosition(.192);
+    }
   }
 
   public void intake() {
