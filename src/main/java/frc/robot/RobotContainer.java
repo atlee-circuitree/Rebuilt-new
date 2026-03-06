@@ -112,9 +112,6 @@ public class RobotContainer {
         Player1.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Player1.getLeftY(), -Player1.getLeftX()))
         ));
-        
-        Player1.setRumble(RumbleType.kBothRumble, 1);
-
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -128,7 +125,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        configureDrivetrain();
+        /*configureDrivetrain();
  drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> 
@@ -150,7 +147,7 @@ public class RobotContainer {
         Player1.rightTrigger().onTrue(new SequentialCommandGroup(
             new ClimbUp(climber),
             climber.holdPosition()
-        ));
+        ));*/
         
         /*Player1.y().onTrue(new DeployIntake(intake));
         Player1.x().onTrue(new RetractIntake(intake));
@@ -163,9 +160,11 @@ public class RobotContainer {
         Player1.start().and(Player1.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         */
         Player1.povDown().onTrue(new SpinToSpeed(turret, 0));
-        Player1.povRight().onTrue(new SpinToSpeed(turret, 1));
+        Player1.povRight().onTrue(new SpinToSpeed(turret, 25));
         Player1.povUp().onTrue(new TestShooter(turret, 0));
         Player1.povLeft().onTrue(new TestShooter(turret, 0.3));
+        
+        Player1.a().whileTrue(new Shoot(turret, trigger));
 
         //Player1.rightBumper().onTrue(new LineUpClimb(drivetrain));
 

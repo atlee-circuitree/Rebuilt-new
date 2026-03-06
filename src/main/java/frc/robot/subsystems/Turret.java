@@ -52,9 +52,9 @@ public class Turret extends SubsystemBase {
     motorRotator.getConfigurator().apply(conf);
 
     Slot0Configs spinMotorConfigs = new Slot0Configs();
-    spinMotorConfigs.kP = 0.2; // An error of 1 rotation results in 2.4 V output
+    spinMotorConfigs.kP = 0.4; // An error of 1 rotation results in 2.4 V output
     spinMotorConfigs.kI = 0; // no output for integrated error
-    spinMotorConfigs.kD = 0.1; // A velocity of 1 rps results in 0.1 V output
+    spinMotorConfigs.kD = 0; // A velocity of 1 rps results in 0.1 V output
 
     motorLeft.getConfigurator().apply(spinMotorConfigs);
     motorRight.getConfigurator().apply(spinMotorConfigs);
@@ -86,7 +86,7 @@ public class Turret extends SubsystemBase {
   public void spin(double speed) {
     // velocity unit is rev per sec of the motor
     targetVelocity = speed; // gear ratio is 1:1 so no math needed
-    final VelocityVoltage m_request = new VelocityVoltage(targetVelocity).withSlot(0);
+    final VelocityVoltage m_request = new VelocityVoltage(targetVelocity).withFeedForward(0).withSlot(0);
     motorLeft.setControl(m_request);
     motorRight.setControl(m_request);
   }
@@ -124,6 +124,12 @@ public class Turret extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Turret Motor Right Speed", motorRight.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Turret Motor Left Speed", motorLeft.getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Right Voltage", motorRight.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber("Left Voltage", motorLeft.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber("Right Current", motorRight.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("Left Current", motorLeft.getStatorCurrent().getValueAsDouble());
+
+
     SmartDashboard.putNumber("Turret Motor Rotator Speed", motorRotator.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Turret Position", motorRotator.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("cancoder", turretEncoder.getPosition().getValueAsDouble());
