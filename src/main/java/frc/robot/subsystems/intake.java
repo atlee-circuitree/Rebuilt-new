@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -32,49 +33,30 @@ public class Intake extends SubsystemBase {
 
 
     Slot0Configs slot0Configs = new Slot0Configs();
-    slot0Configs.kP = 0.3; // An error of 1 rotation results in 2.4 V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // A velocity of 1 rps results in 0.1 V output
+    slot0Configs.kP = 9.5; // An error of 1 rotation results in 2.4 V output
+    slot0Configs.kI = 0.0; // no output for integrated error
+    slot0Configs.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
     deployMotor.getConfigurator().apply(slot0Configs);
-    feedMotor.getConfigurator().apply(slot0Configs);
     gearRatio = 45;
   }
 
   public void deploy() {
-    // position unit is rotations of the motor
-    
-
-    if (getAngleEncoder() <= Constants.Intake.deployLowThreshold) {
-      deployMotor.set(0);
-    } else if (getAngleEncoder() >= Constants.Intake.deployHighThreshold) {
-      deployMotor.set(0);
-    } else {
-      runToPosition(.285);
-    }
+      runToPosition(.268);
   }
 
   public void retract() {
-    // no math needed because it is zero
-     if (getAngleEncoder() <= Constants.Intake.deployLowThreshold) {
-      deployMotor.set(0);
-    } else if (getAngleEncoder() >= Constants.Intake.deployHighThreshold) {
-      deployMotor.set(0);
-    } else {
-      runToPosition(.192);
-    }
+      runToPosition(0);
   }
 
   public void intake() {
-
     feedMotor.set(Constants.Intake.intakeSpeed);
   }
 
   public void runToPosition(double deg)
   {
-    pid.setSetpoint(deg);
-    double out = pid.calculate(getAngleEncoder());
-    deployMotor.set(out);
+    final PositionVoltage m_request = new PositionVoltage(deg).withFeedForward(0).withSlot(0);
+    deployMotor.setControl(m_request);
   }
 
   public double getAngleEncoder() {
@@ -91,9 +73,11 @@ public class Intake extends SubsystemBase {
     //feedMotor.set(0);
   }
 
-  
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Angle", getAngleEncoder());
+    SmartDashboard.putNumber("CANCODER Angle", deployEncoder.getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber("MOTOR Angle", deployMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("MOTOR votlage", deployMotor.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber("MOTOR current", deployMotor.getSupplyCurrent().getValueAsDouble());
   }
 }
