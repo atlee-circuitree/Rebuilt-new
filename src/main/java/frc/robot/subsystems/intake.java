@@ -51,7 +51,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void deploy() {
-      runToPosition(.268);
+      runToPosition(.343);
   }
 
   public void retract() {
