@@ -140,10 +140,8 @@ public class RobotContainer {
         drivetrain.seedFieldCentric();
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));*/
 
-        //Player1.rightBumper().onTrue(new ClimbUp(climber));
-        Player1.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        Player1.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        //Player1.leftBumper().onTrue(new ClimbDown(climber));
+        //Player1.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        //Player1.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         
         Player1.y().onTrue(new DeployIntake(intake));
         Player1.x().onTrue(new RetractIntake(intake));
@@ -153,7 +151,8 @@ public class RobotContainer {
         Player1.povDown().onTrue(new StopTurretWheels(turret));
         Player1.povRight().onTrue(new SpinToSpeed(turret, 40));
         Player1.povUp().onTrue(new ToggleHood(turret));
-        //Player1.povLeft().onTrue(new TestShooter(turret, 0.3));
+
+        turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player1.getLeftX(); }));
     }
 
 }

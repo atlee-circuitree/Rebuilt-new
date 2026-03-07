@@ -46,9 +46,10 @@ public class Constants {
     }
 
     public class Turret {
-        public static final double minAngle = 0;
-        public static final double maxAngle = 0;
+        public static final double minAngle = 20;
+        public static final double maxAngle = 80;
         public static final double shooterThreshold = 0;
+        public static final double angleThreshold = 4;
     }
 
     public class Intake {

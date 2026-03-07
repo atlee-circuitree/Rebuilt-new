@@ -7,22 +7,23 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
-public class ManualTurret extends Command {
+public class TurretTo extends Command {
   private Turret turret;
-  private Supplier<Double> speed;
+  private double ang;
 
-  public ManualTurret(Turret turret, Supplier<Double> speed) {
+  public TurretTo(Turret turret, double ang) {
     this.turret = turret;
-    this.speed = speed;
+    this.ang = ang;
     addRequirements(turret);
   }
 
   @Override
   public void execute()
   {
-    turret.rotate(speed.get());
+    turret.rotateTo(ang);
   }
 
   @Override
@@ -32,6 +33,6 @@ public class ManualTurret extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return Math.abs(turret.getAngle() - ang) < Constants.Turret.angleThreshold;
   }
 }

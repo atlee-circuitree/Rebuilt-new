@@ -25,7 +25,6 @@ public class Turret extends SubsystemBase {
   private TalonFX motorRight;
   private TalonFX motorRotator;
   private LinearServo motorHoodLeft;
-  private LinearServo motorHoodRight;
   private boolean hoodUp;
   private CANcoder turretEncoder;
   private double targetVelocity;
@@ -37,13 +36,12 @@ public class Turret extends SubsystemBase {
     motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator, "FRC 1599B");
 
     motorHoodLeft = new HiTecServo(Constants.Channels.motorHoodLeft);
-    //motorHoodRight = new HiTecServo(Constants.Channels.motorHoodRight);
     hoodUp = false;
 
     Slot0Configs slot0Configs = new Slot0Configs();
-    slot0Configs.kP = 0.2; // An error of 1 rotation results in 2.4 V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.1; // A velocity of 1 rps results in 0.1 V output
+    slot0Configs.kP = 0.1; // An error of 1 rotation results in 2.4 V output
+    slot0Configs.kI = 0.0; // no output for integrated error
+    slot0Configs.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
     turretEncoder = new CANcoder(Constants.CAN_IDS.turretEncoder, "FRC 1599B");
 
@@ -67,12 +65,10 @@ public class Turret extends SubsystemBase {
   }
 
   public void rotate(double speed) {
-    //if (speed < 0 && getAngle() > Constants.Turret.minAngle)
+    if (isSafe(speed))
       motorRotator.set(speed * 0.05);
-    //else if (speed > 0 && getAngle() < Constants.Turret.maxAngle)
-      //motorRotator.set(speed);
-    //else
-      //stopRotator();
+    else
+      stopRotator();
   }
 
   public void rotateTo(double degree) {
@@ -89,15 +85,9 @@ public class Turret extends SubsystemBase {
   public void setHoodPosition(boolean up) {
     hoodUp = up;
     if (hoodUp)
-    {
       motorHoodLeft.setPosition(0.8);
-      //motorHoodRight.setPosition(1.0);
-    }
     else
-    {
       motorHoodLeft.setPosition(0.0);
-      //motorHoodRight.setPosition(0.0);
-    }
   }
 
   public double getVelocity()
@@ -141,17 +131,25 @@ public class Turret extends SubsystemBase {
     motorRight.set(power);
   }
 
+  public boolean isSafe(double output)
+  {
+    if (output < 0 && getAngle() > Constants.Turret.minAngle)
+      return true;
+    else if (output > 0 && getAngle() < Constants.Turret.maxAngle)
+      return true;
+    else
+      return false;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Turret Motor Right Speed", motorRight.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Turret Motor Left Speed", motorLeft.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Right Voltage", motorRight.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber("Left Voltage", motorLeft.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber("Right Current", motorRight.getStatorCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("Left Current", motorLeft.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("turret angle", motorRotator.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("turret position", getAngle());
 
-
-   
+    /*
+    if (!isSafe(motorRotator.getMotorOutputStatus().getValueAsDouble())) // ALWAYS check for safety
+      stopRotator();
+    */
   }
 }
