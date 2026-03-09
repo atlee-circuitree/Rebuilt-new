@@ -50,7 +50,7 @@ public class RobotContainer {
     // drivetrain
     private final Field2d field;
 
-    //private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> autoChooser;
 
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) / 4; // kSpeedAt12Volts desired top speed
@@ -68,28 +68,40 @@ public class RobotContainer {
 
     // IO devices
     private final CommandXboxController Player1 = new CommandXboxController(0);
-
+    private final CommandXboxController Player2 = new CommandXboxController(1);
+    
     public RobotContainer() {
         field = new Field2d();
         climber = new Elevator();
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
+        autoChooser = AutoBuilder.buildAutoChooser();
 
+        boolean isCompetition = true;
         // Do all other initialization
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        mapEventsToCommands();
     }
 
-    /*public Command getAutonomousCommand() {
+    public void mapEventsToCommands()
+    {
+        // replace null with command instance
+        // do this for all commands
+        NamedCommands.registerCommand("Test Event", new RunIntake(intake));
+    }
+
+    public Command getAutonomousCommand() {
     // This method loads the auto when it is called, however, it is recommended
     // to first load your paths/autos when code starts, then return the
     // pre-loaded auto/path
-    return new PathPlannerAuto("FullNudge");
-    }*/
+        return autoChooser.getSelected();
+    }
 
-    private void configureDrivetrain()
-    {
+    private void configureDrivetrain() {
         // drivetrain
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -127,7 +139,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        /*configureDrivetrain();
+        configureDrivetrain();
  drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> 
@@ -138,13 +150,13 @@ public class RobotContainer {
         );
 
         drivetrain.seedFieldCentric();
-        Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));*/
+        Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         //Player1.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         //Player1.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         
-        Player1.y().onTrue(new DeployIntake(intake));
-        Player1.x().onTrue(new RetractIntake(intake));
+        //Player1.y().onTrue(new DeployIntake(intake));
+        //Player1.x().onTrue(new RetractIntake(intake));
         Player1.a().whileTrue(new RunIntake(intake));
         Player1.b().whileTrue(new Shoot(turret, trigger));
 
@@ -152,7 +164,21 @@ public class RobotContainer {
         Player1.povRight().onTrue(new SpinToSpeed(turret, 40));
         Player1.povUp().onTrue(new ToggleHood(turret));
 
-        turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player1.getLeftX(); }));
+        turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
+
+        Player2.y().onTrue(new DeployIntake(intake));
+        Player2.x().onTrue(new RetractIntake(intake));
+        //Player2.a().whileTrue(new RunIntake(intake));
+       // Player2.b().whileTrue(new Shoot(turret, trigger));
+
+      //  Player2.povDown().onTrue(new StopTurretWheels(turret));
+       // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
+       // Player2.povUp().onTrue(new ToggleHood(turret));
+
+       Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
+        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+
     }
 
 }
