@@ -20,6 +20,12 @@ public class DeployIntake extends Command {
     intake.deploy();
   }
 
+  @Override
+  public void end(boolean interrupted)
+  {
+    intake.holdPosition();
+  }
+
  @Override
   public boolean isFinished() {
     return true;

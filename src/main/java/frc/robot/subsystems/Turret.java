@@ -74,7 +74,7 @@ public class Turret extends SubsystemBase {
 
     targetVelocity = 0;
     gearRatio = 10;
-    setHoodPosition(true);
+
   }
 
   public void rotate(double speed) {
