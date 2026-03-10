@@ -33,12 +33,6 @@
           "data": {
             "pathName": "Push6"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Push7"
-          }
         }
       ]
     }

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.445301204819277,
+        "x": 3.5055180722891564,
         "y": 0.4725662650602419
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.986108433734939,
-        "y": 0.5818433734939765
+        "x": 4.784060240963855,
+        "y": 0.6474096385542167
       },
       "isLocked": false,
       "linkedName": null
@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 6.565277108433736,
-        "y": 0.6474096385542167
+        "y": 0.7348313253012042
       },
       "prevControl": {
         "x": 6.211999042686801,
-        "y": 0.5897315870036971
+        "y": 0.6771532737506846
       },
       "nextControl": {
         "x": 7.100734939759036,
-        "y": 0.7348313253012042
+        "y": 0.8222530120481917
       },
       "isLocked": false,
       "linkedName": null
@@ -73,6 +73,12 @@
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
+    {
+      "name": "deploy intake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
     {
       "name": "intake",
       "waypointRelativePos": 2.188089330024806,

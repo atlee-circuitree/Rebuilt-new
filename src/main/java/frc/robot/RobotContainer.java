@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.*;
-import frc.robot.generated.Pigeon;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LinearServo;
 import frc.robot.subsystems.*;
@@ -37,6 +36,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import frc.robot.Telemetry;
+import frc.robot.Constants.Speed;
 
 public class RobotContainer {
 
@@ -47,12 +47,11 @@ public class RobotContainer {
     private Trigger trigger;
     private Turret turret;
     private Trigger index;
-    private Pigeon pigeon;
 
     // drivetrain
     private final Field2d field;
 
-    //private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Command> autoChooser;
 
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) / 4; // kSpeedAt12Volts desired top speed
@@ -70,28 +69,49 @@ public class RobotContainer {
 
     // IO devices
     private final CommandXboxController Player1 = new CommandXboxController(0);
-
+    private final CommandXboxController Player2 = new CommandXboxController(1);
+    
     public RobotContainer() {
         field = new Field2d();
         climber = new Elevator();
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
+        autoChooser = AutoBuilder.buildAutoChooser();
 
+        boolean isCompetition = true;
         // Do all other initialization
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        mapEventsToCommands();
     }
 
-    /*public Command getAutonomousCommand() {
+    public void mapEventsToCommands()
+    {
+        // replace null with command instance
+        // do this for all commands
+        NamedCommands.registerCommand("intake", new RunIntake(intake));
+        NamedCommands.registerCommand("shoot",  new SpinToSpeed(turret, MaxSpeed));
+        NamedCommands.registerCommand("kickup", new Shoot(turret, trigger));
+        NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
+        NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
+        NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain));
+        NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
+        NamedCommands.registerCommand("toggle hood", new SetServoPosition(null, MaxAngularRate));
+        NamedCommands.registerCommand("climb up", new ClimbUp(climber));
+        NamedCommands.registerCommand("climb down", new ClimbDown(climber));
+    }
+
+    public Command getAutonomousCommand() {
     // This method loads the auto when it is called, however, it is recommended
     // to first load your paths/autos when code starts, then return the
     // pre-loaded auto/path
-    return new PathPlannerAuto("FullNudge");
-    }*/
+        return autoChooser.getSelected();
+    }
 
-    private void configureDrivetrain()
-    {
+    private void configureDrivetrain() {
         // drivetrain
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -129,7 +149,7 @@ public class RobotContainer {
 
 
     private void configureBindings() {
-        /*configureDrivetrain();
+        configureDrivetrain();
  drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> 
@@ -140,26 +160,35 @@ public class RobotContainer {
         );
 
         drivetrain.seedFieldCentric();
-        Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));*/
+        Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         //Player1.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         //Player1.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        Player1.rightTrigger().onTrue(new TurretTo(turret, 30));
-        Player1.leftTrigger().onTrue(new TurretTo(turret, 50));
-        Player1.start().onTrue(new TurretTo(turret, 86));
-
-        Player1.y().onTrue(new DeployIntake(intake));
-        Player1.x().onTrue(new RetractIntake(intake));
+        
+        //Player1.y().onTrue(new DeployIntake(intake));
+        //Player1.x().onTrue(new RetractIntake(intake));
         Player1.a().whileTrue(new RunIntake(intake));
-        //Player1.b().whileTrue(new Shoot(turret, trigger));
+        Player1.b().whileTrue(new Shoot(turret, trigger));
 
         Player1.povDown().onTrue(new StopTurretWheels(turret));
         Player1.povRight().onTrue(new SpinToSpeed(turret, 40));
         Player1.povUp().onTrue(new ToggleHood(turret));
 
-        Player1.b().onTrue(new ZeroTurret(turret));
+        turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
 
-        turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player1.getLeftX(); }));
+        Player2.x().onTrue(new DeployIntake(intake));
+        Player2.y().onTrue(new RetractIntake(intake));
+        //Player2.a().whileTrue(new RunIntake(intake));
+       // Player2.b().whileTrue(new Shoot(turret, trigger));
+
+      //  Player2.povDown().onTrue(new StopTurretWheels(turret));
+       // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
+       // Player2.povUp().onTrue(new ToggleHood(turret));
+
+        Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
+        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+
     }
 
 }

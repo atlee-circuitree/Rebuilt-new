@@ -10,6 +10,7 @@
   "autoFolders": [
     "BottomStart",
     "MiddleStarting",
+    "Test",
     "TopStarting"
   ],
   "defaultMaxVel": 3.0,
