@@ -176,8 +176,8 @@ public class RobotContainer {
 
         turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
 
-        Player2.y().onTrue(new DeployIntake(intake));
-        Player2.x().onTrue(new RetractIntake(intake));
+        Player2.x().onTrue(new DeployIntake(intake));
+        Player2.y().onTrue(new RetractIntake(intake));
         //Player2.a().whileTrue(new RunIntake(intake));
        // Player2.b().whileTrue(new Shoot(turret, trigger));
 
@@ -185,7 +185,7 @@ public class RobotContainer {
        // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
        // Player2.povUp().onTrue(new ToggleHood(turret));
 
-       Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
 
