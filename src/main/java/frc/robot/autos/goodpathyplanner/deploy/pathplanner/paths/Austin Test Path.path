@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Test Event",
+      "name": "intake",
       "waypointRelativePos": 0.32410533423361115,
       "endWaypointRelativePos": null,
       "command": null
@@ -52,7 +52,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "TopStarting",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
