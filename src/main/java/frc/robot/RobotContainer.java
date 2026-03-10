@@ -104,12 +104,12 @@ public class RobotContainer {
         NamedCommands.registerCommand("climb down", new ClimbDown(climber));
     }
 
-    public Command getAutonomousCommand() {
+    //public Command getAutonomousCommand() {
     // This method loads the auto when it is called, however, it is recommended
     // to first load your paths/autos when code starts, then return the
     // pre-loaded auto/path
-        return autoChooser.getSelected();
-    }
+        //return autoChooser.getSelected();
+    //}
 
     private void configureDrivetrain() {
         // drivetrain
@@ -171,7 +171,7 @@ public class RobotContainer {
         Player1.b().whileTrue(new Shoot(turret, trigger));
 
         Player1.povDown().onTrue(new StopTurretWheels(turret));
-        Player1.povRight().onTrue(new SpinToSpeed(turret, 40));
+        Player1.povRight().onTrue(new SpinToSpeed(turret, 80));
         Player1.povUp().onTrue(new ToggleHood(turret));
 
         turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));

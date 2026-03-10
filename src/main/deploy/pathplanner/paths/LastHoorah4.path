@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.614795180722891,
-        "y": 3.7508795180722894
+        "x": 0.522253012048193,
+        "y": 4.9638554216867465
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.489240963855421,
-        "y": 4.636024096385542
+        "x": 0.5550361445692659,
+        "y": 4.275409638554102
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Last hourrah climb"
     },
     {
       "anchor": {
-        "x": 0.8828674698795178,
-        "y": 5.007566265060241
+        "x": 0.522253012048193,
+        "y": 0.7239036144578312
       },
       "prevControl": {
-        "x": 1.7024457831325301,
-        "y": 4.854578313253012
+        "x": 0.5113253011957718,
+        "y": 1.7511084337349405
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Last Hoorah Human"
     }
   ],
   "rotationTargets": [],
@@ -33,13 +33,13 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "climb",
-      "waypointRelativePos": 1.0,
-      "endWaypointRelativePos": null,
+      "name": "shoot",
+      "waypointRelativePos": 0.5429280397022359,
+      "endWaypointRelativePos": 0.8605459057071954,
       "command": null
     },
     {
-      "name": "shoot",
+      "name": "stop",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
@@ -55,13 +55,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "MiddleStarting",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
