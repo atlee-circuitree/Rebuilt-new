@@ -161,7 +161,8 @@ public class RobotContainer {
 
         drivetrain.seedFieldCentric();
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+        
+        /*
         //Player1.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         //Player1.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         
@@ -187,7 +188,22 @@ public class RobotContainer {
 
         Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));*/
+
+        //Button Map
+
+        Player1.x().onTrue(new DeployIntake(intake)); // deploy
+        Player1.y().onTrue(new RetractIntake(intake)); // retract
+
+        Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
+            new TestCommand1(),
+            new TestCommand2()
+        )); // shoot and kick up
+
+        Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
+        //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
+        //TODO: manual hood, and turret rotator
+
 
     }
 

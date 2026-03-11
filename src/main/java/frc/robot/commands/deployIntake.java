@@ -23,7 +23,7 @@ public class DeployIntake extends Command {
   @Override
   public void end(boolean interrupted)
   {
-    intake.holdPosition();
+    //intake.holdPosition();
   }
 
  @Override
