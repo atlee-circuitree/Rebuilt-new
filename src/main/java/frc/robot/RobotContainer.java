@@ -189,7 +189,7 @@ public class RobotContainer {
         Player1.b().whileTrue(new Shoot(turret, trigger));
 
         Player1.povDown().onTrue(new StopTurretWheels(turret));
-        Player1.povRight().onTrue(new SpinToSpeed(turret, 80));
+        Player1.povRight().onTrue(new SpinToSpeed(turret, 80)); //shot
         Player1.povUp().onTrue(new ToggleHood(turret));
 
         //turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
@@ -203,9 +203,32 @@ public class RobotContainer {
        // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
        // Player2.povUp().onTrue(new ToggleHood(turret));
 
+<<<<<<< Updated upstream
         GreenButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         RedButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         BlueButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+=======
+        Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
+        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));*/
+
+        //Button Map
+
+        Player1.x().onTrue(new DeployIntake(intake)); // deploy
+        Player1.y().onTrue(new RetractIntake(intake)); // retract
+
+        Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
+            new SpinToSpeed(turret, 70),
+            new Shoot(turret, trigger)
+        )); // shoot and kick up, shooter first then kickup
+
+        Player1.rightBumper().onTrue(new StopTurretWheels(turret));
+
+        Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
+        //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
+        //TODO: manual hood, and turret rotator
+
+>>>>>>> Stashed changes
 
     }
 

@@ -23,8 +23,9 @@ public class TestCommand2 extends Command {
   public void execute() {
     if (SmartDashboard.getNumber("TestVal1", 0) >= 5) {
       SmartDashboard.putBoolean("Test Command Now Running!", true);
+    } else {
+      SmartDashboard.putBoolean("Test Command Now Running!", false);
     }
-    SmartDashboard.putBoolean("Test Command Now Running!", false);
   }
 
   // Called once the command ends or is interrupted.
