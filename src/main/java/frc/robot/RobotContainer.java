@@ -7,8 +7,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.DriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,14 +46,22 @@ public class RobotContainer {
 
     // subsystems
     private Elevator climber;
-    private CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private Intake intake;
     private Trigger trigger;
     private Turret turret;
     private Trigger index;
 
     // drivetrain
-    private final Field2d field;
+    private static final Field2d field = new Field2d();
+
+    public static Field2d getField() {
+        return field;
+    }
+    
+    public static Pose2d getCurrentPose() {
+        return drivetrain.getState().Pose;
+    }
 
     private final SendableChooser<Command> autoChooser;
 
@@ -74,18 +84,20 @@ public class RobotContainer {
     private final CommandXboxController Player1 = new CommandXboxController(0);
     public final GenericHID Player2 = new GenericHID(1);
 
+
     public int GreenArcade = 1;
     public int RedArcade = 2;
     public int BlueArcade = 3;
-
+    
     
     public RobotContainer() {
-        field = new Field2d();
+
         climber = new Elevator();
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
         autoChooser = AutoBuilder.buildAutoChooser();
+
 
     // Define zones as bounding boxes
     //boolean Zone0 = pose.getX() >= 491 && pose.getY() > 108;
@@ -203,12 +215,11 @@ public class RobotContainer {
        // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
        // Player2.povUp().onTrue(new ToggleHood(turret));
 
-<<<<<<< Updated upstream
         GreenButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         RedButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         BlueButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
-=======
-        Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+
+        /*Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));*/
 
@@ -227,8 +238,6 @@ public class RobotContainer {
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
         //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
         //TODO: manual hood, and turret rotator
-
->>>>>>> Stashed changes
 
     }
 

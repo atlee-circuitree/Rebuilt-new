@@ -371,7 +371,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 lastPose.pose,
                 lastPose.timestampSeconds);
             if (lastPose.pose != null) {
-                SmartDashboard.putString("booboo", lastPose.pose.toString());
                 return;
             }
         }
