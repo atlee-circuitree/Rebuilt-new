@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.*;
@@ -23,6 +24,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.util.LinearServo;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -69,7 +71,12 @@ public class RobotContainer {
 
     // IO devices
     private final CommandXboxController Player1 = new CommandXboxController(0);
-    private final CommandXboxController Player2 = new CommandXboxController(1);
+    public final GenericHID Player2 = new GenericHID(1);
+
+    public int GreenArcade = 1;
+    public int RedArcade = 2;
+    public int BlueArcade = 3;
+
     
     public RobotContainer() {
         field = new Field2d();
@@ -159,6 +166,15 @@ public class RobotContainer {
             )
         );
 
+        JoystickButton RedButton = new JoystickButton(Player2, RedArcade);
+        JoystickButton BlueButton = new JoystickButton(Player2, BlueArcade);
+        JoystickButton GreenButton = new JoystickButton(Player2, GreenArcade);
+
+
+
+
+
+
         drivetrain.seedFieldCentric();
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -174,10 +190,10 @@ public class RobotContainer {
         Player1.povRight().onTrue(new SpinToSpeed(turret, 80));
         Player1.povUp().onTrue(new ToggleHood(turret));
 
-        turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
+        //turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
 
-        Player2.x().onTrue(new DeployIntake(intake));
-        Player2.y().onTrue(new RetractIntake(intake));
+        Player1.x().onTrue(new DeployIntake(intake));
+        Player1.y().onTrue(new RetractIntake(intake));
         //Player2.a().whileTrue(new RunIntake(intake));
        // Player2.b().whileTrue(new Shoot(turret, trigger));
 
@@ -185,9 +201,9 @@ public class RobotContainer {
        // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
        // Player2.povUp().onTrue(new ToggleHood(turret));
 
-        Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+        GreenButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        RedButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
+        BlueButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
 
     }
 
