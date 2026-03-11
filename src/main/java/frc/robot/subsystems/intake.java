@@ -7,10 +7,13 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Voltage;
@@ -35,27 +38,35 @@ public class Intake extends SubsystemBase {
     deployEncoder = new CANcoder(33, "FRC 1599B");
 
 
-    Slot0Configs slot0ConfigsDown = new Slot0Configs();
-    slot0ConfigsDown.kP = 30;//6.5; // An error of 1 rotation results in 2.4 V output
-    slot0ConfigsDown.kI = 1.5; // no output for integrated error
-    slot0ConfigsDown.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
+    Slot0Configs slot0ConfigsUp = new Slot0Configs();
+    slot0ConfigsUp.kP = 5;//30; // An error of 1 rotation results in 2.4 V output
+    slot0ConfigsUp.kI = 0.0;//1.5; // no output for integrated error
+    slot0ConfigsUp.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
-    Slot1Configs slot1ConfigsUp = new Slot1Configs();
-    slot1ConfigsUp.kP = 5.5;//35; // An error of 1 rotation results in 2.4 V output
-    slot1ConfigsUp.kI = 0.05; // no output for integrated error
-    slot1ConfigsUp.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
+    Slot1Configs slot1ConfigsDown = new Slot1Configs();
+    slot1ConfigsDown.kP = 1.5;//35; // An error of 1 rotation results in 2.4 V output
+    slot1ConfigsDown.kI = 0.0;//0.05; // no output for integrated error
+    slot1ConfigsDown.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
 
-    deployMotor.getConfigurator().apply(slot0ConfigsDown);
-    deployMotor.getConfigurator().apply(slot1ConfigsUp);
+    MotorOutputConfigs motorOutput = new MotorOutputConfigs();
+    motorOutput.NeutralMode = NeutralModeValue.Coast;
+    deployMotor.getConfigurator().apply(motorOutput);
+
+    deployMotor.getConfigurator().apply(slot0ConfigsUp);
+    deployMotor.getConfigurator().apply(slot1ConfigsDown);
     runningToPosition = false;
   }
 
   public void deploy() {
-      runToPosition(.36);
+      runToPosition(-.7);
+      
   }
 
   public void retract() {
-      runToPosition(.0);
+      runToPosition(-.9);
+    MotorOutputConfigs motorOutput = new MotorOutputConfigs();
+    motorOutput.NeutralMode = NeutralModeValue.Brake;
+    deployMotor.getConfigurator().apply(motorOutput);
   }
 
   public void intake() {
@@ -75,7 +86,7 @@ public class Intake extends SubsystemBase {
   }
 
   public double getAngleEncoder() {
-    return (deployEncoder.getAbsolutePosition().getValueAsDouble());
+    return (deployMotor.getPosition().getValueAsDouble());
   }
 
   public void outtake() {
@@ -90,7 +101,7 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("CANCODER Angle", deployEncoder.getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber("CANCODER Angle", getAngleEncoder());
     SmartDashboard.putNumber("MOTOR Angle", deployMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("MOTOR votlage", deployMotor.getMotorVoltage().getValueAsDouble());
     SmartDashboard.putNumber("MOTOR current", deployMotor.getSupplyCurrent().getValueAsDouble());
@@ -99,7 +110,7 @@ public class Intake extends SubsystemBase {
     {
       SmartDashboard.putNumber("run request", m_request.getPositionMeasure().baseUnitMagnitude());
       SmartDashboard.putNumber("run motor", deployMotor.getPosition().getValueAsDouble());
-      if (Math.abs(setPoint - deployMotor.getPosition().getValueAsDouble()) < 0.035)
+      if (Math.abs(setPoint - getAngleEncoder()) < 0.035)
       {
         runningToPosition = false;
         deployMotor.set(0);
