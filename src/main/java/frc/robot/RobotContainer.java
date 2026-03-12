@@ -242,6 +242,8 @@ public class RobotContainer {
         //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
         //TODO: manual hood, and turret rotator
 
+        Player1.povRight().whileTrue(new TurnTurret(Limelight.getTurretSpeed()));
+
     }
 
 }
