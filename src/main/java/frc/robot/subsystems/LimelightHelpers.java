@@ -617,7 +617,7 @@ public class LimelightHelpers {
 
     static final String sanitizeName(String name) {
         if (name == "" || name == null) {
-            return "limelight-left";
+            return "limelight-turret";
         }
         return name;
     }
@@ -1649,10 +1649,10 @@ public class LimelightHelpers {
     public static LimelightHelpers.PoseEstimate localize(CommandSwerveDrivetrain drivetrain)
     {
         int[] validIDs = {1};
-        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-turret", validIDs);
         
-        LimelightHelpers.SetRobotOrientation("limelight-left", drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+        LimelightHelpers.SetRobotOrientation("limelight-turret", drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret");
         return mt2;
         // if our angular velocity is greater than 360 degrees per second, ignore vision updates
         /*boolean doRejectUpdate = false;

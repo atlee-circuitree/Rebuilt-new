@@ -73,6 +73,20 @@ public class Intake extends SubsystemBase {
     feedMotor.set(Constants.Intake.intakeSpeed);
   }
 
+  public void deployManual(double speed) {
+    deployMotor.set(speed);
+  }
+
+  public void stopDeploy() {
+    deployMotor.set(0);
+  }
+
+  public void deployBrake() {
+    MotorOutputConfigs motorOutput = new MotorOutputConfigs();
+    motorOutput.NeutralMode = NeutralModeValue.Brake;
+    deployMotor.getConfigurator().apply(motorOutput);
+  }
+
   public void runToPosition(double deg)
   {
     if (Math.abs(deg) < 0.015) // down position
