@@ -131,12 +131,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("climb down", new ClimbDown(climber));
     }
 
-    //public Command getAutonomousCommand() {
-    // This method loads the auto when it is called, however, it is recommended
-    // to first load your paths/autos when code starts, then return the
-    // pre-loaded auto/path
-        //return autoChooser.getSelected();
-    //}
+    public Command getAutonomousCommand() {
+        return autoChooser.getSelected();
+    }
 
     private void configureDrivetrain() {
         // drivetrain

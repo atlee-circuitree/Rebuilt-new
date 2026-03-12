@@ -31,6 +31,11 @@ public class Trigger extends SubsystemBase {
     indexMotor.set(1);
   }
 
+  public void reverseShoot() {
+    kickUpMotor.set(-1);
+    indexMotor.set(-1);
+  }
+
   public void stop() {
     kickUpMotor.set(0);
     indexMotor.set(0);
