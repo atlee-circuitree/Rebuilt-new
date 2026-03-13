@@ -8,15 +8,19 @@ import frc.robot.subsystems.Trigger;
 import frc.robot.subsystems.Turret;
 
 public class AutoShoot extends Command {
+  private static final double FORCE_FIRE_TIMEOUT_S = 3.0;
+
   private Turret turret;
   private Trigger trigger;
   private Timer feedDelayTimer;
+  private Timer commandTimer;
   private boolean feedStarted;
 
   public AutoShoot(Turret turret, Trigger trigger) {
     this.turret = turret;
     this.trigger = trigger;
     feedDelayTimer = new Timer();
+    commandTimer   = new Timer();
     SmartDashboard.putNumber("Current Turret Speed", 0);
     // not requiring turret because we are using it as read only
     // requiring it would prevent shooting if another command is working on turret
@@ -26,12 +30,16 @@ public class AutoShoot extends Command {
   public void initialize() {
     System.out.println("Shooter speed " + turret.getVelocity());
     feedDelayTimer.reset();
+    commandTimer.restart();
     feedStarted = false;
   }
 
   @Override
   public void execute() {
-    if (turret.getVelocity() >= 30) { //TODO: change value later for tuning
+    boolean atSpeed = turret.getVelocity() >= 30; //TODO: change value later for tuning
+    boolean forceNow = commandTimer.hasElapsed(FORCE_FIRE_TIMEOUT_S);
+
+    if (atSpeed || forceNow) {
       if (!feedStarted) {
         feedDelayTimer.start();
         feedStarted = true;
@@ -49,6 +57,7 @@ public class AutoShoot extends Command {
     trigger.stop();
     feedDelayTimer.stop();
     feedDelayTimer.reset();
+    commandTimer.stop();
   }
 
   @Override

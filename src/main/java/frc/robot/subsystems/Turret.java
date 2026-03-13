@@ -22,6 +22,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -44,6 +45,7 @@ public class Turret extends SubsystemBase {
   private boolean zeroing;
   private PIDController pid;
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
+  private boolean angleSafe = true;
 
   public Turret() {
     motorLeft = new TalonFX(Constants.CAN_IDS.turretMotorLeft, "FRC 1599B");
@@ -113,6 +115,7 @@ public class Turret extends SubsystemBase {
       stopRotator();
   }
 
+
   public void setSetpoint(double degree)
   {
     pid.setSetpoint(degree);
@@ -129,6 +132,7 @@ public class Turret extends SubsystemBase {
 
   public void autoRotate() {
     double position = Limelight.getTurretSpeed();
+    SmartDashboard.putNumber("turr pos", position);
     if (isSafe(position)) {
       motorRotator.set(-position);
     }
@@ -154,7 +158,10 @@ public class Turret extends SubsystemBase {
 
   public void spinAtDistance() {
     double distance = Limelight.getDistance();
-    if (distance <= 0) return; // no valid target - don't change speed
+    if (distance <= 0) {
+      spin(Constants.Turret.speedMid); // no valid target — spin at mid-range fallback
+      return;
+    }
     spin(shooterSpeedMap.get(distance));
   }
 
@@ -231,6 +238,15 @@ public class Turret extends SubsystemBase {
       return false;
   }
 
+  public double isAngleSafe() {
+    if (getAngle() < Constants.Turret.minAngle)
+      return 0.1;
+    else if (getAngle() > Constants.Turret.maxAngle)
+      return -0.1;
+    else
+      return 0;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -238,11 +254,26 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putNumber("turret angle", getAngle());
     SmartDashboard.putNumber("given output", motorRotator.getMotorVoltage().getValueAsDouble());
     SmartDashboard.putNumber("turret curent output", motorRotator.getSupplyCurrent().getValueAsDouble());
-
+    
     if (!zeroing)
     {
-      if (!isSafe(motorRotator.getMotorVoltage().getValueAsDouble())) // ALWAYS check for safety
+      if (!isSafe(motorRotator.getMotorVoltage().getValueAsDouble())) {// ALWAYS check for safety
         stopRotator();
+      }
+      if (isAngleSafe() != 0) {
+        if (angleSafe) {
+          Timer timer = new Timer();
+          timer.start();
+          angleSafe = false;
+          motorRotator.set(0);
+          if (timer.advanceIfElapsed(0.25)) {
+            timer.reset();
+            stopRotator();
+            angleSafe=true;
+          }
+        }
+        
+      }
     }
   }
 }

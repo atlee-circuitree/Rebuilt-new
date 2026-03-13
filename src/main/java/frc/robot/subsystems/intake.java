@@ -81,6 +81,10 @@ public class Intake extends SubsystemBase {
     deployMotor.set(0);
   }
 
+  public double getDeployCurrent() {
+    return deployMotor.getSupplyCurrent().getValueAsDouble();
+  }
+
   public void deployBrake() {
     MotorOutputConfigs motorOutput = new MotorOutputConfigs();
     motorOutput.NeutralMode = NeutralModeValue.Brake;

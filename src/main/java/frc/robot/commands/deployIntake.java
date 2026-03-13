@@ -20,7 +20,7 @@ public class DeployIntake extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    intake.deployManual(0.15);
+    intake.deployManual(-0.15);
   }
 
   @Override
@@ -30,6 +30,6 @@ public class DeployIntake extends Command {
 
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(1.2);
+    return intake.getDeployCurrent() >= 35.0 || timer.hasElapsed(2.0);
   }
 }

@@ -84,6 +84,7 @@ public class RobotContainer {
     // IO devices
     private final CommandXboxController Player1 = new CommandXboxController(0);
     public final GenericHID Player2 = new GenericHID(1);
+    private final CommandXboxController Player3 = new CommandXboxController(0);
 
 
     public int GreenArcade = 1;
@@ -98,8 +99,6 @@ public class RobotContainer {
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
-        autoChooser = AutoBuilder.buildAutoChooser();
-
 
     // Define zones as bounding boxes
     //boolean Zone0 = pose.getX() >= 491 && pose.getY() > 108;
@@ -109,11 +108,11 @@ public class RobotContainer {
 
         boolean isCompetition = true;
         // Do all other initialization
+        mapEventsToCommands();
+        autoChooser = AutoBuilder.buildAutoChooser();
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
         SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        mapEventsToCommands();
     }
 
     public void mapEventsToCommands()
@@ -131,6 +130,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
         NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain));
+        NamedCommands.registerCommand("aim and shoot", new AimAndShoot(turret, trigger));
         NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
         NamedCommands.registerCommand("toggle hood", new SetServoPosition(null, MaxAngularRate));
         NamedCommands.registerCommand("climb up", new ClimbUp(climber));
@@ -211,7 +211,7 @@ public class RobotContainer {
         Player1.povRight().onTrue(new SpinToSpeed(turret, 80)); //shot
         Player1.povUp().onTrue(new ToggleHood(turret));*/
 
-        //turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
+        //turret.setDefaultCommand(new ManualTurret(turret, () -> { Player3.getLeftX(); }));
 
         //Player1.x().onTrue(new DeployIntake(intake));
         //Player1.y().onTrue(new RetractIntake(intake));
@@ -235,13 +235,10 @@ public class RobotContainer {
         Player1.x().onTrue(new DeployIntake(intake)); // deploy
         Player1.y().onTrue(new RetractIntake(intake)); // retract
 
-        //Player1.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
-        //Player1.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
+        Player1.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
+        Player1.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
 
-        Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
-            turret.startEnd(turret::spinAtDistance, turret::stopShooter),
-            new Shoot(turret, trigger)
-        )); // shoot and kick up, shooter first then kickup
+        Player1.rightTrigger().whileTrue(new AimAndShoot(turret, trigger));
 
         Player1.rightBumper().onTrue(new StopTurretWheels(turret));
 
@@ -249,6 +246,7 @@ public class RobotContainer {
         //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
         //TODO: manual hood, and turret rotator
         Player1.povDown().whileTrue(new TurnTurret(turret));
+        //Player1.povLeft().whileTrue(new ManualTurret(turret, ))
     }   
 
 }

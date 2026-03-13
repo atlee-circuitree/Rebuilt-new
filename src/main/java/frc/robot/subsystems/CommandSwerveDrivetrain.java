@@ -33,9 +33,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.generated.Pigeon;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.util.Limelight;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -141,42 +143,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     ) {
         
         super(drivetrainConstants, modules);
-        p = new Pigeon2(38);
+        // p = new Pigeon2(38); // old ID — replaced with CAN ID from Constants
+        p = new Pigeon2(37); // CAN ID 37 — matches TunerConstants.kPigeonId
         if (Utils.isSimulation()) {
             startSimThread();
-        }
-
-        RobotConfig config;
-        try{
-            config = RobotConfig.fromGUISettings();
-            AutoBuilder.configure(
-            this::getPose,
-            this::resetPose,
-            this::getRobotRelativeSpeeds,
-            (speeds, feedforwards) -> setControl(
-                    m_pathApplyRobotSpeeds.withSpeeds(speeds)
-                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
-                 ),
-                new PPHolonomicDriveController(
-                    // PID constants for translation
-                    new PIDConstants(10, 0, 0),
-                    // PID constants for rotation
-                    new PIDConstants(7, 0, 0)
-                ),
-            config,
-            () -> {
-
-                var alliance = DriverStation.getAlliance();
-                if (alliance.isPresent()) {
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-            },
-            this
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         configureAutoBuilder();
     }
@@ -226,6 +196,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, modules);
+        p = new Pigeon2(37); // CAN ID 37 — matches TunerConstants.kPigeonId
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -262,6 +233,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
+        p = new Pigeon2(37); // CAN ID 37 — matches TunerConstants.kPigeonId
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -323,10 +295,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("pigeon pitch", p.getPitch().getValueAsDouble());
         SmartDashboard.putNumber("pigeon roll", p.getRoll().getValueAsDouble());
 
-        // Feed limelight MegaTag2 pose into the pose estimator
-        LimelightHelpers.SetRobotOrientation("limelight-turret",
-            getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        savePose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret"));
+        // Feed climber limelight MegaTag1+2 fused pose into the pose estimator
+        Limelight.getMeasurement(
+            getState().Pose,
+            p.getPitch().getValueAsDouble(),
+            p.getRoll().getValueAsDouble(),
+            p.getAngularVelocityZWorld().getValueAsDouble()
+        ).ifPresent(m -> addVisionMeasurement(
+            m.poseEstimate.pose,
+            m.poseEstimate.timestampSeconds,
+            m.standardDeviations
+        ));
     }
     
     private void configureAutoBuilder(){
