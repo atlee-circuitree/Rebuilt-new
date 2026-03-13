@@ -122,6 +122,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("intake", new RunIntake(intake));
         NamedCommands.registerCommand("shoot",  new SpinToSpeed(turret, MaxSpeed));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger));
+        NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
         NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain));
@@ -131,12 +132,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("climb down", new ClimbDown(climber));
     }
 
-    //public Command getAutonomousCommand() {
-    // This method loads the auto when it is called, however, it is recommended
-    // to first load your paths/autos when code starts, then return the
-    // pre-loaded auto/path
-        //return autoChooser.getSelected();
-    //}
+    public Command getAutonomousCommand() {
+        return autoChooser.getSelected();
+    }
 
     private void configureDrivetrain() {
         // drivetrain

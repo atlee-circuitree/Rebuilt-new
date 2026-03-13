@@ -50,6 +50,7 @@ public class Constants {
         public static final double maxAngle = 120;
         public static final double shooterThreshold = 0;
         public static final double angleThreshold = 2;
+        public static final double autoShootFeedDelay = 0.3; // seconds to wait after turret reaches speed before running kickup and index
     }
 
     public class Intake {

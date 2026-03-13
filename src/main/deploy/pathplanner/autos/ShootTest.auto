@@ -9,6 +9,12 @@
           "data": {
             "pathName": "ShootStart"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "auto shoot"
+          }
         }
       ]
     }
