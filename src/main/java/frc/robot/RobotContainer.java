@@ -93,6 +93,7 @@ public class RobotContainer {
     
     public RobotContainer() {
 
+        mapEventsToCommands();
         climber = new Elevator();
         intake = new Intake();
         trigger = new Trigger();
@@ -132,6 +133,9 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
+    // This method loads the auto when it is called, however, it is recommended
+    // to first load your paths/autos when code starts, then return the
+    // pre-loaded auto/path
         return autoChooser.getSelected();
     }
 
@@ -226,8 +230,8 @@ public class RobotContainer {
         Player1.x().onTrue(new DeployIntake(intake)); // deploy
         Player1.y().onTrue(new RetractIntake(intake)); // retract
 
-        Player1.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
-        Player1.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
+        //Player1.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
+        //Player1.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
             new SpinToSpeed(turret, 70),    
