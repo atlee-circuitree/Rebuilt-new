@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LastHoorah"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LastHoorah2"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LastHoorah3"
+            "pathName": null
           }
         }
       ]

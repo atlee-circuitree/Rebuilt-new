@@ -7,31 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootStart"
+            "pathName": "Human Player to Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ConnerIntake"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ConnerReturn"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ReturnShoot"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ClimbReturn"
+            "pathName": null
           }
         }
       ]

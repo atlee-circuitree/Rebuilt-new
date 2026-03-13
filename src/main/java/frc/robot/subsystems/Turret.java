@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -15,6 +17,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Servo;
@@ -39,11 +43,21 @@ public class Turret extends SubsystemBase {
   private double realZero;
   private boolean zeroing;
   private PIDController pid;
+  private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
 
   public Turret() {
     motorLeft = new TalonFX(Constants.CAN_IDS.turretMotorLeft, "FRC 1599B");
     motorRight = new TalonFX(Constants.CAN_IDS.turretMotorRight, "FRC 1599B");
     motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator, "FRC 1599B");
+
+    MotorOutputConfigs coastConfig = new MotorOutputConfigs();
+    coastConfig.NeutralMode = NeutralModeValue.Coast;
+    motorLeft.getConfigurator().apply(coastConfig);
+
+    MotorOutputConfigs invertConfig = new MotorOutputConfigs();
+    invertConfig.NeutralMode = NeutralModeValue.Coast;
+    invertConfig.Inverted = InvertedValue.Clockwise_Positive;
+    motorRight.getConfigurator().apply(invertConfig);
 
     motorHoodLeft = new HiTecServo(Constants.Channels.motorHoodLeft);
     hoodUp = false;
@@ -59,10 +73,13 @@ public class Turret extends SubsystemBase {
 
     turretEncoder = new CANcoder(Constants.CAN_IDS.turretEncoder, "FRC 1599B");
 
-    motorRotator.getConfigurator().apply(slot0Configs);
     TalonFXConfiguration conf = new TalonFXConfiguration();
     conf.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     conf.Feedback.FeedbackRemoteSensorID = turretEncoder.getDeviceID();
+    conf.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    conf.Slot0.kP = slot0Configs.kP;
+    conf.Slot0.kI = slot0Configs.kI;
+    conf.Slot0.kD = slot0Configs.kD;
     motorRotator.getConfigurator().apply(conf);
 
     Slot0Configs spinMotorConfigs = new Slot0Configs();
@@ -72,6 +89,17 @@ public class Turret extends SubsystemBase {
 
     motorLeft.getConfigurator().apply(spinMotorConfigs);
     motorRight.getConfigurator().apply(spinMotorConfigs);
+
+    shooterSpeedMap.put(Constants.Turret.distClose, Constants.Turret.speedClose);
+    shooterSpeedMap.put(Constants.Turret.distMid,   Constants.Turret.speedMid);
+    shooterSpeedMap.put(Constants.Turret.distFar,   Constants.Turret.speedFar);
+
+    SmartDashboard.putNumber("Shooter/distClose",  Constants.Turret.distClose);
+    SmartDashboard.putNumber("Shooter/speedClose", Constants.Turret.speedClose);
+    SmartDashboard.putNumber("Shooter/distMid",    Constants.Turret.distMid);
+    SmartDashboard.putNumber("Shooter/speedMid",   Constants.Turret.speedMid);
+    SmartDashboard.putNumber("Shooter/distFar",    Constants.Turret.distFar);
+    SmartDashboard.putNumber("Shooter/speedFar",   Constants.Turret.speedFar);
 
     targetVelocity = 0;
     gearRatio = 10;
@@ -121,6 +149,12 @@ public class Turret extends SubsystemBase {
   public double getVelocity()
   {
     return motorLeft.getVelocity().getValueAsDouble();
+  }
+
+  public void spinAtDistance() {
+    double distance = Limelight.getDistance();
+    if (distance <= 0) return; // no valid target - don't change speed
+    spin(shooterSpeedMap.get(distance));
   }
 
   public void spin(double speed) {

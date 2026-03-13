@@ -113,7 +113,7 @@ public class AutoTurret extends Command {
 
         if (Math.abs(angle) <= 60)
         {
-            turret.spin(100);
+            turret.spinAtDistance();
             if (turret.isAtSpeed())
                 trigger.shoot();
         }

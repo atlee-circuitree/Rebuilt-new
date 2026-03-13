@@ -7,43 +7,49 @@
         {
           "type": "path",
           "data": {
+            "pathName": "Start to Middle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "deploy intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle to Human Player"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
             "pathName": "Human Player to Shoot"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
+            "name": "shoot distance"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "BottomStart",
+  "folder": null,
   "choreoAuto": false
 }

@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Trench Shoot1"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SmallTrenchShoot2"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchShoot5"
+            "pathName": null
           }
         }
       ]

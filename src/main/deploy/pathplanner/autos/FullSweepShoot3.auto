@@ -7,31 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "IntakePos"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SweepShoot3"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "3Return"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ReturnShoot"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ClimbReturn"
+            "pathName": null
           }
         }
       ]

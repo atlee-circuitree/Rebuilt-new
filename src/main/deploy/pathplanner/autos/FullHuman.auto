@@ -7,43 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "IntakePos"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Sweep3"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "3Return"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ReturnShoot"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HumanPlayer"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HumanShoot"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ClimbReturn"
+            "pathName": null
           }
         }
       ]

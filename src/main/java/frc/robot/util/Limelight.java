@@ -18,15 +18,15 @@ public class Limelight {
     }
 
     public static double getTA() {
-        return limelight.getValue("ta").getDouble();
+        return limelight.getEntry("ta").getDouble(0.0);
     }
 
     public static double getTX() {
-        return limelight.getValue("tx").getDouble();
+        return limelight.getEntry("tx").getDouble(0.0);
     }
 
     public static double getTY() {
-        return limelight.getValue("ty").getDouble();
+        return limelight.getEntry("ty").getDouble(0.0);
     }
 
     public static double getDistance() {

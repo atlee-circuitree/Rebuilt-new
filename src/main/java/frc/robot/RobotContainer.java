@@ -97,6 +97,7 @@ public class RobotContainer {
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
+        mapEventsToCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
 
 
@@ -111,8 +112,6 @@ public class RobotContainer {
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
         SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        mapEventsToCommands();
     }
 
     public void mapEventsToCommands()
@@ -120,7 +119,11 @@ public class RobotContainer {
         // replace null with command instance
         // do this for all commands
         NamedCommands.registerCommand("intake", new RunIntake(intake));
-        NamedCommands.registerCommand("shoot",  new SpinToSpeed(turret, MaxSpeed));
+        NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
+        NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
+            new SpinToDistanceSpeed(turret),
+            new AutoShoot(turret, trigger)
+        ));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
@@ -227,11 +230,11 @@ public class RobotContainer {
         Player1.x().onTrue(new DeployIntake(intake)); // deploy
         Player1.y().onTrue(new RetractIntake(intake)); // retract
 
-        Player1.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
+        Player1.a().onTrue(new DeployIntake(intake).withTimeout(1.0)); // deploy for 1s
         Player1.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
-            new SpinToSpeed(turret, 70),    
+            turret.startEnd(turret::spinAtDistance, turret::stopShooter),
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
 

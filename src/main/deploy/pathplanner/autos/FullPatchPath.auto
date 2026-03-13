@@ -7,31 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PatchPath1"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PatchPath2"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PatchPath3"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PatchPath4"
+            "pathName": null
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "NomPatchClimb"
+            "pathName": null
           }
         }
       ]

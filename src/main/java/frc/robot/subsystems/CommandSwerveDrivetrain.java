@@ -322,6 +322,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("pigeon yaw", p.getYaw().getValueAsDouble());
         SmartDashboard.putNumber("pigeon pitch", p.getPitch().getValueAsDouble());
         SmartDashboard.putNumber("pigeon roll", p.getRoll().getValueAsDouble());
+
+        // Feed limelight MegaTag2 pose into the pose estimator
+        LimelightHelpers.SetRobotOrientation("limelight-turret",
+            getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        savePose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret"));
     }
     
     private void configureAutoBuilder(){
