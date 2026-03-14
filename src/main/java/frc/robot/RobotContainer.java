@@ -253,7 +253,7 @@ public class RobotContainer {
         )); // shoot and kick up, shooter first then kickup
 
         Player1.povUp().onTrue(new StopTurretWheels(turret));
-        Player1.rightBumper().onTrue(new ReverseShoot(turret, trigger));
+        Player1.rightBumper().whileTrue(new ReverseShoot(turret, trigger));
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
         //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
