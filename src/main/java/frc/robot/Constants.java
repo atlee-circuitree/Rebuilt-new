@@ -55,11 +55,11 @@ public class Constants {
         // Distance-based flywheel speed map - TODO: tune all values
         // Distance units match Limelight.getDistance() (derived from ta via power-law formula)
         public static final double distClose  = 10.0;  // distance unit - close range
-        public static final double speedClose = 55.0; // RPS
+        public static final double speedClose = 50.0; // RPS
         public static final double distMid    = 20.0;  // distance unit - mid range
-        public static final double speedMid   = 58.0; // RPS
+        public static final double speedMid   = 53.0; // RPS
         public static final double distFar    = 35.0;  // distance unit - far range
-        public static final double speedFar   = 75.0;  // RPS
+        public static final double speedFar   = 70.0;  // RPS
     }
 
     public class Intake {

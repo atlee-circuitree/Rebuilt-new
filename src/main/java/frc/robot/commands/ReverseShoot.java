@@ -25,12 +25,7 @@ public class ReverseShoot extends Command {
 
   @Override
   public void execute() {
-
-    if (turret.getVelocity() >= 30) { //TODO: change value later for tuning
-      trigger.reverseShoot();
-    } else {
-      SmartDashboard.putNumber("Current Turret Speed", turret.getVelocity());
-    }
+  trigger.reverseShoot();
     
   }
 

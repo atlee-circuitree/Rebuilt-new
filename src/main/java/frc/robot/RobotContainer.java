@@ -83,7 +83,7 @@ public class RobotContainer {
 
     // IO devices
     private final CommandXboxController Player1 = new CommandXboxController(0);
-    public final GenericHID Player2 = new GenericHID(1);
+    public final CommandXboxController Player2 = new CommandXboxController(1);
 
 
     public int GreenArcade = 1;
@@ -93,7 +93,7 @@ public class RobotContainer {
     
     public RobotContainer() {
 
-        mapEventsToCommands();
+      
         climber = new Elevator();
         intake = new Intake();
         trigger = new Trigger();
@@ -123,6 +123,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("intake", new RunIntake(intake));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
         NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
+            new TurnTurret(turret),
             new SpinToDistanceSpeed(turret),
             new AutoShoot(turret, trigger)
         ));
@@ -192,10 +193,16 @@ public class RobotContainer {
             )
         );
 
-        JoystickButton RedButton = new JoystickButton(Player2, RedArcade);
+        /*JoystickButton RedButton = new JoystickButton(Player2, RedArcade);
         JoystickButton BlueButton = new JoystickButton(Player2, BlueArcade);
         JoystickButton GreenButton = new JoystickButton(Player2, GreenArcade);
-
+        */
+        
+        Player2.y().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        Player2.b().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
+        Player2.a().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+        turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
+        
         drivetrain.seedFieldCentric();
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -222,9 +229,9 @@ public class RobotContainer {
        // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
        // Player2.povUp().onTrue(new ToggleHood(turret));
 
-        GreenButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        RedButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        BlueButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+        //GreenButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
+        //RedButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
+        //BlueButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
 
         /*Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
         Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
@@ -244,6 +251,7 @@ public class RobotContainer {
         )); // shoot and kick up, shooter first then kickup
 
         Player1.rightBumper().onTrue(new StopTurretWheels(turret));
+        Player1.leftBumper().onTrue(new ReverseShoot(turret, trigger));
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
         //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret

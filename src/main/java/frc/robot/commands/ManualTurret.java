@@ -22,7 +22,8 @@ public class ManualTurret extends Command {
   @Override
   public void execute()
   {
-    turret.rotate(speed.get());
+    if (Math.abs(speed.get()) < 0.08) 
+      turret.rotate(speed.get());
   }
 
   @Override
