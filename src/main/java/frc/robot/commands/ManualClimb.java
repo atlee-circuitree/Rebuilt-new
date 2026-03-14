@@ -17,7 +17,7 @@ public class ManualClimb extends Command {
 
   @Override
   public void initialize() {
-    climb.driveAtSpeed(goUp ? 0.12 : -0.12);
+    climb.driveAtSpeed(goUp ? 0.30 : -0.60); //-0.12
   }
 
   @Override

@@ -247,6 +247,7 @@ public class RobotContainer {
         Player1.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
+            new DeployJumpCommand(intake),
             turret.startEnd(turret::spinAtDistance, turret::stopShooter),
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
