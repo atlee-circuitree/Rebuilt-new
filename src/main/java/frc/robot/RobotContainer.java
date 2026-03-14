@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -98,9 +99,52 @@ public class RobotContainer {
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
-        autoChooser = AutoBuilder.buildAutoChooser();
-        autoChooser.addOption("Just Zero Turret", new ZeroTurret(turret));
+        //autoChooser = AutoBuilder.buildAutoChooser();
+        //autoChooser.addOption("Just Zero Turret", new ZeroTurret(turret));
+        
+        //DO NOT DELETE (Autos not using PathPlanner) LLOK ATY THIS TOMOROW MORNING
 
+        autoChooser = new SendableChooser<>();
+        autoChooser.addOption("Just Shoot", new SequentialCommandGroup(
+        new SpinToSpeed(turret, Constants.Turret.speedMid),
+        new Shoot(turret, trigger).withTimeout(12),
+        new StopTurretWheels(turret)
+        ));
+        autoChooser.addOption("Center Shoot", new SequentialCommandGroup(
+        drivetrain.applyRequest(() -> drive.withVelocityX(-0.4 * MaxSpeed)
+                       .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
+                       .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
+        ).withTimeout(3.5),
+        drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
+                       .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
+                       .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
+        ).withTimeout(0.2),
+        new SpinToSpeed(turret, Constants.Turret.speedMid),
+        new Shoot(turret, trigger).withTimeout(12),
+        new StopTurretWheels(turret)
+        ));
+        autoChooser.addOption("Feeder Shoot", new SequentialCommandGroup(
+        new ManualDeploy(intake, 0.15).withTimeout(0.5),
+        new ParallelCommandGroup(
+            new RunIntake(intake),
+            new SequentialCommandGroup(
+                drivetrain.applyRequest(() -> drive.withVelocityX(-0.6 * MaxSpeed)
+                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
+                            .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
+                ).withTimeout(3.5),
+                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
+                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
+                            .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
+                ).withTimeout(0.2)
+            )),
+        new SpinToSpeed(turret, Constants.Turret.speedMid),
+        new TurnTurret(turret).withTimeout(1.5),
+        new Shoot(turret, trigger).withTimeout(12),
+        new StopTurretWheels(turret)
+        ));
+
+        // line to feeder, 3.4 m (133 in)
+        
 
     // Define zones as bounding boxes
     //boolean Zone0 = pose.getX() >= 491 && pose.getY() > 108;
