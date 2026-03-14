@@ -123,16 +123,13 @@ public class RobotContainer {
         // do this for all commands
         NamedCommands.registerCommand("intake", new RunIntake(intake));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
-        NamedCommands.registerCommand("shoot distance", null);
-        // NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
-        //     new TurnTurret(turret),
-        //     new SpinToDistanceSpeed(turret),
-        //     new AutoShoot(turret, trigger)
-        // ));
+        NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
+            new SpinToDistanceSpeed(turret),
+            new AutoShoot(turret, trigger)
+        ));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
-        //NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
-        NamedCommands.registerCommand("deploy intake", null);
+        NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
         NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain));
         NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
@@ -202,7 +199,7 @@ public class RobotContainer {
         */
         
         Player2.y().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        Player2.b().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
+        //Player2.b().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
         Player2.a().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
         turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
         Player2.povUp().whileTrue(new ManualClimb(climber, true));
