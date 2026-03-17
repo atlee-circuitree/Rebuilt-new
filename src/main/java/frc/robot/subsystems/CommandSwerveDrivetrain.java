@@ -7,9 +7,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -27,7 +25,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,8 +45,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
 
     
-    Pigeon2 p;
-    private LimelightHelpers.PoseEstimate lastPose = null;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -141,7 +136,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     ) {
         
         super(drivetrainConstants, modules);
-        p = new Pigeon2(38);
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -159,19 +153,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return this.getState().Speeds;
     }
 
+    /** Drives robot-relative -- used by PathPlanner if called directly. */
     public void driveRobotRelative(ChassisSpeeds speeds)
     {
-        SmartDashboard.putNumber("drive x ", speeds.vxMetersPerSecond);
-        SmartDashboard.putNumber("drive y ", speeds.vyMetersPerSecond);
-        double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) / 4; // kSpeedAt12Volts desired top speed
-        double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
-        applyRequest(() -> new SwerveRequest.RobotCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-            .withVelocityX(speeds.vxMetersPerSecond) // Drive forward with
-            .withVelocityY(-speeds.vyMetersPerSecond) // Drive left with negative X (left)
-            .withRotationalRate(-speeds.omegaRadiansPerSecond));
+        setControl(m_pathApplyRobotSpeeds.withSpeeds(speeds));
     }
 
     /**
@@ -286,15 +271,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        BaseStatusSignal.refreshAll(p.getYaw(), p.getPitch(), p.getRoll());
-        SmartDashboard.putNumber("pigeon yaw", p.getYaw().getValueAsDouble());
-        SmartDashboard.putNumber("pigeon pitch", p.getPitch().getValueAsDouble());
-        SmartDashboard.putNumber("pigeon roll", p.getRoll().getValueAsDouble());
-
         // Feed limelight-climb MegaTag2 pose into the pose estimator
         LimelightHelpers.SetRobotOrientation("limelight-climb",
             getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        if (DriverStation.getAlliance().get() == Alliance.Blue)
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
             savePose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-climb"));
         else
             savePose(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-climb"));
@@ -381,20 +361,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
     }
 
+    /**
+     * Injects a fresh MegaTag2 pose into the Kalman filter.
+     * Only applied when a valid, non-zero estimate with visible tags is received.
+     */
     public void savePose(LimelightHelpers.PoseEstimate mt2) {
-        if (mt2 != null && mt2.pose.getX() + mt2.pose.getY() != 0) {
-            lastPose = mt2;
-        }
-
-        if (lastPose != null) {
-            setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-            addVisionMeasurement(
-                lastPose.pose,
-                lastPose.timestampSeconds);
-            if (lastPose.pose != null) {
-                return;
-            }
-        }
-
+        if (mt2 == null || mt2.tagCount == 0) return;
+        if (mt2.pose.getX() + mt2.pose.getY() == 0) return;
+        setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        super.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
     }
+
 }

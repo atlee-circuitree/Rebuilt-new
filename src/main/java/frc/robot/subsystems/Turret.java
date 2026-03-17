@@ -65,8 +65,8 @@ public class Turret extends SubsystemBase {
       new edu.wpi.first.math.filter.Debouncer(4 * 0.02, edu.wpi.first.math.filter.Debouncer.DebounceType.kRising);
 
   public Turret() {
-    flywheelLeft    = new TalonFX(Constants.CAN_IDS.turretMotorLeft,     "FRC 1599B");
-    flywheelRight   = new TalonFX(Constants.CAN_IDS.turretMotorRight,    "FRC 1599B");
+    flywheelLeft    = new TalonFX(Constants.CAN_IDS.flywheelMotorLeft,   "FRC 1599B");
+    flywheelRight   = new TalonFX(Constants.CAN_IDS.flywheelMotorRight,  "FRC 1599B");
     motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator,  "FRC 1599B");
     turretEncoder = new CANcoder(Constants.CAN_IDS.turretEncoder,     "FRC 1599B");
 
@@ -104,16 +104,16 @@ public class Turret extends SubsystemBase {
     m_rotatorCurrent  = motorRotator.getSupplyCurrent();
 
     // Distance-to-speed interpolation table
-    shooterSpeedMap.put(Constants.Turret.distClose, Constants.Turret.speedClose);
-    shooterSpeedMap.put(Constants.Turret.distMid,   Constants.Turret.speedMid);
-    shooterSpeedMap.put(Constants.Turret.distFar,   Constants.Turret.speedFar);
+    shooterSpeedMap.put(Constants.Turret.DIST_CLOSE_FT, Constants.Turret.SPEED_CLOSE_RPS);
+    shooterSpeedMap.put(Constants.Turret.DIST_MID_FT,   Constants.Turret.SPEED_MID_RPS);
+    shooterSpeedMap.put(Constants.Turret.DIST_FAR_FT,   Constants.Turret.SPEED_FAR_RPS);
 
-    SmartDashboard.putNumber("Shooter/distClose",  Constants.Turret.distClose);
-    SmartDashboard.putNumber("Shooter/speedClose", Constants.Turret.speedClose);
-    SmartDashboard.putNumber("Shooter/distMid",    Constants.Turret.distMid);
-    SmartDashboard.putNumber("Shooter/speedMid",   Constants.Turret.speedMid);
-    SmartDashboard.putNumber("Shooter/distFar",    Constants.Turret.distFar);
-    SmartDashboard.putNumber("Shooter/speedFar",   Constants.Turret.speedFar);
+    SmartDashboard.putNumber("Shooter/distClose",  Constants.Turret.DIST_CLOSE_FT);
+    SmartDashboard.putNumber("Shooter/speedClose", Constants.Turret.SPEED_CLOSE_RPS);
+    SmartDashboard.putNumber("Shooter/distMid",    Constants.Turret.DIST_MID_FT);
+    SmartDashboard.putNumber("Shooter/speedMid",   Constants.Turret.SPEED_MID_RPS);
+    SmartDashboard.putNumber("Shooter/distFar",    Constants.Turret.DIST_FAR_FT);
+    SmartDashboard.putNumber("Shooter/speedFar",   Constants.Turret.SPEED_FAR_RPS);
 
     motorHoodLeft = new HiTecServo(Constants.Turret.HOOD_SERVO_CHANNEL);
   }
@@ -164,7 +164,7 @@ public class Turret extends SubsystemBase {
   public void spinAtDistance() {
     double distance = Limelight.getDistance();
     if (distance <= 0)
-      spin(Constants.Turret.speedMid); // no valid target — use mid-range default
+      spin(Constants.Turret.SPEED_MID_RPS); // no valid target — use mid-range default
     else
       spin(shooterSpeedMap.get(distance));
   }
@@ -195,7 +195,7 @@ public class Turret extends SubsystemBase {
     limitConf.ReverseSoftLimitEnable = true;
     limitConf.ReverseSoftLimitThreshold =
         realZero + (Constants.Turret.MIN_ANGLE_DEG / 360.0) * Constants.Turret.GEAR_RATIO;
-    motorRotator.getConfigurator().apply(limitConf);
+    motorRotator.getConfigurator().apply(limitConf, 0.0); // 0 s timeout = non-blocking
     zeroing = false;
     commandedDirection = 0;
   }

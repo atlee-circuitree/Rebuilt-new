@@ -63,7 +63,7 @@ public class RobotContainer {
 
     // IO devices
     private final CommandXboxController Player1 = new CommandXboxController(0);
-    public final CommandXboxController Player2 = new CommandXboxController(1);
+    private final CommandXboxController Player2 = new CommandXboxController(1);
 
 
     public RobotContainer() {
@@ -91,17 +91,17 @@ public class RobotContainer {
     {
         // replace null with command instance
         // do this for all commands
-        NamedCommands.registerCommand("intake", new RunIntake(intake));
+        NamedCommands.registerCommand("intake", new RunIntake(intake).withTimeout(3.0));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
         NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
             new SpinToDistanceSpeed(turret),
             new AutoShoot(turret, trigger)
         ));
-        NamedCommands.registerCommand("kickup", new Shoot(turret, trigger));
+        NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(12.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
         NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
-        NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain));
+        NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
         NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
         NamedCommands.registerCommand("climb up", new ClimbUp(climber));
         NamedCommands.registerCommand("climb down", new ClimbDown(climber));
@@ -171,8 +171,8 @@ public class RobotContainer {
  drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> 
-                drive.withVelocityX(-(getLeftY()) * ((Constants.Drive.MaxSpeed) / Constants.Drive.Speed)) // Drive forward with negative Y (forward)
-                    .withVelocityY(-(getLeftX()) * ((Constants.Drive.MaxSpeed) / Constants.Drive.Speed)) // Drive left with negative X (left)
+                drive.withVelocityX(-(getLeftY()) * ((Constants.Drive.MAX_SPEED_MPS) / Constants.Drive.SPEED_DIVISOR)) // Drive forward with negative Y (forward)
+                    .withVelocityY(-(getLeftX()) * ((Constants.Drive.MAX_SPEED_MPS) / Constants.Drive.SPEED_DIVISOR)) // Drive left with negative X (left)
                     .withRotationalRate(-(getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -191,7 +191,7 @@ public class RobotContainer {
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
-            new SpinToSpeedInterrupt(turret, Constants.Turret.speedFar),
+            new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
 
@@ -209,7 +209,7 @@ public class RobotContainer {
 
         Player2.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
-            new SpinToSpeedInterrupt(turret, Constants.Turret.speedFar),
+            new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
 

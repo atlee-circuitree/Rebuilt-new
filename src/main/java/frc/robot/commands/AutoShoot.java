@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Trigger;
@@ -38,8 +37,6 @@ public class AutoShoot extends Command {
       if (feedDelayTimer.get() >= Constants.Turret.AUTO_SHOOT_FEED_DELAY_SECS) {
         trigger.shoot();
       }
-    } else {
-      SmartDashboard.putNumber("Turret/current_velocity_rps", turret.getVelocity());
     }
   }
 

@@ -25,7 +25,9 @@ public class ZeroTurret extends Command {
   @Override
   public void end(boolean interrupted) {
     turret.stopRotator();
-    turret.setZero();
+    if (!interrupted) {
+      turret.setZero(); // only calibrate if we actually found the zero
+    }
   }
 
   @Override

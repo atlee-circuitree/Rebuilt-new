@@ -17,7 +17,7 @@ public class SpinToDistanceSpeed extends Command {
   public void initialize() {
     double distance = Limelight.getDistance();
     if (distance <= 0) {
-      turret.spin(Constants.Turret.speedMid); // fallback: no limelight target
+      turret.spin(Constants.Turret.SPEED_MID_RPS); // fallback: no limelight target
     } else {
       turret.spinAtDistance();
     }

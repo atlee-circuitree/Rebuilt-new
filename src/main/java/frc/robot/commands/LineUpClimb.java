@@ -46,6 +46,6 @@ public class LineUpClimb extends Command {
     Pose2d cur = drivetrain.getState().Pose;
     return Math.abs(cur.getX() - pose.getX()) < Constants.Climber.LINEUP_THRESHOLD_M &&
       Math.abs(cur.getY() - pose.getY()) < Constants.Climber.LINEUP_THRESHOLD_M &&
-      Math.abs(cur.getRotation().getDegrees() - pose.getRotation().getDegrees()) < Constants.Climber.LINEUP_THRESHOLD_M;
+      Math.abs(cur.getRotation().getDegrees() - pose.getRotation().getDegrees()) < Constants.Climber.LINEUP_HEADING_THRESHOLD_DEG;
   }
 }
