@@ -4,36 +4,28 @@
 
 package frc.robot.subsystems;
 
-import java.util.HashMap;
-
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Trigger extends SubsystemBase {
-  /** Creates a new Trigger. */
 
-  private TalonFX kickUpMotor;
-  private TalonFX indexMotor;
+  private final TalonFX kickUpMotor;
+  private final TalonFX indexMotor;
 
   public Trigger() {
-
     kickUpMotor = new TalonFX(Constants.CAN_IDS.kickUpMotor, "FRC 1599B");
-    indexMotor = new TalonFX(Constants.CAN_IDS.indexMotor, "FRC 1599B");
+    indexMotor  = new TalonFX(Constants.CAN_IDS.indexMotor,  "FRC 1599B");
   }
 
   public void shoot() {
-    kickUpMotor.set(1);
-    indexMotor.set(1);
+    kickUpMotor.set(Constants.Trigger.SHOOT_SPEED);
+    indexMotor.set(Constants.Trigger.SHOOT_SPEED);
   }
 
   public void reverseShoot() {
-    kickUpMotor.set(-1);
-    indexMotor.set(-1);
+    kickUpMotor.set(Constants.Trigger.REVERSE_SPEED);
+    indexMotor.set(Constants.Trigger.REVERSE_SPEED);
   }
 
   public void stop() {

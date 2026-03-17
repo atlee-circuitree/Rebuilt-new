@@ -1,30 +1,24 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.LimelightHelpers;
-import frc.robot.subsystems.LimelightHelpers.PoseEstimate;
+import frc.robot.Constants;
 
 public class Limelight {
-    private final static String limelightName = "limelight-turret";
-    private final static NetworkTable limelight = NetworkTableInstance.getDefault().getTable(limelightName);
-    private final static PIDController turretPID = new PIDController(0.05, 0, 0);
+    private static final NetworkTable limelight = NetworkTableInstance.getDefault()
+            .getTable(Constants.LimelightConstants.TURRET_LIMELIGHT_NAME);
 
     public static double getTurretSpeed() {
         double tx = getTX();
-        if (tx > 10)
-            return 0.15;
-        if (tx > 3)
-            return 0.07;
-        else if (tx < -10)
-            return -0.15;
-        else if (tx < -3)
-            return -0.07;
+        if (tx > Constants.LimelightConstants.TX_THRESHOLD_LARGE)
+            return Constants.LimelightConstants.TURRET_SPEED_FAST;
+        if (tx > Constants.LimelightConstants.TX_THRESHOLD_SMALL)
+            return Constants.LimelightConstants.TURRET_SPEED_SLOW;
+        if (tx < -Constants.LimelightConstants.TX_THRESHOLD_LARGE)
+            return -Constants.LimelightConstants.TURRET_SPEED_FAST;
+        if (tx < -Constants.LimelightConstants.TX_THRESHOLD_SMALL)
+            return -Constants.LimelightConstants.TURRET_SPEED_SLOW;
         return 0;
-        //return turretPID.calculate(getTX(), 0); // , 0 <--- this is desired value.
     }
 
     public static double getTA() {
@@ -40,13 +34,11 @@ public class Limelight {
     }
 
     public static double getDistance() {
-        if (getTA() > 24 || getTA() == 0) {
+        double ta = getTA();
+        if (ta > Constants.LimelightConstants.MAX_TA_FOR_DISTANCE || ta == 0) {
             return 0;
         }
-
-        double value = (46.39986) * Math.pow(getTA(), -0.4918478);
-        return value;
-
+        return Constants.LimelightConstants.DISTANCE_SCALE
+                * Math.pow(ta, Constants.LimelightConstants.DISTANCE_EXPONENT);
     }
-    
 }

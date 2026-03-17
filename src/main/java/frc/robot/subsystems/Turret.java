@@ -5,23 +5,21 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -31,25 +29,38 @@ import frc.robot.util.LinearServo;
 
 public class Turret extends SubsystemBase {
 
-  private TalonFX motorLeft;
-  private TalonFX motorRight;
-  private TalonFX motorRotator;
-  private LinearServo motorHoodLeft;
-  private boolean hoodUp;
-  private CANcoder turretEncoder;
-  private double targetVelocity;
-  private final double gearRatio;
-  private ArrayList<Double> currents;
-  private double realZero;
-  private boolean zeroing;
-  private PIDController pid;
+  private final TalonFX motorLeft;
+  private final TalonFX motorRight;
+  private final TalonFX motorRotator;
+  private final LinearServo motorHoodLeft;
+  private final CANcoder turretEncoder;
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
 
-  public Turret() {
-    motorLeft = new TalonFX(Constants.CAN_IDS.turretMotorLeft, "FRC 1599B");
-    motorRight = new TalonFX(Constants.CAN_IDS.turretMotorRight, "FRC 1599B");
-    motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator, "FRC 1599B");
+  // Reusable CTRE control request objects (never allocate in hot path)
+  private final VelocityVoltage m_velocityRequest = new VelocityVoltage(0).withFeedForward(0).withSlot(0);
+  private final PositionVoltage m_rotatorPositionRequest = new PositionVoltage(0).withSlot(0);
 
+  // Cached status signals — refresh once per periodic, then read .getValue()
+  private final StatusSignal<edu.wpi.first.units.measure.AngularVelocity> m_leftVelocity;
+  private final StatusSignal<edu.wpi.first.units.measure.Angle> m_rotatorPosition;
+  private final StatusSignal<edu.wpi.first.units.measure.Current> m_rotatorCurrent;
+
+  private boolean hoodUp = false;
+  private double targetVelocity = 0;
+  private double targetAngleDeg = 0;   // setpoint for CTRE closed-loop rotation
+  private double realZero = 0;
+  private boolean zeroing = false;
+  /** Last commanded rotator direction — used for software safety backstop. */
+  private double commandedDirection = 0;
+  private final ArrayList<Double> currents = new ArrayList<>(7);
+
+  public Turret() {
+    motorLeft    = new TalonFX(Constants.CAN_IDS.turretMotorLeft,     "FRC 1599B");
+    motorRight   = new TalonFX(Constants.CAN_IDS.turretMotorRight,    "FRC 1599B");
+    motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator,  "FRC 1599B");
+    turretEncoder = new CANcoder(Constants.CAN_IDS.turretEncoder,     "FRC 1599B");
+
+    // Flywheel motors
     MotorOutputConfigs coastConfig = new MotorOutputConfigs();
     coastConfig.NeutralMode = NeutralModeValue.Coast;
     motorLeft.getConfigurator().apply(coastConfig);
@@ -59,37 +70,29 @@ public class Turret extends SubsystemBase {
     invertConfig.Inverted = InvertedValue.Clockwise_Positive;
     motorRight.getConfigurator().apply(invertConfig);
 
-    motorHoodLeft = new HiTecServo(Constants.Channels.motorHoodLeft);
-    hoodUp = false;
-    currents = new ArrayList<>(7);
-    realZero = 0;
-    zeroing = false;
-    pid = new PIDController(0.014, 0, 0);
+    Slot0Configs spinMotorConfigs = new Slot0Configs();
+    spinMotorConfigs.kP = Constants.Turret.FLYWHEEL_KP;
+    spinMotorConfigs.kI = Constants.Turret.FLYWHEEL_KI;
+    spinMotorConfigs.kD = Constants.Turret.FLYWHEEL_KD;
+    motorLeft.getConfigurator().apply(spinMotorConfigs);
+    motorRight.getConfigurator().apply(spinMotorConfigs);
 
-    Slot0Configs slot0Configs = new Slot0Configs();
-    slot0Configs.kP = 0.1; // An error of 1 rotation results in 2.4 V output
-    slot0Configs.kI = 0.0; // no output for integrated error
-    slot0Configs.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
-
-    turretEncoder = new CANcoder(Constants.CAN_IDS.turretEncoder, "FRC 1599B");
-
+    // Rotator motor — CTRE closed-loop with remote CANcoder feedback
     TalonFXConfiguration conf = new TalonFXConfiguration();
     conf.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     conf.Feedback.FeedbackRemoteSensorID = turretEncoder.getDeviceID();
     conf.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    conf.Slot0.kP = slot0Configs.kP;
-    conf.Slot0.kI = slot0Configs.kI;
-    conf.Slot0.kD = slot0Configs.kD;
+    conf.Slot0.kP = Constants.Turret.ROTATOR_KP;
+    conf.Slot0.kI = Constants.Turret.ROTATOR_KI;
+    conf.Slot0.kD = Constants.Turret.ROTATOR_KD;
     motorRotator.getConfigurator().apply(conf);
 
-    Slot0Configs spinMotorConfigs = new Slot0Configs();
-    spinMotorConfigs.kP = 0.64; // An error of 1 rotation results in 2.4 V output
-    spinMotorConfigs.kI = 0.0; // no output for integrated error
-    spinMotorConfigs.kD = 0.0; // A velocity of 1 rps results in 0.1 V output
+    // Cache signal references — avoids repeated object allocation in hot path
+    m_leftVelocity   = motorLeft.getVelocity();
+    m_rotatorPosition = motorRotator.getPosition();
+    m_rotatorCurrent  = motorRotator.getSupplyCurrent();
 
-    motorLeft.getConfigurator().apply(spinMotorConfigs);
-    motorRight.getConfigurator().apply(spinMotorConfigs);
-
+    // Distance-to-speed interpolation table
     shooterSpeedMap.put(Constants.Turret.distClose, Constants.Turret.speedClose);
     shooterSpeedMap.put(Constants.Turret.distMid,   Constants.Turret.speedMid);
     shooterSpeedMap.put(Constants.Turret.distFar,   Constants.Turret.speedFar);
@@ -101,101 +104,108 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/distFar",    Constants.Turret.distFar);
     SmartDashboard.putNumber("Shooter/speedFar",   Constants.Turret.speedFar);
 
-    targetVelocity = 0;
-    gearRatio = 10;
-
+    motorHoodLeft = new HiTecServo(Constants.Channels.motorHoodLeft);
   }
 
   public void rotate(double speed) {
-    if (isSafe(speed))
-      motorRotator.set(speed * 0.15);
-    else
+    if (isSafe(speed)) {
+      commandedDirection = speed;
+      motorRotator.set(speed * Constants.Turret.ROTATE_OUTPUT_SCALE);
+    } else {
       stopRotator();
+    }
   }
 
-  public void setSetpoint(double degree)
-  {
-    pid.setSetpoint(degree);
+  /** Set the target angle (degrees) for CTRE closed-loop position control via rotateTo(). */
+  public void setSetpoint(double degree) {
+    targetAngleDeg = degree;
   }
 
+  /** Drive the rotator to the last angle set by setSetpoint() using CTRE onboard PID. */
   public void rotateTo() {
-    double out = pid.calculate(getAngle());
-    if (out > 1.0)
-      out = 1.0;
-    else if (out < -1.0)
-      out = -1.0;
-    motorRotator.set(out);
+    double targetRotations = realZero + (targetAngleDeg / 360.0) * Constants.Turret.GEAR_RATIO;
+    commandedDirection = Math.signum(targetAngleDeg - getAngle());
+    motorRotator.setControl(m_rotatorPositionRequest.withPosition(targetRotations));
   }
 
   public void autoRotate() {
     double position = Limelight.getTurretSpeed();
     if (isSafe(position)) {
-      motorRotator.set(position); 
+      commandedDirection = position;
+      motorRotator.set(position);
     }
   }
 
-  public boolean getHoodPosition()
-  {
+  public boolean getHoodPosition() {
     return hoodUp;
   }
 
   public void setHoodPosition(boolean up) {
     hoodUp = up;
-    if (hoodUp)
-      motorHoodLeft.setPosition(0.8);
-    else
-      motorHoodLeft.setPosition(0.0);
+    motorHoodLeft.setPosition(hoodUp ? Constants.Turret.HOOD_UP_POS : Constants.Turret.HOOD_DOWN_POS);
   }
 
-  public double getVelocity()
-  {
-    return motorLeft.getVelocity().getValueAsDouble();
+  /** Returns flywheel velocity in RPS (left motor). Uses cached, refreshed signal. */
+  public double getVelocity() {
+    return m_leftVelocity.getValueAsDouble();
   }
 
   public void spinAtDistance() {
     double distance = Limelight.getDistance();
-    if (distance <= 0) 
-      spin(Constants.Turret.speedMid); // no valid target - don't change speed
+    if (distance <= 0)
+      spin(Constants.Turret.speedMid); // no valid target — use mid-range default
     else
       spin(shooterSpeedMap.get(distance));
   }
 
   public void spin(double speed) {
-    // velocity unit is rev per sec of the motor
-    targetVelocity = speed; // gear ratio is 1:1 so no math needed
-    final VelocityVoltage m_request = new VelocityVoltage(targetVelocity).withFeedForward(0).withSlot(0);
-    motorLeft.setControl(m_request);
-    motorRight.setControl(m_request);
+    targetVelocity = speed;
+    motorLeft.setControl(m_velocityRequest.withVelocity(targetVelocity));
+    motorRight.setControl(m_velocityRequest.withVelocity(targetVelocity));
   }
 
   public void findZero() {
     zeroing = true;
-    motorRotator.set(-0.08);
+    commandedDirection = -1;
+    motorRotator.set(Constants.Turret.ZERO_POWER);
   }
 
-  public void setZero()
-  {
-    realZero = motorRotator.getPosition().getValueAsDouble();
+  public void setZero() {
+    realZero = m_rotatorPosition.getValueAsDouble();
+    // Apply CTRE soft limits now that we know the calibrated zero
+    SoftwareLimitSwitchConfigs limitConf = new SoftwareLimitSwitchConfigs();
+    limitConf.ForwardSoftLimitEnable = true;
+    limitConf.ForwardSoftLimitThreshold =
+        realZero + (Constants.Turret.maxAngle / 360.0) * Constants.Turret.GEAR_RATIO;
+    limitConf.ReverseSoftLimitEnable = true;
+    limitConf.ReverseSoftLimitThreshold =
+        realZero + (Constants.Turret.minAngle / 360.0) * Constants.Turret.GEAR_RATIO;
+    motorRotator.getConfigurator().apply(limitConf);
+    zeroing = false;
+    commandedDirection = 0;
   }
 
   public boolean zeroPeriodic() {
-    currents.add(Math.abs(motorRotator.getSupplyCurrent().getValueAsDouble()));
-    
+    currents.add(Math.abs(m_rotatorCurrent.getValueAsDouble()));
+
     int count = 0;
     for (int i = 1; i < currents.size(); i++) {
-        double delta = Math.abs(currents.get(i) - currents.get(i - 1));
-        if (delta >= 0.1)
-            count++;
+      double delta = Math.abs(currents.get(i) - currents.get(i - 1));
+      if (delta >= Constants.Turret.ZERO_CURRENT_DELTA_AMPS)
+        count++;
     }
 
-    if (currents.size() > 3)
-      return currents.get(currents.size() - 1) > 1.25 && currents.get(currents.size() - 2) > 1.25 && currents.get(currents.size() - 3) > 1.25;
+    if (currents.size() > 3) {
+      int n = currents.size();
+      return currents.get(n - 1) > Constants.Turret.ZERO_STALL_CURRENT_AMPS
+          && currents.get(n - 2) > Constants.Turret.ZERO_STALL_CURRENT_AMPS
+          && currents.get(n - 3) > Constants.Turret.ZERO_STALL_CURRENT_AMPS;
+    }
     return count > 3;
   }
 
-  public boolean isAtSpeed()
-  {
-    return Math.abs(getSpeed() - targetVelocity) < Constants.Turret.shooterThreshold;
+  public boolean isAtSpeed() {
+    return Math.abs(getVelocity() - targetVelocity) < Constants.Turret.shooterThreshold;
   }
 
   public void stopShooter() {
@@ -204,47 +214,44 @@ public class Turret extends SubsystemBase {
   }
 
   public void stopRotator() {
+    commandedDirection = 0;
     motorRotator.set(0);
   }
 
+  /** Returns turret angle in degrees relative to the homed zero position. */
   public double getAngle() {
-    return ((motorRotator.getPosition().getValueAsDouble() - realZero) / gearRatio) * 360;
+    return ((m_rotatorPosition.getValueAsDouble() - realZero) / Constants.Turret.GEAR_RATIO) * 360.0;
   }
 
-  public double getSpeed() {
-    return motorLeft.getVelocity().getValueAsDouble();
-  }
-
-  public void runAtPower(double power)
-  {
+  public void runAtPower(double power) {
     motorLeft.set(power);
     motorRight.set(power);
   }
 
-  public boolean isSafe(double output)
-  {
-    if (output < 0 && getAngle() > Constants.Turret.minAngle)
-      return true;
-    else if (output > 0 && getAngle() < Constants.Turret.maxAngle)
-      return true;
-    else if (output == 0)
-      return true;
-    else
-      return false;
+  /**
+   * Returns true if the given output direction is safe given the current angle.
+   * Negative output = moving toward minAngle; positive = toward maxAngle.
+   */
+  public boolean isSafe(double output) {
+    if (output < 0 && getAngle() > Constants.Turret.minAngle) return true;
+    if (output > 0 && getAngle() < Constants.Turret.maxAngle) return true;
+    if (output == 0) return true;
+    return false;
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    SmartDashboard.putNumber("turret pos", motorRotator.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("turret angle", getAngle());
-    SmartDashboard.putNumber("given output", motorRotator.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber("turret curent output", motorRotator.getSupplyCurrent().getValueAsDouble());
+    // Refresh all cached signals at the top of periodic — never read stale values
+    BaseStatusSignal.refreshAll(m_leftVelocity, m_rotatorPosition, m_rotatorCurrent);
 
-    if (!zeroing)
-    {
-      if (!isSafe(motorRotator.getMotorVoltage().getValueAsDouble())) // ALWAYS check for safety
-        stopRotator();
+    SmartDashboard.putNumber("Turret/position_rot", m_rotatorPosition.getValueAsDouble());
+    SmartDashboard.putNumber("Turret/angle_deg",    getAngle());
+    SmartDashboard.putNumber("Turret/current_amps", m_rotatorCurrent.getValueAsDouble());
+    SmartDashboard.putNumber("Turret/velocity_rps", getVelocity());
+
+    // Software safety backstop: stop if commanded direction would exceed limits
+    if (!zeroing && !isSafe(commandedDirection)) {
+      stopRotator();
     }
   }
 }

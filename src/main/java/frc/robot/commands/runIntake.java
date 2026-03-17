@@ -18,19 +18,16 @@ public class RunIntake extends Command {
   @Override
   public void initialize() {
     intake.intake();
-    System.out.println("run command");
   }
 
-  public void execute()
-  {
+  @Override
+  public void execute() {
     intake.intake();
-    System.out.println("running");
   }
 
   @Override
   public void end(boolean interrupted) {
     intake.stopWheels();
-    System.out.println("end now");
   }
 
   @Override

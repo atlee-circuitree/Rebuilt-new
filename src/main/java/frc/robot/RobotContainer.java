@@ -7,52 +7,33 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.jni.SwerveJNI.DriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.util.Limelight;
-import frc.robot.util.LinearServo;
 import frc.robot.subsystems.*;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.util.PathPlannerLogging;
-
 import frc.robot.Telemetry;
-import frc.robot.Constants.Speed;
 
 public class RobotContainer {
 
     // subsystems
     private Elevator climber;
-    private static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private Intake intake;
     private Trigger trigger;
     private Turret turret;
-    private Trigger index;
 
     // drivetrain
     private static final Field2d field = new Field2d();
@@ -61,7 +42,7 @@ public class RobotContainer {
         return field;
     }
     
-    public static Pose2d getCurrentPose() {
+    public Pose2d getCurrentPose() {
         return drivetrain.getState().Pose;
     }
 
@@ -75,7 +56,7 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.14).withRotationalDeadband(MaxAngularRate * 0.14) // Add a 10% deadband
+            .withDeadband(MaxSpeed * Constants.Drive.DEADBAND_PERCENT).withRotationalDeadband(MaxAngularRate * Constants.Drive.DEADBAND_PERCENT)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -99,11 +80,6 @@ public class RobotContainer {
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
-        //autoChooser = AutoBuilder.buildAutoChooser();
-        //autoChooser.addOption("Just Zero Turret", new ZeroTurret(turret));
-        
-        //DO NOT DELETE (Autos not using PathPlanner) LLOK ATY THIS TOMOROW MORNING
-
         autoChooser = new SendableChooser<>();
         autoChooser.addOption("Just Shoot", new SequentialCommandGroup(
         new SpinToSpeed(turret, Constants.Turret.speedMid),
@@ -126,7 +102,7 @@ public class RobotContainer {
         //Correct for blue.
         autoChooser.addOption("Human Player Shoot (Blue)", new SequentialCommandGroup(
         new ParallelCommandGroup(
-            new ManualDeploy(intake, 0.15).withTimeout(0.5),
+            new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED).withTimeout(0.5),
             new SequentialCommandGroup(
                 drivetrain.applyRequest(() -> drive.withVelocityX(0)
                             .withVelocityY(0.6 * MaxSpeed)
@@ -159,7 +135,7 @@ public class RobotContainer {
 
         autoChooser.addOption("Human Player Shoot (RED)", new SequentialCommandGroup(
         new ParallelCommandGroup(
-            new ManualDeploy(intake, 0.15).withTimeout(0.5),
+            new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED).withTimeout(0.5),
             new SequentialCommandGroup(
                 drivetrain.applyRequest(() -> drive.withVelocityX(0)
                             .withVelocityY(-0.6 * MaxSpeed)
@@ -191,7 +167,7 @@ public class RobotContainer {
         ));
 
         autoChooser.addOption("Feeder Shoot", new SequentialCommandGroup(
-        new ManualDeploy(intake, 0.15).withTimeout(0.5),
+        new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED).withTimeout(0.5),
         new ParallelCommandGroup(
             new RunIntake(intake),
             new SequentialCommandGroup(
@@ -210,16 +186,8 @@ public class RobotContainer {
         new StopTurretWheels(turret)
         ));
 
-        // line to feeder, 3.4 m (133 in)
-        
-
-    // Define zones as bounding boxes
-    //boolean Zone0 = pose.getX() >= 491 && pose.getY() > 108;
-    //boolean Zone1 = pose.getX() > 14.0;
-
         SmartDashboard.putData("Field", field);
 
-        boolean isCompetition = true;
         // Do all other initialization
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
@@ -244,7 +212,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain));
         NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
-        NamedCommands.registerCommand("toggle hood", new SetServoPosition(null, MaxAngularRate));
         NamedCommands.registerCommand("climb up", new ClimbUp(climber));
         NamedCommands.registerCommand("climb down", new ClimbDown(climber));
     }
@@ -257,19 +224,6 @@ public class RobotContainer {
     }
 
     private void configureDrivetrain() {
-        // drivetrain
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() -> drive.withVelocityX(-getLeftY() * MaxSpeed) // Drive forward with
-                                                                                                   // negative Y
-                                                                                                   // (forward)
-                        .withVelocityY(-getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-getRightX() * MaxAngularRate) // Drive counterclockwise with
-                                                                                    // negative X (left)
-        ));
-
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
@@ -339,55 +293,10 @@ public class RobotContainer {
             )
         );
 
-        /*JoystickButton RedButton = new JoystickButton(Player2, RedArcade);
-        JoystickButton BlueButton = new JoystickButton(Player2, BlueArcade);
-        JoystickButton GreenButton = new JoystickButton(Player2, GreenArcade);
-        */
-        
-        // Player2.y().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        // //Player2.b().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
-        // Player2.a().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        // turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
-        // Player2.povUp().whileTrue(new ManualClimb(climber, true));
-        // Player2.povDown().whileTrue(new ManualClimb(climber, false));
-        
-        // drivetrain.seedFieldCentric();
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         Player2.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        //Player1.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        //Player1.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        
-        //Player1.y().onTrue(new DeployIntake(intake));
-        //Player1.x().onTrue(new RetractIntake(intake));
-        /*Player1.a().whileTrue(new RunIntake(intake));
-        Player1.b().whileTrue(new Shoot(turret, trigger));
-
-        Player1.povDown().onTrue(new StopTurretWheels(turret));
-        Player1.povRight().onTrue(new SpinToSpeed(turret, 80)); //shot
-        Player1.povUp().onTrue(new ToggleHood(turret));*/
-
-        //turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
-
-        //Player1.x().onTrue(new DeployIntake(intake));
-        //Player1.y().onTrue(new RetractIntake(intake));
-        //Player2.a().whileTrue(new RunIntake(intake));
-       // Player2.b().whileTrue(new Shoot(turret, trigger));
-
-      //  Player2.povDown().onTrue(new StopTurretWheels(turret));
-       // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
-       // Player2.povUp().onTrue(new ToggleHood(turret));
-
-        //GreenButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        //RedButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        //BlueButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
-
-        /*Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));*/
-
-        //Button Map
-
+        // Button Map
         Player1.x().onTrue(new DeployIntake(intake)); // deploy
         Player1.y().onTrue(new RetractIntake(intake)); // retract
         Player1.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
@@ -400,11 +309,9 @@ public class RobotContainer {
         )); // shoot and kick up, shooter first then kickup
 
         Player1.povUp().onTrue(new StopTurretWheels(turret));
-        Player1.rightBumper().whileTrue(new ReverseShoot(turret, trigger));
+        Player1.rightBumper().whileTrue(new ReverseShoot(trigger));
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
-        //Player1.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
-        //TODO: manual hood, and turret rotator
         Player1.leftBumper().toggleOnTrue(new TurnTurret(turret));
 
         //Player 2 controls
@@ -420,11 +327,9 @@ public class RobotContainer {
         )); // shoot and kick up, shooter first then kickup
 
         Player2.povUp().onTrue(new StopTurretWheels(turret));
-        Player2.rightBumper().whileTrue(new ReverseShoot(turret, trigger));
+        Player2.rightBumper().whileTrue(new ReverseShoot(trigger));
 
         Player2.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
-        //Player2.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
-        //TODO: manual hood, and turret rotator
         Player2.leftBumper().toggleOnTrue(new TurnTurret(turret));
     }   
 

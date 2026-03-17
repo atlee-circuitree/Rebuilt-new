@@ -18,6 +18,7 @@ public class RetractIntake extends Command {
 
   @Override
   public void initialize() {
+    intake.deployBrake(); // set brake mode once before retracting
     intake.retract();
   }
 

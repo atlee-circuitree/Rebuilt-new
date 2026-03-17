@@ -4,51 +4,37 @@
 
 package frc.robot;
 
-import java.util.HashMap;
-import java.awt.geom.*;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
-import com.ctre.phoenix6.hardware.CANcoder;
-
-import java.util.Set;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.LimelightConstants;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private CANcoder canCoder;
-
   private final RobotContainer m_robotContainer;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    canCoder = new CANcoder(33, "FRC 1599B");
   }
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run(); 
-    SmartDashboard.putBoolean("Limelight Turret Connected", NetworkTableInstance.getDefault().getTable("limelight-turret").containsKey("tx"));
+    CommandScheduler.getInstance().run();
+    SmartDashboard.putBoolean("Limelight Turret Connected",
+        NetworkTableInstance.getDefault().getTable(LimelightConstants.TURRET_LIMELIGHT_NAME).containsKey("tx"));
+    SmartDashboard.putBoolean("Limelight Climb Connected",
+        NetworkTableInstance.getDefault().getTable("limelight-climb").containsKey("tx"));
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
-    SmartDashboard.putBoolean("Limelight Climb Connected", NetworkTableInstance.getDefault().getTable("limelight-climb").containsKey("tx"));
   }
 
   @Override
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {
-    SmartDashboard.putNumber("Deploy Robot Encoder", canCoder.getAbsolutePosition().getValueAsDouble());
-  }
+  public void disabledPeriodic() {}
 
   @Override
   public void disabledExit() {}
@@ -56,7 +42,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -65,7 +50,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {}
 
-  @ Override
+  @Override
   public void autonomousExit() {}
 
   @Override
@@ -78,9 +63,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-   // m_robotContainer.Periodic();
-   RobotContainer.getField().setRobotPose(RobotContainer.getCurrentPose());
-    
+    RobotContainer.getField().setRobotPose(m_robotContainer.getCurrentPose());
   }
 
   @Override
@@ -99,11 +82,4 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {}
-
-  public class Region2d {
-  private Path2D shape;
-  private HashMap<Region2d, Translation2d> transitionMap;
-  }
-
 }
-//

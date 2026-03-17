@@ -1,32 +1,19 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Trigger;
-import frc.robot.subsystems.Turret;
 
 public class ReverseShoot extends Command {
-  private Turret turret;
-  private Trigger trigger;
-  
-  public ReverseShoot(Turret turret, Trigger trigger) {
-    this.turret = turret;
-    this.trigger = trigger;
-    SmartDashboard.putNumber("Current Turret Speed", 0);
-    // not requiring turret because we are using it as read only
-    // requiring it would prvent shooting if another command is working on turret
-  }
+  private final Trigger trigger;
 
-  @Override
-  public void initialize()
-  {
-    System.out.println("Shooter speed " + turret.getVelocity());
+  public ReverseShoot(Trigger trigger) {
+    this.trigger = trigger;
+    addRequirements(trigger);
   }
 
   @Override
   public void execute() {
-  trigger.reverseShoot();
-    
+    trigger.reverseShoot();
   }
 
   @Override

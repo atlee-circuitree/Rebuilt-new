@@ -7,11 +7,12 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
 public class ManualTurret extends Command {
-  private Turret turret;
-  private Supplier<Double> speed;
+  private final Turret turret;
+  private final Supplier<Double> speed;
 
   public ManualTurret(Turret turret, Supplier<Double> speed) {
     this.turret = turret;
@@ -22,8 +23,10 @@ public class ManualTurret extends Command {
   @Override
   public void execute()
   {
-    if (Math.abs(speed.get()) < 0.08) 
+    if (Math.abs(speed.get()) > Constants.Turret.MANUAL_DEADBAND)
       turret.rotate(speed.get());
+    else
+      turret.stopRotator();
   }
 
   @Override

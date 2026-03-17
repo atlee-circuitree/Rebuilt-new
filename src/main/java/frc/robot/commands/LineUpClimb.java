@@ -10,21 +10,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class LineUpClimb extends Command {
 
-  private CommandSwerveDrivetrain drivetrain;
-  private SwerveRequest.FieldCentric drive;
-  private Pose2d pose;
+  private final CommandSwerveDrivetrain drivetrain;
+  private final SwerveRequest.FieldCentric drive;
+  private final Pose2d pose;
   private double maxSpeed;
   private double maxRotation;
-  private double P = 0.2;
-  private double threshold = 0.2;
 
   public LineUpClimb(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
+    this.drive = new SwerveRequest.FieldCentric();
     pose = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
     addRequirements(drivetrain);
   }
@@ -32,9 +31,9 @@ public class LineUpClimb extends Command {
   @Override
   public void execute() {
     Pose2d cur = drivetrain.getState().Pose;
-    double x = (cur.getX() - pose.getX()) * P;
-    double y = (cur.getY() - pose.getY()) * P;
-    double r = (cur.getRotation().getDegrees() - pose.getRotation().getDegrees()) * P;
+    double x = (cur.getX() - pose.getX()) * Constants.Climber.LINEUP_P;
+    double y = (cur.getY() - pose.getY()) * Constants.Climber.LINEUP_P;
+    double r = (cur.getRotation().getDegrees() - pose.getRotation().getDegrees()) * Constants.Climber.LINEUP_P;
 
     drivetrain.setControl(drive.withVelocityX(x * maxSpeed)
                         .withVelocityY(y * maxSpeed)
@@ -45,8 +44,8 @@ public class LineUpClimb extends Command {
   @Override
   public boolean isFinished() {
     Pose2d cur = drivetrain.getState().Pose;
-    return Math.abs(cur.getX() - pose.getX()) < threshold && 
-      Math.abs(cur.getY() - pose.getY()) < threshold &&
-      Math.abs(cur.getRotation().getDegrees() - pose.getRotation().getDegrees()) < threshold;
+    return Math.abs(cur.getX() - pose.getX()) < Constants.Climber.LINEUP_THRESHOLD_M &&
+      Math.abs(cur.getY() - pose.getY()) < Constants.Climber.LINEUP_THRESHOLD_M &&
+      Math.abs(cur.getRotation().getDegrees() - pose.getRotation().getDegrees()) < Constants.Climber.LINEUP_THRESHOLD_M;
   }
 }
