@@ -117,7 +117,7 @@ public class Turret extends SubsystemBase {
 
     motorHoodLeft = new HiTecServo(Constants.Turret.HOOD_SERVO_CHANNEL);
   }
-
+  //hardcoded 0.15
   public void rotate(double speed) {
     if (isSafe(speed)) {
       commandedDirection = speed;

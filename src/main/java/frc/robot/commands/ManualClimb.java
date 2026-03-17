@@ -15,6 +15,7 @@ public class ManualClimb extends Command {
     addRequirements(climb);
   }
 
+  //maybe explain what both values mean.
   @Override
   public void initialize() {
     climb.driveAtSpeed(goUp ? Constants.Climber.MANUAL_UP_SPEED : Constants.Climber.MANUAL_DOWN_SPEED);

@@ -19,7 +19,7 @@ public class ManualTurret extends Command {
     this.speed = speed;
     addRequirements(turret);
   }
-
+  //Possibly reverse the condition.
   @Override
   public void execute()
   {

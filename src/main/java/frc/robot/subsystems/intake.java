@@ -100,7 +100,7 @@ public class Intake extends SubsystemBase {
     runningToPosition = true;
   }
 
-  /** Returns deploy position offset by +1 for telemetry display. */
+  //need to fix deploy and retract.
   public double getAngleEncoder() {
     return m_deployPosition.getValueAsDouble() + 1;
   }

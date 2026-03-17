@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.commands.*;
@@ -24,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.auto.NamedCommands;
-import frc.robot.Telemetry;
 
 public class RobotContainer {
 
@@ -75,110 +73,9 @@ public class RobotContainer {
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
-        autoChooser = new SendableChooser<>();
-        autoChooser.addOption("Just Shoot", new SequentialCommandGroup(
-        new SpinToSpeed(turret, Constants.Turret.speedMid),
-        new Shoot(turret, trigger).withTimeout(12),
-        new StopTurretWheels(turret)
-        ));
-        autoChooser.addOption("Center Shoot", new SequentialCommandGroup(
-        drivetrain.applyRequest(() -> drive.withVelocityX(0.4 * MaxSpeed)
-                       .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                       .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
-        ).withTimeout(3.5),
-        drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                       .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                       .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
-        ).withTimeout(0.2),
-        new SpinToSpeed(turret, Constants.Turret.speedMid),
-        new Shoot(turret, trigger).withTimeout(12),
-        new StopTurretWheels(turret)
-        ));
-        autoChooser.addOption("Human Player Shoot (Blue)", new SequentialCommandGroup(
-        new ParallelCommandGroup(
-            new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED).withTimeout(0.5),
-            new SequentialCommandGroup(
-                drivetrain.applyRequest(() -> drive.withVelocityX(0)
-                            .withVelocityY(0.6 * MaxSpeed)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(4.75),
-                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(0.2)
-            )),
-        new WaitCommand(2),
-        new SequentialCommandGroup(
-                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                            .withVelocityY(-0.6 * MaxSpeed)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(1.5),
-                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(0.2)
-            ),
-        new SpinToDistanceSpeed(turret),
-        new TurnTurret(turret).withTimeout(1.5),
-        new ParallelCommandGroup(
-            new DeployJumpCommand(intake).withTimeout(12),
-            new Shoot(turret, trigger).withTimeout(12)
-        ).withTimeout(12),
-        new StopTurretWheels(turret)
-        ));
-
-        autoChooser.addOption("Human Player Shoot (RED)", new SequentialCommandGroup(
-        new ParallelCommandGroup(
-            new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED).withTimeout(0.5),
-            new SequentialCommandGroup(
-                drivetrain.applyRequest(() -> drive.withVelocityX(0)
-                            .withVelocityY(-0.6 * MaxSpeed)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(4.75),
-                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(0.2)
-            )),
-        new WaitCommand(2),
-        new SequentialCommandGroup(
-                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                            .withVelocityY(0.6 * MaxSpeed)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(1.5),
-                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                            .withRotationalRate(0) // Drive counterclockwise with
-                ).withTimeout(0.2)
-            ),
-        new SpinToDistanceSpeed(turret),
-        new TurnTurret(turret).withTimeout(1.5),
-        new ParallelCommandGroup(
-            new DeployJumpCommand(intake).withTimeout(12),
-            new Shoot(turret, trigger).withTimeout(12)
-        ).withTimeout(12),
-        new StopTurretWheels(turret)
-        ));
-
-        autoChooser.addOption("Feeder Shoot", new SequentialCommandGroup(
-        new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED).withTimeout(0.5),
-        new ParallelCommandGroup(
-            new RunIntake(intake),
-            new SequentialCommandGroup(
-                drivetrain.applyRequest(() -> drive.withVelocityX(-0.6 * MaxSpeed)
-                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                            .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
-                ).withTimeout(3.5),
-                drivetrain.applyRequest(() -> drive.withVelocityX(0 * MaxSpeed)
-                            .withVelocityY(0 * MaxSpeed) // Drive left with negative X (left)
-                            .withRotationalRate(0 * MaxAngularRate) // Drive counterclockwise with
-                ).withTimeout(0.2)
-            )),
-        new SpinToSpeed(turret, Constants.Turret.speedMid),
-        new TurnTurret(turret).withTimeout(1.5),
-        new Shoot(turret, trigger).withTimeout(12),
-        new StopTurretWheels(turret)
-        ));
+        
+        //AUTO CHOOSER CREATION.
+        autoChooser = AutoCommands.buildAutoChooser(drivetrain, drive, MaxSpeed, MaxAngularRate, turret, trigger, intake);
 
         SmartDashboard.putData("Field", field);
 
@@ -280,10 +177,13 @@ public class RobotContainer {
             )
         );
 
+        
+        // drivetrain.seedFieldCentric();
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         Player2.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // Button Map
+        //Button Map
+
         Player1.x().onTrue(new DeployIntake(intake)); // deploy
         Player1.y().onTrue(new RetractIntake(intake)); // retract
         Player1.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
@@ -317,6 +217,8 @@ public class RobotContainer {
         Player2.rightBumper().whileTrue(new ReverseShoot(trigger));
 
         Player2.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
+
+        //TODO: manual hood, and turret rotator
         Player2.leftBumper().toggleOnTrue(new TurnTurret(turret));
     }   
 

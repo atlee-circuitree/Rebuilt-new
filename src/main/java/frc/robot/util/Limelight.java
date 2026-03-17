@@ -33,6 +33,7 @@ public class Limelight {
         return limelight.getEntry("ty").getDouble(0.0);
     }
 
+    //magic number 46.39986 no documentation
     public static double getDistance() {
         double ta = getTA();
         if (ta > Constants.LimelightConstants.MAX_TA_FOR_DISTANCE || ta == 0) {
