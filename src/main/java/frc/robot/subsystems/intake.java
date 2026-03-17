@@ -13,6 +13,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -32,6 +33,8 @@ public class Intake extends SubsystemBase {
 
   private boolean runningToPosition = false;
   private double setPoint = 0;
+  // 4-cycle (80 ms) debounce — prevents a single noisy sample from stopping the deploy motor
+  private final Debouncer m_atPositionDebouncer = new Debouncer(4 * 0.02, Debouncer.DebounceType.kRising);
 
   public Intake() {
     feedMotor   = new TalonFX(Constants.CAN_IDS.feedIntakeMotor, "FRC 1599B");
@@ -122,7 +125,8 @@ public class Intake extends SubsystemBase {
     if (runningToPosition) {
       SmartDashboard.putNumber("Intake/setpoint_rot", setPoint);
       // Compare setPoint directly against raw motor position (no +1 offset)
-      if (Math.abs(setPoint - m_deployPosition.getValueAsDouble()) < Constants.Intake.POSITION_TOLERANCE_ROT) {
+      boolean atPosition = Math.abs(setPoint - m_deployPosition.getValueAsDouble()) < Constants.Intake.POSITION_TOLERANCE_ROT;
+      if (m_atPositionDebouncer.calculate(atPosition)) {
         runningToPosition = false;
         deployMotor.set(0);
       }

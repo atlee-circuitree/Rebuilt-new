@@ -60,6 +60,10 @@ public class Turret extends SubsystemBase {
   private final LinearFilter m_velocityFilter = LinearFilter.movingAverage(5);
   private double m_filteredVelocity = 0;
 
+  // 4-cycle (80 ms) debounce — prevents a single noisy CANcoder reading from triggering the safety stop
+  private final edu.wpi.first.math.filter.Debouncer m_unsafeDebouncer =
+      new edu.wpi.first.math.filter.Debouncer(4 * 0.02, edu.wpi.first.math.filter.Debouncer.DebounceType.kRising);
+
   public Turret() {
     flywheelLeft    = new TalonFX(Constants.CAN_IDS.turretMotorLeft,     "FRC 1599B");
     flywheelRight   = new TalonFX(Constants.CAN_IDS.turretMotorRight,    "FRC 1599B");
@@ -262,8 +266,8 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putNumber("Turret/current_amps", m_rotatorCurrent.getValueAsDouble());
     SmartDashboard.putNumber("Turret/velocity_rps", getVelocity());
 
-    // Software safety backstop: stop if commanded direction would exceed limits
-    if (!zeroing && !isSafe(commandedDirection)) {
+    // Software safety backstop: stop if commanded direction has been unsafe for 4 consecutive cycles
+    if (!zeroing && m_unsafeDebouncer.calculate(!isSafe(commandedDirection))) {
       stopRotator();
     }
   }
