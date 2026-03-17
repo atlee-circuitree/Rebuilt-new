@@ -99,6 +99,7 @@ public class Intake extends SubsystemBase {
     runningToPosition = true;
   }
 
+  //need to fix deploy and retract.
   public double getAngleEncoder() {
     return (deployMotor.getPosition().getValueAsDouble() + 1);
   }

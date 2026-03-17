@@ -52,7 +52,6 @@ public class RobotContainer {
     private Intake intake;
     private Trigger trigger;
     private Turret turret;
-    private Trigger index;
 
     // drivetrain
     private static final Field2d field = new Field2d();
@@ -102,8 +101,6 @@ public class RobotContainer {
         //autoChooser = AutoBuilder.buildAutoChooser();
         //autoChooser.addOption("Just Zero Turret", new ZeroTurret(turret));
         
-        //DO NOT DELETE (Autos not using PathPlanner) LLOK ATY THIS TOMOROW MORNING
-
         autoChooser = new SendableChooser<>();
         autoChooser.addOption("Just Shoot", new SequentialCommandGroup(
         new SpinToSpeed(turret, Constants.Turret.speedMid),
@@ -219,7 +216,6 @@ public class RobotContainer {
 
         SmartDashboard.putData("Field", field);
 
-        boolean isCompetition = true;
         // Do all other initialization
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
@@ -244,7 +240,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain));
         NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
-        NamedCommands.registerCommand("toggle hood", new SetServoPosition(null, MaxAngularRate));
         NamedCommands.registerCommand("climb up", new ClimbUp(climber));
         NamedCommands.registerCommand("climb down", new ClimbDown(climber));
     }
@@ -339,52 +334,10 @@ public class RobotContainer {
             )
         );
 
-        /*JoystickButton RedButton = new JoystickButton(Player2, RedArcade);
-        JoystickButton BlueButton = new JoystickButton(Player2, BlueArcade);
-        JoystickButton GreenButton = new JoystickButton(Player2, GreenArcade);
-        */
-        
-        // Player2.y().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        // //Player2.b().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
-        // Player2.a().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        // turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
-        // Player2.povUp().whileTrue(new ManualClimb(climber, true));
-        // Player2.povDown().whileTrue(new ManualClimb(climber, false));
         
         // drivetrain.seedFieldCentric();
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         Player2.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
-        //Player1.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        //Player1.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        
-        //Player1.y().onTrue(new DeployIntake(intake));
-        //Player1.x().onTrue(new RetractIntake(intake));
-        /*Player1.a().whileTrue(new RunIntake(intake));
-        Player1.b().whileTrue(new Shoot(turret, trigger));
-
-        Player1.povDown().onTrue(new StopTurretWheels(turret));
-        Player1.povRight().onTrue(new SpinToSpeed(turret, 80)); //shot
-        Player1.povUp().onTrue(new ToggleHood(turret));*/
-
-        //turret.setDefaultCommand(new ManualTurret(turret, () -> { return Player2.getLeftX(); }));
-
-        //Player1.x().onTrue(new DeployIntake(intake));
-        //Player1.y().onTrue(new RetractIntake(intake));
-        //Player2.a().whileTrue(new RunIntake(intake));
-       // Player2.b().whileTrue(new Shoot(turret, trigger));
-
-      //  Player2.povDown().onTrue(new StopTurretWheels(turret));
-       // Player2.povRight().onTrue(new SpinToSpeed(turret, 40));
-       // Player2.povUp().onTrue(new ToggleHood(turret));
-
-        //GreenButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        //RedButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        //BlueButton.onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));
-
-        /*Player2.rightBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Top;}));
-        Player2.leftBumper().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Starting;}));
-        Player2.povUp().onTrue(climber.goToSetpoint(() -> {return Elevator.Setpoint.Middle;}));*/
 
         //Button Map
 
@@ -423,7 +376,7 @@ public class RobotContainer {
         Player2.rightBumper().whileTrue(new ReverseShoot(turret, trigger));
 
         Player2.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
-        //Player2.leftBumper().toggleOnTrue(new AutoTurret(turret, trigger, drivetrain)); //auto turret
+
         //TODO: manual hood, and turret rotator
         Player2.leftBumper().toggleOnTrue(new TurnTurret(turret));
     }   

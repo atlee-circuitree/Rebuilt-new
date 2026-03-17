@@ -6,7 +6,6 @@ import frc.robot.subsystems.Turret;
 
 public class StopTurretWheels extends Command {
   private Turret turret;
-  private double speed;
   
   public StopTurretWheels(Turret turret) {
     this.turret = turret; 

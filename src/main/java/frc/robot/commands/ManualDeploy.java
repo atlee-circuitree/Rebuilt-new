@@ -12,13 +12,9 @@ public class ManualDeploy extends Command {
   /** Creates a new ManualDeploy. */
   private Intake intake;
   private double speed;
-  private boolean brake;
 
   public ManualDeploy(Intake intake, double speed) {
-    // Use addRequirements() here to declare subsystem dependencies.\
-    if (speed < 0) {
-      boolean brake = true;
-    }
+    // Use addRequirements() here to declare subsystem dependencies.
     this.intake = intake;
     this.speed = speed;
 
@@ -32,10 +28,7 @@ public class ManualDeploy extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-    if (brake) {
-      intake.deployBrake();
-    }
+    
     intake.deployManual(speed);
 
   }

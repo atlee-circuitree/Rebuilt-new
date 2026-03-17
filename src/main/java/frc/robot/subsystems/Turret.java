@@ -105,7 +105,7 @@ public class Turret extends SubsystemBase {
     gearRatio = 10;
 
   }
-
+  //hardcoded 0.15
   public void rotate(double speed) {
     if (isSafe(speed))
       motorRotator.set(speed * 0.15);

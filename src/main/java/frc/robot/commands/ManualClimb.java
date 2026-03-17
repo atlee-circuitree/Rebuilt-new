@@ -15,6 +15,7 @@ public class ManualClimb extends Command {
     addRequirements(climb);
   }
 
+  //maybe explain what both values mean.
   @Override
   public void initialize() {
     climb.driveAtSpeed(goUp ? 0.30 : -0.60); //-0.12
