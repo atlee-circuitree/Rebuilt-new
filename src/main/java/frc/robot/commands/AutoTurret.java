@@ -13,30 +13,20 @@ import frc.robot.subsystems.Turret;
 
 public class AutoTurret extends Command {
 
-  private Rectangle2d Zone0 = new Rectangle2d(new Translation2d(491,316), new Translation2d(651, 158));
-  private Rectangle2d Zone1 = new Rectangle2d(new Translation2d(204,216), new Translation2d(447, 108));
-  private Rectangle2d Zone2 = new Rectangle2d(new Translation2d(204,108), new Translation2d(447, 0));
-  private Rectangle2d Zone3 = new Rectangle2d(new Translation2d(491,108), new Translation2d(651, 0));
-  private Rectangle2d DeadZone1 = new Rectangle2d(new Translation2d(211, 187), new Translation2d(258,128));
-  private Rectangle2d DeadZone2 = new Rectangle2d(new Translation2d(498, 187), new Translation2d(545,128));
+  // Zones in WPILib field meters (converted from 2022 field inches: divide by 39.3701)
+  private final Rectangle2d Zone0     = new Rectangle2d(new Translation2d(12.47, 8.03), new Translation2d(16.54, 4.01));
+  private final Rectangle2d Zone1     = new Rectangle2d(new Translation2d( 5.18, 5.49), new Translation2d(11.35, 2.74));
+  private final Rectangle2d Zone2     = new Rectangle2d(new Translation2d( 5.18, 2.74), new Translation2d(11.35, 0.00));
+  private final Rectangle2d Zone3     = new Rectangle2d(new Translation2d(12.47, 2.74), new Translation2d(16.54, 0.00));
+  private final Rectangle2d DeadZone1 = new Rectangle2d(new Translation2d( 5.36, 4.75), new Translation2d( 6.55, 3.25));
+  private final Rectangle2d DeadZone2 = new Rectangle2d(new Translation2d(12.65, 4.75), new Translation2d(13.84, 3.25));
 
 
-    private class Point {
-        int x;
-        int y;
-
-        public Point(int xi, int yi)
-        {
-            x = xi;
-            y = yi;
-        }
-    }
-
-    private Turret turret;
-    private Trigger trigger;
-    private CommandSwerveDrivetrain drivetrain;
+    private final Turret turret;
+    private final Trigger trigger;
+    private final CommandSwerveDrivetrain drivetrain;
     // key = zone id, value = target point to shoot at
-    private HashMap<Integer, Point> table;
+    private final HashMap<Integer, Translation2d> table;
 
   public AutoTurret(Turret turret, Trigger trigger, CommandSwerveDrivetrain drivetrain) {
     this.turret = turret;
@@ -46,9 +36,9 @@ public class AutoTurret extends Command {
     addRequirements(trigger);
 
     table = new HashMap<>();
-    table.put(0, new Point(91, 269));
-    table.put(1, new Point(91, 47));
-    table.put(2, new Point(182, 158));
+    table.put(0, new Translation2d(2.31, 6.83));
+    table.put(1, new Translation2d(2.31, 1.19));
+    table.put(2, new Translation2d(4.62, 4.01));
   }
 
   private int getZone(Pose2d pose)
@@ -91,7 +81,7 @@ public class AutoTurret extends Command {
     Pose2d pose = drivetrain.getState().Pose;
     int zone = getZone(pose);
     
-    Point target = table.get(zone);
+    Translation2d target = table.get(zone);
     if (isInDeadZone(pose))
     {
         turret.runAtPower(0.2);
@@ -105,13 +95,13 @@ public class AutoTurret extends Command {
           trigger.stop();
           return;
         }
-        if (getZone(pose) == 4) {
+        if (zone == 4) {
           turret.setHoodPosition(false);
         } else {
           turret.setHoodPosition(true);
         }
-        double dist = Math.sqrt(Math.pow(pose.getX() - target.x, 2) + Math.pow(pose.getY() - target.y, 2));
-        double angle = Math.atan2(pose.getY() - target.y, pose.getX() - target.x);
+        double dist = Math.sqrt(Math.pow(pose.getX() - target.getX(), 2) + Math.pow(pose.getY() - target.getY(), 2));
+        double angle = Math.atan2(pose.getY() - target.getY(), pose.getX() - target.getX());
         angle -= pose.getRotation().getRadians();
         angle = Math.toDegrees(angle);
         //turret.rotateTo(angle);

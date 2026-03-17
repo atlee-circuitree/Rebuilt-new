@@ -5,6 +5,10 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.generated.TunerConstants;
 
@@ -38,8 +42,8 @@ public class Constants {
         public static final int kickUpMotor        = 28;
 
         // Turret
-        public static final int turretMotorLeft    = 40;
-        public static final int turretMotorRight   = 25;
+        public static final int flywheelMotorLeft   = 40;
+        public static final int flywheelMotorRight  = 25;
         public static final int turretMotorRotator = 27;
         public static final int turretEncoder      = 32;
 
@@ -83,13 +87,7 @@ public class Constants {
         public static final double DIST_FAR_FT    = 35.0;
         public static final double SPEED_FAR_RPS  = 75.0;
 
-        // Legacy aliases used in auto routines (kept for backwards compat)
-        public static final double distClose  = DIST_CLOSE_FT;
-        public static final double speedClose = SPEED_CLOSE_RPS;
-        public static final double distMid    = DIST_MID_FT;
-        public static final double speedMid   = SPEED_MID_RPS;
-        public static final double distFar    = DIST_FAR_FT;
-        public static final double speedFar   = SPEED_FAR_RPS;
+
 
         // --- Rotator PID  (CTRE Slot 0) ---
         public static final double ROTATOR_KP = 0.1;
@@ -246,8 +244,6 @@ public class Constants {
         /** Current speed divisor (1.0 = full speed). Increase for a slower mode. */
         public static final double SPEED_DIVISOR      = 1.0;
 
-        // Legacy aliases referenced in RobotContainer default-command formula
-        public static final double MaxSpeed  = MAX_SPEED_MPS;
-        public static final double Speed     = SPEED_DIVISOR;
+
     }
 }

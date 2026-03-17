@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -16,6 +17,12 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
 
+  // Cached NetworkTable references to avoid repeated traversal in robotPeriodic()
+  private final NetworkTable m_limelightTurretTable =
+      NetworkTableInstance.getDefault().getTable(Constants.LimelightConstants.TURRET_LIMELIGHT_NAME);
+  private final NetworkTable m_limelightClimbTable =
+      NetworkTableInstance.getDefault().getTable("limelight-climb");
+
   public Robot() {
     m_robotContainer = new RobotContainer();
   }
@@ -24,9 +31,9 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("Limelight Turret Connected",
-        NetworkTableInstance.getDefault().getTable(LimelightConstants.TURRET_LIMELIGHT_NAME).containsKey("tx"));
+        m_limelightTurretTable.containsKey("tx"));
     SmartDashboard.putBoolean("Limelight Climb Connected",
-        NetworkTableInstance.getDefault().getTable("limelight-climb").containsKey("tx"));
+        m_limelightClimbTable.containsKey("tx"));
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
   }
 

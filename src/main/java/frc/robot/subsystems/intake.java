@@ -90,7 +90,7 @@ public class Intake extends SubsystemBase {
   public void deployBrake() {
     MotorOutputConfigs motorOutput = new MotorOutputConfigs();
     motorOutput.NeutralMode = NeutralModeValue.Brake;
-    deployMotor.getConfigurator().apply(motorOutput);
+    deployMotor.getConfigurator().apply(motorOutput, 0.0); // 0 s timeout = non-blocking
   }
 
   public void runToPosition(double positionRotations) {

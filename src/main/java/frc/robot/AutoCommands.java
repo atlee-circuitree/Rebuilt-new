@@ -25,7 +25,7 @@ public class AutoCommands {
         SendableChooser<Command> chooser = new SendableChooser<>();
 
         chooser.addOption("Just Shoot", new SequentialCommandGroup(
-            new SpinToSpeed(turret, Constants.Turret.speedMid),
+            new SpinToSpeed(turret, Constants.Turret.SPEED_MID_RPS),
             new Shoot(turret, trigger).withTimeout(12),
             new StopTurretWheels(turret)
         ));
@@ -39,7 +39,7 @@ public class AutoCommands {
                 .withVelocityY(0 * maxSpeed)
                 .withRotationalRate(0 * maxAngularRate)
             ).withTimeout(0.2),
-            new SpinToSpeed(turret, Constants.Turret.speedMid),
+            new SpinToSpeed(turret, Constants.Turret.SPEED_MID_RPS),
             new Shoot(turret, trigger).withTimeout(12),
             new StopTurretWheels(turret)
         ));
@@ -112,19 +112,17 @@ public class AutoCommands {
 
         chooser.addOption("Feeder Shoot", new SequentialCommandGroup(
             new ManualDeploy(intake, 0.15).withTimeout(0.5),
-            new ParallelCommandGroup(
-                new RunIntake(intake),
-                new SequentialCommandGroup(
-                    drivetrain.applyRequest(() -> drive.withVelocityX(-0.6 * maxSpeed)
-                        .withVelocityY(0 * maxSpeed)
-                        .withRotationalRate(0 * maxAngularRate)
-                    ).withTimeout(3.5),
-                    drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
-                        .withVelocityY(0 * maxSpeed)
-                        .withRotationalRate(0 * maxAngularRate)
-                    ).withTimeout(0.2)
-                )),
-            new SpinToSpeed(turret, Constants.Turret.speedMid),
+            new SequentialCommandGroup(
+                drivetrain.applyRequest(() -> drive.withVelocityX(-0.6 * maxSpeed)
+                    .withVelocityY(0 * maxSpeed)
+                    .withRotationalRate(0 * maxAngularRate)
+                ).withTimeout(3.5),
+                drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
+                    .withVelocityY(0 * maxSpeed)
+                    .withRotationalRate(0 * maxAngularRate)
+                ).withTimeout(0.2)
+            ).deadlineFor(new RunIntake(intake)),
+            new SpinToSpeed(turret, Constants.Turret.SPEED_MID_RPS),
             new TurnTurret(turret).withTimeout(1.5),
             new Shoot(turret, trigger).withTimeout(12),
             new StopTurretWheels(turret)

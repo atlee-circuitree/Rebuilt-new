@@ -61,7 +61,7 @@ public class Elevator extends SubsystemBase {
     private static final int kNumConfigAttempts = 2;
 
     private static final double kGearRatio = 45;
-    private static final Distance kDrumRadius = Meters.of(3.0734);
+    private static final Distance kDrumRadius = Centimeters.of(3.0734); // ~1.21 in drum radius
     private static final Distance kMaxHeight = Meters.of(0);
 
     /* leader and follower motors */
