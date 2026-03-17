@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
@@ -19,8 +17,8 @@ public class ZeroTurret extends Command {
   }
 
   @Override
-  public void initialize()
-  {
+  public void initialize() {
+    turret.clearZeroCurrents();
     turret.findZero();
   }
 

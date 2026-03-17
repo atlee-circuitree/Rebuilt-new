@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
+import frc.robot.Constants;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -17,7 +18,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import com.ctre.phoenix6.signals.ReverseLimitTypeValue;
@@ -66,7 +66,7 @@ public class Elevator extends SubsystemBase {
 
     /* leader and follower motors */
     private final CANBus kCANBus = new CANBus("FRC 1599B");
-    private final TalonFX motor_id_31 = new TalonFX(31, kCANBus);
+    private final TalonFX motor_id_31 = new TalonFX(Constants.CAN_IDS.climberMotor, kCANBus);
 
     /* device status signals */
     private final StatusSignal<Angle> motor_id_31Position = motor_id_31.getPosition(false);
@@ -273,7 +273,7 @@ public class Elevator extends SubsystemBase {
             motor_id_31Position.getValueAsDouble() * kDrumRadius.in(Meters) * 2 * Math.PI
         );
 
-        SmartDashboard.putNumber("climber", motor_id_31.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("climber", motor_id_31Position.getValueAsDouble());
     }
 
     private void startSimThread() {

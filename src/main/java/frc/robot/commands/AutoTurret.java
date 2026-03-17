@@ -126,6 +126,12 @@ public class AutoTurret extends Command {
   }
 
   @Override
+  public void end(boolean interrupted) {
+    turret.stopRotator();
+    trigger.stop();
+  }
+
+  @Override
   public boolean isFinished() {
     return false;
   }

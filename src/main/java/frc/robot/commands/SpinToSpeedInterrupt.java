@@ -11,9 +11,9 @@ public class SpinToSpeedInterrupt extends Command {
   private double speed;
   
   public SpinToSpeedInterrupt(Turret turret, double speed) {
-    this.turret = turret;  
+    this.turret = turret;
     this.speed = speed;
-    SmartDashboard.putNumber("Turret Required Speed", 0);
+    addRequirements(turret);
   }
 
   @Override
@@ -22,6 +22,7 @@ public class SpinToSpeedInterrupt extends Command {
     turret.spin(speed);
   }
 
+  @Override
   public void end(boolean interrupted)
   {
     turret.stopShooter();

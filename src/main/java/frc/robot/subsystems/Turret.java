@@ -104,7 +104,7 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/distFar",    Constants.Turret.distFar);
     SmartDashboard.putNumber("Shooter/speedFar",   Constants.Turret.speedFar);
 
-    motorHoodLeft = new HiTecServo(Constants.Channels.motorHoodLeft);
+    motorHoodLeft = new HiTecServo(Constants.Turret.HOOD_SERVO_CHANNEL);
   }
 
   public void rotate(double speed) {
@@ -162,6 +162,10 @@ public class Turret extends SubsystemBase {
     targetVelocity = speed;
     motorLeft.setControl(m_velocityRequest.withVelocity(targetVelocity));
     motorRight.setControl(m_velocityRequest.withVelocity(targetVelocity));
+  }
+
+  public void clearZeroCurrents() {
+    currents.clear();
   }
 
   public void findZero() {

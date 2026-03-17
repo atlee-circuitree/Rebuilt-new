@@ -68,11 +68,6 @@ public class RobotContainer {
     public final CommandXboxController Player2 = new CommandXboxController(1);
 
 
-    public int GreenArcade = 1;
-    public int RedArcade = 2;
-    public int BlueArcade = 3;
-    
-    
     public RobotContainer() {
 
       
@@ -99,7 +94,6 @@ public class RobotContainer {
         new Shoot(turret, trigger).withTimeout(12),
         new StopTurretWheels(turret)
         ));
-        //Correct for blue.
         autoChooser.addOption("Human Player Shoot (Blue)", new SequentialCommandGroup(
         new ParallelCommandGroup(
             new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED).withTimeout(0.5),
@@ -231,16 +225,9 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
         
-        //().whileTrue(drivetrain.applyRequest(() -> brake));
         Player1.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-Player1.getLeftY(), -Player1.getLeftX()))
         ));
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-       
-        // reset the field-centric heading on left bumper press
-        //joystick.leftBumper().onTrue(new runIntake(intake, 0.5));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -299,8 +286,8 @@ public class RobotContainer {
         // Button Map
         Player1.x().onTrue(new DeployIntake(intake)); // deploy
         Player1.y().onTrue(new RetractIntake(intake)); // retract
-        Player1.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
-        Player1.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
+        Player1.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
+        Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
@@ -317,8 +304,8 @@ public class RobotContainer {
         //Player 2 controls
         Player2.x().onTrue(new DeployIntake(intake)); // deploy
         Player2.y().onTrue(new RetractIntake(intake)); // retract
-        Player2.a().whileTrue(new ManualDeploy(intake, 0.15)); // down
-        Player2.b().whileTrue(new ManualDeploy(intake, -0.15)); // up
+        Player2.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
+        Player2.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
 
         Player2.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
