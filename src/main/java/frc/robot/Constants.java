@@ -178,7 +178,7 @@ public class Constants {
     public static class Climber {
         /** Position tolerance (rotations) for ClimbUp/ClimbDown setpoint checks. */
         public static final double SETPOINT_THRESHOLD_ROT = 0.15;
-
+        public static final double LINEUP_HEADING_THRESHOLD_DEG = 2;
         // --- LineUpClimb vision alignment ---
         /** Proportional gain for the lateral alignment P controller. */
         public static final double LINEUP_P           = 0.2;
