@@ -4,12 +4,9 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,7 +26,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 public class RobotContainer {
 
     // subsystems
-    private Elevator climber;
+    // private Elevator climber;
     private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private Intake intake;
     private Trigger trigger;
@@ -49,8 +46,8 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
 
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) / 4; // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private final double MaxSpeed = Constants.Drive.MAX_SPEED_MPS / Constants.Drive.SPEED_DIVISOR;
+    private final double MaxAngularRate = Constants.Drive.MAX_ANGULAR_RATE_RPS;
 
     
 
@@ -71,7 +68,7 @@ public class RobotContainer {
     public RobotContainer() {
 
       
-        climber = new Elevator();
+        // climber = new Elevator();
         intake = new Intake();
         trigger = new Trigger();
         turret = new Turret();
@@ -104,9 +101,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
         NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
-        NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
-        NamedCommands.registerCommand("climb up", new ClimbUp(climber));
-        NamedCommands.registerCommand("climb down", new ClimbDown(climber));
+        // NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
+        // NamedCommands.registerCommand("climb up", new ClimbUp(climber));
+        // NamedCommands.registerCommand("climb down", new ClimbDown(climber));
     }
 
     public Command getAutonomousCommand() {
@@ -168,14 +165,6 @@ public class RobotContainer {
         return player2;
     }
 
-    public void Periodic() {
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.localize(drivetrain);
-        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-        drivetrain.addVisionMeasurement(
-            mt2.pose, 
-            mt2.timestampSeconds);
-    }
-    
     private void configureBindings() {
         configureDrivetrain();
  drivetrain.setDefaultCommand(

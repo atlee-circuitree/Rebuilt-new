@@ -76,31 +76,35 @@ public class AutoTurret extends Command {
   }
 
   @Override
+  public void initialize() {
+    turret.stopRotator();
+    trigger.stop();
+  }
+
+  @Override
   public void execute()
   {
     Pose2d pose = drivetrain.getState().Pose;
     int zone = getZone(pose);
-    
+
     Translation2d target = table.get(zone);
     if (isInDeadZone(pose))
     {
-        turret.runAtPower(0.2);
-        
+        // In a dead zone — stop the rotator and do not fire
+        turret.stopRotator();
         trigger.stop();
     }
     else
     {
         if (target == null) {
           // Zone has no registered target — hold position and don't fire
+          turret.stopRotator();
           trigger.stop();
           return;
         }
-        if (zone == 4) {
-          turret.setHoodPosition(false);
-        } else {
-          turret.setHoodPosition(true);
-        }
-        double dist = Math.sqrt(Math.pow(pose.getX() - target.getX(), 2) + Math.pow(pose.getY() - target.getY(), 2));
+        // All zones with a registered target use hood-up position
+        turret.setHoodPosition(true);
+
         double angle = Math.atan2(pose.getY() - target.getY(), pose.getX() - target.getX());
         angle -= pose.getRotation().getRadians();
         angle = Math.toDegrees(angle);
@@ -114,7 +118,8 @@ public class AutoTurret extends Command {
         }
         else
         {
-            turret.runAtPower(0.2);
+            // Angle out of range — stop the rotator and do not fire
+            turret.stopRotator();
             trigger.stop();
         }
     }

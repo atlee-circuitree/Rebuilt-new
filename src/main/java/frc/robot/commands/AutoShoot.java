@@ -31,11 +31,19 @@ public class AutoShoot extends Command {
   public void execute() {
     if (turret.getVelocity() >= Constants.Turret.MIN_FIRE_SPEED_RPS) {
       if (!feedStarted) {
+        feedDelayTimer.reset();
         feedDelayTimer.start();
         feedStarted = true;
       }
       if (feedDelayTimer.get() >= Constants.Turret.AUTO_SHOOT_FEED_DELAY_SECS) {
         trigger.shoot();
+      }
+    } else {
+      // Speed dropped below threshold — reset so the delay restarts cleanly on recovery
+      if (feedStarted) {
+        feedDelayTimer.stop();
+        feedDelayTimer.reset();
+        feedStarted = false;
       }
     }
   }

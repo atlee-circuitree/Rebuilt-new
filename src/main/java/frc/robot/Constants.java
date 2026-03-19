@@ -234,8 +234,8 @@ public class Constants {
     public static class Drive {
         /** Top speed (m/s) — sourced from TunerConstants at full 12 V. */
         public static final double MAX_SPEED_MPS      = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-        /** Max angular rate (rad/s). */
-        public static final double MAX_ANGULAR_RATE_RPS = RotationsPerSecond.of(0.5).in(RadiansPerSecond);
+        /** Max angular rate (rad/s) — 0.75 rotations/sec, matches teleop drive default command. */
+        public static final double MAX_ANGULAR_RATE_RPS = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
         /** Fraction of max speed/rate applied as joystick deadband. */
         public static final double DEADBAND_PERCENT   = 0.14;

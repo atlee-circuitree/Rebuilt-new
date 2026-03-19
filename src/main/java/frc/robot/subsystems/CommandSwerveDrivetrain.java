@@ -48,6 +48,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
+    /* Cached alliance color — updated alongside operator perspective to avoid redundant DS calls */
+    private boolean m_isBlue = true;
 
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
@@ -263,21 +265,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         ? kRedAlliancePerspectiveRotation
                         : kBlueAlliancePerspectiveRotation
                 );
+                m_isBlue = allianceColor != Alliance.Red;
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        // Feed blended MegaTag2 pose estimate from limelight-left and limelight-forward
+        // Feed blended MegaTag2 pose estimate from limelight-left and limelight-forward.
+        // Always publish heading so the Limelights can compute MegaTag2 estimates.
         double heading = getState().Pose.getRotation().getDegrees();
         LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-forward", heading, 0, 0, 0, 0, 0);
-        boolean isBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
-        LimelightHelpers.PoseEstimate left = isBlue
-            ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left")
-            : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
-        LimelightHelpers.PoseEstimate forward = isBlue
-            ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-forward")
-            : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-forward");
-        savePose(blendEstimates(left, forward));
+        // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
+        // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
+        double omegaDegPerSec = Math.abs(Math.toDegrees(getState().Speeds.omegaRadiansPerSecond));
+        if (omegaDegPerSec < 720) {
+            // Use cached alliance — avoids a redundant DriverStation.getAlliance() call every loop
+            LimelightHelpers.PoseEstimate left = m_isBlue
+                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left")
+                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
+            LimelightHelpers.PoseEstimate forward = m_isBlue
+                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-forward")
+                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-forward");
+            savePose(blendEstimates(left, forward));
+        }
     }
     
     private void configureAutoBuilder(){
@@ -380,13 +389,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double y = wA * a.pose.getY() + wB * b.pose.getY();
         Rotation2d rotation = a.pose.getRotation().interpolate(b.pose.getRotation(), wB);
 
-        // Use the timestamp from whichever camera has the higher quality
-        double timestamp = qualityA >= qualityB ? a.timestampSeconds : b.timestampSeconds;
+        // Use the timestamp and latency from whichever camera has the higher quality —
+        // they must stay paired so the Kalman filter gets a consistent observation time.
+        boolean aWins = qualityA >= qualityB;
+        double timestamp = aWins ? a.timestampSeconds : b.timestampSeconds;
+        double latency   = aWins ? a.latency          : b.latency;
 
         return new LimelightHelpers.PoseEstimate(
             new Pose2d(x, y, rotation),
             timestamp,
-            Math.max(a.latency, b.latency),
+            latency,
             a.tagCount + b.tagCount,
             Math.max(a.tagSpan, b.tagSpan),
             Math.min(a.avgTagDist, b.avgTagDist),
