@@ -272,12 +272,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         // Feed limelight-climb MegaTag2 pose into the pose estimator
-        LimelightHelpers.SetRobotOrientation("limelight-climb",
+        LimelightHelpers.SetRobotOrientation("limelight-left",
             getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
-            savePose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-climb"));
+         if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue)
+            savePose(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left"));
         else
-            savePose(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-climb"));
+        savePose(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left"));
     }
     
     private void configureAutoBuilder(){

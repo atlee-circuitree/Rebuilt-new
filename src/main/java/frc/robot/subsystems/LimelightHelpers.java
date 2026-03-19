@@ -1649,10 +1649,14 @@ public class LimelightHelpers {
     public static LimelightHelpers.PoseEstimate localize(CommandSwerveDrivetrain drivetrain)
     {
         int[] validIDs = {1};
-        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-climb", validIDs);
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-front", validIDs);
 
-        LimelightHelpers.SetRobotOrientation("limelight-climb", drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-climb");
+        LimelightHelpers.SetRobotOrientation("limelight-left", drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-front", drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+        LimelightHelpers.PoseEstimate mt3 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
         return mt2;
         // if our angular velocity is greater than 360 degrees per second, ignore vision updates
         /*boolean doRejectUpdate = false;

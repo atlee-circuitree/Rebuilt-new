@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -166,6 +167,14 @@ public class RobotContainer {
         return player2;
     }
 
+    public void Periodic() {
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.localize(drivetrain);
+        drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        drivetrain.addVisionMeasurement(
+            mt2.pose, 
+            mt2.timestampSeconds);
+    }
+    
     private void configureBindings() {
         configureDrivetrain();
  drivetrain.setDefaultCommand(
@@ -176,6 +185,8 @@ public class RobotContainer {
                     .withRotationalRate(-(getRightX()) * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+
+    
 
         
         // drivetrain.seedFieldCentric();
@@ -199,7 +210,7 @@ public class RobotContainer {
         Player1.rightBumper().whileTrue(new ReverseShoot(trigger));
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
-        Player1.leftBumper().toggleOnTrue(new TurnTurret(turret));
+        Player1.leftBumper().whileTrue(new TurnTurret(turret));
 
         //Player 2 controls
         Player2.x().onTrue(new DeployIntake(intake)); // deploy

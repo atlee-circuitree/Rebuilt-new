@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.LimelightConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.LimelightHelpers;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -20,8 +22,10 @@ public class Robot extends TimedRobot {
   // Cached NetworkTable references to avoid repeated traversal in robotPeriodic()
   private final NetworkTable m_limelightTurretTable =
       NetworkTableInstance.getDefault().getTable(Constants.LimelightConstants.TURRET_LIMELIGHT_NAME);
-  private final NetworkTable m_limelightClimbTable =
-      NetworkTableInstance.getDefault().getTable("limelight-climb");
+  private final NetworkTable m_limelightLeftTable =
+      NetworkTableInstance.getDefault().getTable("limelight-left");
+  private final NetworkTable m_limelightFrontTable =
+      NetworkTableInstance.getDefault().getTable("limelight-front");
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -32,9 +36,11 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("Limelight Turret Connected",
         m_limelightTurretTable.containsKey("tx"));
-    SmartDashboard.putBoolean("Limelight Climb Connected",
-        m_limelightClimbTable.containsKey("tx"));
+    SmartDashboard.putBoolean("Limelight Left Connected",
+        m_limelightLeftTable.containsKey("tx"));
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
+    
   }
 
   @Override
