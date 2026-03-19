@@ -35,7 +35,7 @@ public class RobotContainer {
     // drivetrain
     private static final Field2d field = new Field2d();
 
-    public static Field2d getField() {
+    public Field2d getField() {
         return field;
     }
     
