@@ -42,6 +42,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     
 
+    /* Field boundary constants — poses outside these bounds are rejected as invalid */
+    private static final double kFieldWidthMeters  = 17.548;
+    private static final double kFieldHeightMeters =  8.052;
+
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
@@ -410,11 +414,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /**
      * Injects a fresh MegaTag2 pose into the Kalman filter.
-     * Only applied when a valid, non-zero estimate with visible tags is received.
+     * Rejects null, zero-tag, origin-coordinate, and out-of-bounds estimates
+     * so a bad Limelight reading can never pull the displayed pose off the field.
      */
     private void savePose(LimelightHelpers.PoseEstimate mt2) {
         if (mt2 == null || mt2.tagCount == 0) return;
-        if (mt2.pose.getX() == 0 && mt2.pose.getY() == 0) return;
+        double x = mt2.pose.getX();
+        double y = mt2.pose.getY();
+        if (x == 0 && y == 0) return;
+        if (x < 0 || x > kFieldWidthMeters || y < 0 || y > kFieldHeightMeters) return;
         super.addVisionMeasurement(mt2.pose, Utils.fpgaToCurrentTime(mt2.timestampSeconds));
     }
 
