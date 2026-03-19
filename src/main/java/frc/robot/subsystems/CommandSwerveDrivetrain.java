@@ -269,11 +269,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        // Feed blended MegaTag2 pose estimate from limelight-left and limelight-forward.
+        // Feed blended MegaTag2 pose estimate from limelight-left and limelight-front.
         // Always publish heading so the Limelights can compute MegaTag2 estimates.
         double heading = getState().Pose.getRotation().getDegrees();
         LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
-        LimelightHelpers.SetRobotOrientation("limelight-forward", heading, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-front", heading, 0, 0, 0, 0, 0);
         // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
         // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
         double omegaDegPerSec = Math.abs(Math.toDegrees(getState().Speeds.omegaRadiansPerSecond));
@@ -283,8 +283,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left")
                 : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
             LimelightHelpers.PoseEstimate forward = m_isBlue
-                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-forward")
-                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-forward");
+                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front")
+                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-front");
             savePose(blendEstimates(left, forward));
         }
     }
