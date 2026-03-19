@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -25,6 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -45,6 +48,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Field boundary constants — poses outside these bounds are rejected as invalid */
     private static final double kFieldWidthMeters  = 17.548;
     private static final double kFieldHeightMeters =  8.052;
+
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -121,27 +125,30 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
-
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants   Drivetrain-wide constants for the swerve drive
-     * @param modules               Constants for each specific module
-     */
-    public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants,
-        SwerveModuleConstants<?, ?, ?>... modules
-    ) {
-        
-        super(drivetrainConstants, modules);
-        setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
+        private Field2d field2d;
+    
+        /**
+         * Constructs a CTRE SwerveDrivetrain using the specified constants.
+         * <p>
+         * This constructs the underlying hardware devices, so users should not construct
+         * the devices themselves. If they need the devices, they can access them through
+         * getters in the classes.
+         *
+         * @param drivetrainConstants   Drivetrain-wide constants for the swerve drive
+         * @param modules               Constants for each specific module
+         */
+        public CommandSwerveDrivetrain(
+            Field2d  field2d,
+            SwerveDrivetrainConstants drivetrainConstants,
+            SwerveModuleConstants<?, ?, ?>... modules
+        ) {
+            
+            super(drivetrainConstants, modules);
+            setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+            if (Utils.isSimulation()) {
+                startSimThread();
+            }
+            this.field2d = field2d;
         configureAutoBuilder();
     }
 
@@ -221,6 +228,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
     }
 
+
     /**
      * Returns a command that applies the specified control request to this swerve drivetrain.
      *
@@ -286,10 +294,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             LimelightHelpers.PoseEstimate left = m_isBlue
                 ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left")
                 : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
-            LimelightHelpers.PoseEstimate forward = m_isBlue
+             LimelightHelpers.PoseEstimate forward = m_isBlue
                 ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front")
                 : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-front");
-            savePose(blendEstimates(left, forward));
+            this.field2d.getObject("Left").setPose(left.pose);
+            this.field2d.getObject("Front").setPose(forward.pose);
+            savePose(blendEstimates(left , forward));
         }
     }
     

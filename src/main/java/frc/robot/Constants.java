@@ -75,7 +75,7 @@ public class Constants {
         /** Minimum flywheel velocity (RPS) before the trigger may fire. */
         public static final double MIN_FIRE_SPEED_RPS   = 30.0;
         /** isAtSpeed() tolerance band (RPS). */
-        public static final double SHOOTER_THRESHOLD_RPS = 5.0;
+        public static final double SHOOTER_THRESHOLD_RPS = 15.0;
         /** Delay (seconds) between reaching speed and starting the feed. */
         public static final double AUTO_SHOOT_FEED_DELAY_SECS = 0.3;
 

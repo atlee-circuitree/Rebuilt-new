@@ -27,15 +27,15 @@ public class RobotContainer {
 
     // subsystems
     // private Elevator climber;
-    private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private Intake intake;
     private Trigger trigger;
     private Turret turret;
 
     // drivetrain
     private static final Field2d field = new Field2d();
+    private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(field);
 
-    public Field2d getField() {
+    public static Field2d getField() {
         return field;
     }
     
@@ -210,7 +210,7 @@ public class RobotContainer {
 
         Player2.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
-            new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
+            new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
 

@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Limelight Left Connected",
         m_limelightLeftTable.containsKey("tx"));
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
-    m_robotContainer.getField().setRobotPose(m_robotContainer.getCurrentPose());
+    RobotContainer.getField().setRobotPose(m_robotContainer.getCurrentPose());
   }
 
   @Override
