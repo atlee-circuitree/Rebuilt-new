@@ -23,6 +23,7 @@ import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 public class RobotContainer {
@@ -75,8 +76,10 @@ public class RobotContainer {
         trigger = new Trigger();
         turret = new Turret();
         
-        //AUTO CHOOSER CREATION.
-        autoChooser = AutoCommands.buildAutoChooser(drivetrain, drive, MaxSpeed, MaxAngularRate, turret, trigger, intake);
+        // NamedCommands must be registered before AutoBuilder loads autos
+        mapEventsToCommands();
+
+        autoChooser = AutoBuilder.buildAutoChooser("Ribakov1");
 
         SmartDashboard.putData("Field", field);
 
@@ -84,8 +87,6 @@ public class RobotContainer {
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
         SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        mapEventsToCommands();
     }
 
     public void mapEventsToCommands()
