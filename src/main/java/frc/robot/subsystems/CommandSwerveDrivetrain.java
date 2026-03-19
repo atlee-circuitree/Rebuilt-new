@@ -369,7 +369,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (mt2 == null || mt2.tagCount == 0) return;
         if (mt2.pose.getX() + mt2.pose.getY() == 0) return;
         setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        super.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+        super.addVisionMeasurement(mt2.pose, Utils.fpgaToCurrentTime(mt2.timestampSeconds));
     }
 
 }
