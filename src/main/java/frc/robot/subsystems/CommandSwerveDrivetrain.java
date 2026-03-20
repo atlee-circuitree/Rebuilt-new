@@ -297,8 +297,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
              LimelightHelpers.PoseEstimate forward = m_isBlue
                 ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front")
                 : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-front");
-            this.field2d.getObject("Left").setPose(left.pose);
-            this.field2d.getObject("Front").setPose(forward.pose);
+            if (left != null) {
+                this.field2d.getObject("Left").setPose(left.pose);
+            }
+            if (forward != null) {
+                this.field2d.getObject("Front").setPose(forward.pose);
+            }
             savePose(blendEstimates(left , forward));
         }
     }
