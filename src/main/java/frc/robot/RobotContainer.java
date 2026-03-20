@@ -76,7 +76,8 @@ public class RobotContainer {
         // NamedCommands must be registered before AutoBuilder loads autos
         mapEventsToCommands();
 
-        autoChooser = AutoBuilder.buildAutoChooser("Ribakov1");
+        //autoChooser = AutoBuilder.buildAutoChooser("Ribakov1");
+        autoChooser = AutoCommands.buildAutoChooser(drivetrain, drive, MaxSpeed, MaxAngularRate, turret, trigger, intake);
 
         SmartDashboard.putData("Field", field);
 
