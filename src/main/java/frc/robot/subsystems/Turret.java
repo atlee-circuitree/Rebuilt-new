@@ -163,9 +163,12 @@ public class Turret extends SubsystemBase {
 
   public void spinAtDistance() {
     double distance = Limelight.getDistance();
-    if (distance <= 0)
-      spin(Constants.Turret.SPEED_MID_RPS); // no valid target — use mid-range default
-    else
+    if (distance >= 0)
+      spin(Constants.Turret.SPEED_CLOSE_RPS); // no valid target — use mid-range default
+    if else (distance >= Constants.Turret.DIST_MID_FT)
+      spin(Constants.Turret.SPEED_MID_RPS);
+    else (Constants.Turret.DIST_FAR_FT)
+      spin(Constants.Turret.SPEED_FAR_RPS);
       spin(shooterSpeedMap.get(distance));
   }
 

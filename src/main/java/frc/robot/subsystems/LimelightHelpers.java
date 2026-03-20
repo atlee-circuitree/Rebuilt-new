@@ -1671,5 +1671,5 @@ public class LimelightHelpers {
         if(!doRejectUpdate)
         {*/
         //}
-    }
+    }//d=(0.629)/(tan(30)+Ty)
 }
