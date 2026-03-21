@@ -16,7 +16,6 @@ public class AutoCommands {
             CommandSwerveDrivetrain drivetrain,
             SwerveRequest.FieldCentric drive,
             double maxSpeed,
-            double maxAngularRate,
             Turret turret,
             Trigger trigger,
             Intake intake) 
@@ -24,17 +23,34 @@ public class AutoCommands {
 
         SendableChooser<Command> chooser = new SendableChooser<>();
 
+        //double maxSpeed = 1;
+        double maxAngularRate = 1;
+
         chooser.addOption("Just Shoot", new SequentialCommandGroup(
+            new SpinToSpeed(turret, 64), //mid rps but + 1, close rps was missing by hitting the foot of the hub
+            new Shoot(turret, trigger).withTimeout(12),
+            new StopTurretWheels(turret)
+        ));
+
+        chooser.addOption("Center Shoot (RED)", new SequentialCommandGroup(
+            drivetrain.applyRequest(() -> drive.withVelocityX(0.4 * maxSpeed)
+                .withVelocityY(0 * maxSpeed)
+                .withRotationalRate(0 * maxAngularRate)
+            ).withTimeout(1.25), //3.5
+            drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
+                .withVelocityY(0 * maxSpeed)
+                .withRotationalRate(0 * maxAngularRate)
+            ).withTimeout(0.2),
             new SpinToSpeed(turret, Constants.Turret.SPEED_MID_RPS),
             new Shoot(turret, trigger).withTimeout(12),
             new StopTurretWheels(turret)
         ));
 
-        chooser.addOption("Center Shoot", new SequentialCommandGroup(
-            drivetrain.applyRequest(() -> drive.withVelocityX(0.4 * maxSpeed)
+        chooser.addOption("Center Shoot (BLUE)", new SequentialCommandGroup(
+            drivetrain.applyRequest(() -> drive.withVelocityX(-0.4 * maxSpeed)
                 .withVelocityY(0 * maxSpeed)
                 .withRotationalRate(0 * maxAngularRate)
-            ).withTimeout(3.5),
+            ).withTimeout(1.25),
             drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
                 .withVelocityY(0 * maxSpeed)
                 .withRotationalRate(0 * maxAngularRate)
