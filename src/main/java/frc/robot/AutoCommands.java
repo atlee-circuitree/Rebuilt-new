@@ -36,7 +36,7 @@ public class AutoCommands {
             drivetrain.applyRequest(() -> drive.withVelocityX(0.4 * maxSpeed)
                 .withVelocityY(0 * maxSpeed)
                 .withRotationalRate(0 * maxAngularRate)
-            ).withTimeout(1.25), //3.5
+            ).withTimeout(1.2), //3.5
             drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
                 .withVelocityY(0 * maxSpeed)
                 .withRotationalRate(0 * maxAngularRate)
@@ -50,7 +50,7 @@ public class AutoCommands {
             drivetrain.applyRequest(() -> drive.withVelocityX(-0.4 * maxSpeed)
                 .withVelocityY(0 * maxSpeed)
                 .withRotationalRate(0 * maxAngularRate)
-            ).withTimeout(1.25),
+            ).withTimeout(1.2),
             drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
                 .withVelocityY(0 * maxSpeed)
                 .withRotationalRate(0 * maxAngularRate)
@@ -67,7 +67,7 @@ public class AutoCommands {
                     drivetrain.applyRequest(() -> drive.withVelocityX(0)
                         .withVelocityY(0.6 * maxSpeed)
                         .withRotationalRate(0)
-                    ).withTimeout(4.75),
+                    ).withTimeout(3.75),
                     drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
                         .withVelocityY(0 * maxSpeed)
                         .withRotationalRate(0)
@@ -100,7 +100,7 @@ public class AutoCommands {
                     drivetrain.applyRequest(() -> drive.withVelocityX(0)
                         .withVelocityY(-0.6 * maxSpeed)
                         .withRotationalRate(0)
-                    ).withTimeout(4.75),
+                    ).withTimeout(3.75),
                     drivetrain.applyRequest(() -> drive.withVelocityX(0 * maxSpeed)
                         .withVelocityY(0 * maxSpeed)
                         .withRotationalRate(0)

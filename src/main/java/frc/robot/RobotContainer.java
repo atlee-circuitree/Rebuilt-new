@@ -66,7 +66,7 @@ public class RobotContainer {
     private final CommandXboxController Player1 = new CommandXboxController(0);
     private final CommandXboxController Player2 = new CommandXboxController(1);
     private final GenericHID Player3 = new GenericHID(3);
-    private final boolean enableStadiaDrive = false;
+    private final boolean enableStadiaDrive = true;
 
     /*
      * Stadia Controller Map
@@ -210,7 +210,7 @@ public class RobotContainer {
 
         double max = Math.abs(player1) > Math.abs(player2) ? player1 : player2;
         if (enableStadiaDrive) {
-            double player3 = Player3.getRawAxis(2);
+            double player3 = Player3.getRawAxis(3);
             if (Math.abs(player3) > Math.abs(max)) { max = player3; }
         }
         return max;
@@ -236,7 +236,7 @@ public class RobotContainer {
 
         //Button Map
 
-        Player2.x().whileTrue(new ParallelCommandGroup(
+        Player1.x().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
             new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
             new Shoot(turret, trigger)

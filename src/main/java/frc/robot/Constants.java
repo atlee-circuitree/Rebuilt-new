@@ -85,7 +85,7 @@ public class Constants {
         public static final double DIST_MID_FT    = 20.0;
         public static final double SPEED_MID_RPS  = 58.0;
         public static final double DIST_FAR_FT    = 35.0;
-        public static final double SPEED_FAR_RPS  = 75.0;
+        public static final double SPEED_FAR_RPS  = 70.0;
 
 
 
@@ -209,7 +209,7 @@ public class Constants {
         /** Switch from fast to slow rotation below this tx error. */
         public static final double TX_THRESHOLD_LARGE  = 10.0;
         /** Stop rotating (consider locked) below this tx error. */
-        public static final double TX_THRESHOLD_SMALL  = 3.0;
+        public static final double TX_THRESHOLD_SMALL  = 4.5;
 
         // --- Turret auto-aim output speeds (duty cycle) ---
         /** Rotation speed when tx error > TX_THRESHOLD_LARGE. */
