@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.util.Limelight;
 
 public class AutoCommands {
 
     public static SendableChooser<Command> buildAutoChooser(
+            RobotContainer robotContainer,
             CommandSwerveDrivetrain drivetrain,
             SwerveRequest.FieldCentric drive,
             double maxSpeed,
@@ -27,7 +29,7 @@ public class AutoCommands {
         double maxAngularRate = 1;
 
         chooser.addOption("Just Shoot", new SequentialCommandGroup(
-            new SpinToSpeed(turret, 64), //mid rps but + 1, close rps was missing by hitting the foot of the hub
+            new SpinToSpeed(turret, 61), //mid rps but + 1, close rps was missing by hitting the foot of the hub
             new Shoot(turret, trigger).withTimeout(12),
             new StopTurretWheels(turret)
         ));
@@ -58,6 +60,16 @@ public class AutoCommands {
             new SpinToSpeed(turret, Constants.Turret.SPEED_MID_RPS),
             new Shoot(turret, trigger).withTimeout(12),
             new StopTurretWheels(turret)
+        ));
+        
+        chooser.addOption("Limelight testing auto (Blue)", new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                drivetrain.applyRequest(() ->
+                drive.withVelocityX(0)
+                .withVelocityY(0.6 * maxSpeed)
+                .withRotationalRate(0)
+                ).onlyWhile(() -> Limelight.getDistance("limelight-left") < 20) //drivetrain request
+            ) // parallel
         ));
 
         chooser.addOption("Human Player Shoot (Blue)", new SequentialCommandGroup(

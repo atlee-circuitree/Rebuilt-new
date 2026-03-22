@@ -113,7 +113,7 @@ public class RobotContainer {
         mapEventsToCommands();
 
         //autoChooser = AutoBuilder.buildAutoChooser("Ribakov1");
-        autoChooser = AutoCommands.buildAutoChooser(drivetrain, drive, MaxSpeed, turret, trigger, intake);
+        autoChooser = AutoCommands.buildAutoChooser(this, drivetrain, drive, MaxSpeed, turret, trigger, intake);
 
         //autoChooser = new SendableChooser<>();
 
@@ -145,6 +145,11 @@ public class RobotContainer {
         // NamedCommands.registerCommand("climb down", new ClimbDown(climber));
     }
 
+    //field orient
+    public void seedFieldOrient() {
+        drivetrain.seedFieldCentric();
+    }
+
     public Command getAutonomousCommand() {
     // This method loads the auto when it is called, however, it is recommended
     // to first load your paths/autos when code starts, then return the
@@ -173,6 +178,7 @@ public class RobotContainer {
         turret.stopShooter();
         intake.stopWheels();
         intake.stopDeploy();
+        seedFieldOrient();
     }
 
     //player 1 and 2 stick getters.
@@ -245,6 +251,8 @@ public class RobotContainer {
         Player1.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
         Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
 
+        
+
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
             new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
@@ -253,6 +261,12 @@ public class RobotContainer {
 
         Player1.povUp().onTrue(new StopTurretWheels(turret));
         Player1.rightBumper().whileTrue(new ReverseShoot(trigger));
+
+        
+
+        //Manual Turret
+        Player1.povRight().whileTrue(new ManualTurret(turret, () -> .35)); //left
+        Player1.povLeft().whileTrue(new ManualTurret(turret, () -> -.35)); //left
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
         Player1.leftBumper().whileTrue(new TurnTurret(turret));

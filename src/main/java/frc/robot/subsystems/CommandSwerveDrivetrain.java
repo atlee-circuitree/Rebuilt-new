@@ -281,11 +281,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        // Feed blended MegaTag2 pose estimate from limelight-left and limelight-front.
-        // Always publish heading so the Limelights can compute MegaTag2 estimates.
+        // Feed MegaTag2 pose estimate from limelight-left.
+        // Always publish heading so the Limelight can compute MegaTag2 estimates.
         double heading = getState().Pose.getRotation().getDegrees();
         LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
-        LimelightHelpers.SetRobotOrientation("limelight-front", heading, 0, 0, 0, 0, 0);
         // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
         // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
         double omegaDegPerSec = Math.abs(Math.toDegrees(getState().Speeds.omegaRadiansPerSecond));
@@ -294,16 +293,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             LimelightHelpers.PoseEstimate left = m_isBlue
                 ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left")
                 : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
-             LimelightHelpers.PoseEstimate forward = m_isBlue
-                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front")
-                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-front");
             if (left != null) {
                 this.field2d.getObject("Left").setPose(left.pose);
             }
-            if (forward != null) {
-                this.field2d.getObject("Front").setPose(forward.pose);
-            }
-            savePose(blendEstimates(left , forward));
+            savePose(left);
         }
     }
     
@@ -386,44 +379,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Matrix<N3, N1> visionMeasurementStdDevs
     ) {
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
-    }
-
-    /**
-     * Blends two PoseEstimates weighted by tagCount * avgTagArea.
-     * Returns the higher-quality estimate alone if the other has no tags.
-     */
-    private LimelightHelpers.PoseEstimate blendEstimates(LimelightHelpers.PoseEstimate a, LimelightHelpers.PoseEstimate b) {
-        double qualityA = (a != null) ? a.tagCount * a.avgTagArea : 0;
-        double qualityB = (b != null) ? b.tagCount * b.avgTagArea : 0;
-        double totalQuality = qualityA + qualityB;
-        if (totalQuality == 0) return null;
-        if (qualityA == 0) return b;
-        if (qualityB == 0) return a;
-
-        double wA = qualityA / totalQuality;
-        double wB = qualityB / totalQuality;
-
-        double x = wA * a.pose.getX() + wB * b.pose.getX();
-        double y = wA * a.pose.getY() + wB * b.pose.getY();
-        Rotation2d rotation = a.pose.getRotation().interpolate(b.pose.getRotation(), wB);
-
-        // Use the timestamp and latency from whichever camera has the higher quality —
-        // they must stay paired so the Kalman filter gets a consistent observation time.
-        boolean aWins = qualityA >= qualityB;
-        double timestamp = aWins ? a.timestampSeconds : b.timestampSeconds;
-        double latency   = aWins ? a.latency          : b.latency;
-
-        return new LimelightHelpers.PoseEstimate(
-            new Pose2d(x, y, rotation),
-            timestamp,
-            latency,
-            a.tagCount + b.tagCount,
-            Math.max(a.tagSpan, b.tagSpan),
-            Math.min(a.avgTagDist, b.avgTagDist),
-            (qualityA * a.avgTagArea + qualityB * b.avgTagArea) / totalQuality,
-            new LimelightHelpers.RawFiducial[]{},
-            true
-        );
     }
 
     /**
