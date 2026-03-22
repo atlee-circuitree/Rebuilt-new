@@ -306,6 +306,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
             savePose(blendEstimates(left , forward));
         }
+        // Keep the main robot marker in sync with the fused odometry pose
+        field2d.setRobotPose(getState().Pose);
     }
     
     private void configureAutoBuilder(){
