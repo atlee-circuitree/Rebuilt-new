@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -282,9 +283,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         // Feed MegaTag2 pose estimate from limelight-left.
-        // Always publish heading so the Limelight can compute MegaTag2 estimates.
+        // Publish heading AND yaw rate so MegaTag2 can compensate for latency during rotation.
         double heading = getState().Pose.getRotation().getDegrees();
-        LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
+        double yawRateDegsPerSec = Math.toDegrees(getState().Speeds.omegaRadiansPerSecond);
+        LimelightHelpers.SetRobotOrientation("limelight-left", heading, yawRateDegsPerSec, 0, 0, 0, 0);
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", new int[]{3});
         // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
         // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
         double omegaDegPerSec = Math.abs(Math.toDegrees(getState().Speeds.omegaRadiansPerSecond));
@@ -298,6 +301,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
             savePose(left);
         }
+        // Keep the main robot marker in sync with the fused odometry pose
+        field2d.setRobotPose(getState().Pose);
     }
     
     private void configureAutoBuilder(){
@@ -383,16 +388,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /**
      * Injects a fresh MegaTag2 pose into the Kalman filter.
-     * Rejects null, zero-tag, origin-coordinate, and out-of-bounds estimates
-     * so a bad Limelight reading can never pull the displayed pose off the field.
+     * Rejects null, zero-tag, origin-coordinate, out-of-bounds, and low-quality estimates.
+     * Uses distance-scaled std devs so far/small tags get less trust than close ones.
      */
     private void savePose(LimelightHelpers.PoseEstimate mt2) {
-        if (mt2 == null || mt2.tagCount == 0) return;
+        if (mt2 == null) { SmartDashboard.putString("LL/Reject", "null"); return; }
+        if (mt2.tagCount == 0) { SmartDashboard.putString("LL/Reject", "no tags"); return; }
         double x = mt2.pose.getX();
         double y = mt2.pose.getY();
-        if (x == 0 && y == 0) return;
-        if (x < 0 || x > kFieldWidthMeters || y < 0 || y > kFieldHeightMeters) return;
-        super.addVisionMeasurement(mt2.pose, Utils.fpgaToCurrentTime(mt2.timestampSeconds));
+        SmartDashboard.putNumber("LL/TagCount", mt2.tagCount);
+        SmartDashboard.putNumber("LL/PoseX", x);
+        SmartDashboard.putNumber("LL/PoseY", y);
+        SmartDashboard.putNumber("LL/TagArea", mt2.avgTagArea);
+        SmartDashboard.putNumber("LL/TagDist", mt2.avgTagDist);
+        SmartDashboard.putNumber("LL/Heading", getState().Pose.getRotation().getDegrees());
+        if (x == 0 && y == 0) { SmartDashboard.putString("LL/Reject", "origin"); return; }
+        if (x < 0 || x > kFieldWidthMeters || y < 0 || y > kFieldHeightMeters) { SmartDashboard.putString("LL/Reject", "out of bounds"); return; }
+        if (mt2.avgTagArea < 0.1) { SmartDashboard.putString("LL/Reject", "area too small"); return; }
+        if (mt2.avgTagDist > 4.0) { SmartDashboard.putString("LL/Reject", "too far"); return; }
+        SmartDashboard.putString("LL/Reject", "ACCEPTED");
+        // Scale x/y trust by distance: close tag = tight std dev, far tag = looser std dev
+        double xyStdDev = 0.4 + mt2.avgTagDist * mt2.avgTagDist * 0.05;
+        super.addVisionMeasurement(
+            mt2.pose,
+            Utils.fpgaToCurrentTime(mt2.timestampSeconds),
+            VecBuilder.fill(xyStdDev, xyStdDev, 9999999)
+        );
     }
 
 }
