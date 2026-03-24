@@ -265,8 +265,8 @@ public class RobotContainer {
         
 
         //Manual Turret
-        Player1.povRight().whileTrue(new ManualTurret(turret, () -> .35)); //left
-        Player1.povLeft().whileTrue(new ManualTurret(turret, () -> -.35)); //left
+        Player1.povRight().whileTrue(new ManualTurret(turret, () -> 1.)); //left
+        Player1.povLeft().whileTrue(new ManualTurret(turret, () -> -1.)); //left
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
         Player1.leftBumper().whileTrue(new TurnTurret(turret));
