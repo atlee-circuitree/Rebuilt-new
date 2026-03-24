@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Snircle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Snircle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Snircle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Snircle"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
