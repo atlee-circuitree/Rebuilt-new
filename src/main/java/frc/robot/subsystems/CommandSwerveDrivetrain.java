@@ -283,19 +283,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         // Feed MegaTag2 pose estimate from limelight-left.
-        // Publish heading AND yaw rate so MegaTag2 can compensate for latency during rotation.
-        double heading = getState().Pose.getRotation().getDegrees();
-        double yawRateDegsPerSec = Math.toDegrees(getState().Speeds.omegaRadiansPerSecond);
+        // MT2 needs the RAW gyro yaw, not the fused pose heading — using fused heading
+        // creates a feedback loop since the fused pose already includes vision corrections.
+        double heading = getPigeon2().getYaw().getValueAsDouble();
+        double yawRateDegsPerSec = getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
         LimelightHelpers.SetRobotOrientation("limelight-left", heading, yawRateDegsPerSec, 0, 0, 0, 0);
-        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", new int[]{3});
         // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
         // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
-        double omegaDegPerSec = Math.abs(Math.toDegrees(getState().Speeds.omegaRadiansPerSecond));
+        double omegaDegPerSec = Math.abs(yawRateDegsPerSec);
         if (omegaDegPerSec < 720) {
-            // Use cached alliance — avoids a redundant DriverStation.getAlliance() call every loop
-            LimelightHelpers.PoseEstimate left = m_isBlue
-                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left")
-                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
+            // Always use _wpiBlue — the CTRE pose estimator works in blue-origin coordinates
+            // regardless of alliance. Using _wpiRed on Red causes teleporting/wrong positions.
+            LimelightHelpers.PoseEstimate left =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
             if (left != null) {
                 this.field2d.getObject("Left").setPose(left.pose);
             }
