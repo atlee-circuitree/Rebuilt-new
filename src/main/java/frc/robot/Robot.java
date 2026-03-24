@@ -66,9 +66,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {
-    m_robotContainer.seedFieldOrient();
-  }
+  public void autonomousExit() {}
 
   @Override
   public void teleopInit() {
