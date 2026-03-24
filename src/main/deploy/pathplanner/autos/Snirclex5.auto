@@ -7,43 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "Snircle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "Snircle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "Snircle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
+            "pathName": "Snircle"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "BottomStart",
+  "folder": null,
   "choreoAuto": false
 }
