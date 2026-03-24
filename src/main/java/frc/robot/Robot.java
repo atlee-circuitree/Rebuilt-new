@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.LimelightHelpers;
+import frc.robot.util.Limelight;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -24,8 +25,6 @@ public class Robot extends TimedRobot {
       NetworkTableInstance.getDefault().getTable(Constants.LimelightConstants.TURRET_LIMELIGHT_NAME);
   private final NetworkTable m_limelightLeftTable =
       NetworkTableInstance.getDefault().getTable("limelight-left");
-  private final NetworkTable m_limelightFrontTable =
-      NetworkTableInstance.getDefault().getTable("limelight-front");
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -40,6 +39,10 @@ public class Robot extends TimedRobot {
         m_limelightLeftTable.containsKey("tx"));
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
     RobotContainer.getField().setRobotPose(m_robotContainer.getCurrentPose());
+    SmartDashboard.putBoolean("Limelight Distance Far Check", (80 < Limelight.getDistance() && Limelight.getDistance() < 95));
+    SmartDashboard.putNumber("Limelight Distance", Limelight.getDistance()); //close 49-57
+    //limelight settins for field Hickory, 160 exposure
+    SmartDashboard.putBoolean("Limelight Distance Close Check", (49 < Limelight.getDistance() && Limelight.getDistance() < 57));
   }
 
   @Override

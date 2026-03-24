@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -281,30 +282,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        // Feed blended MegaTag2 pose estimate from limelight-left and limelight-front.
-        // Always publish heading so the Limelights can compute MegaTag2 estimates.
-        double heading = getState().Pose.getRotation().getDegrees();
-        LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
-        LimelightHelpers.SetRobotOrientation("limelight-front", heading, 0, 0, 0, 0, 0);
+        // Feed MegaTag2 pose estimate from limelight-left.
+        // MT2 needs the RAW gyro yaw, not the fused pose heading — using fused heading
+        // creates a feedback loop since the fused pose already includes vision corrections.
+        double heading = getPigeon2().getYaw().getValueAsDouble();
+        double yawRateDegsPerSec = getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
+        LimelightHelpers.SetRobotOrientation("limelight-left", heading, yawRateDegsPerSec, 0, 0, 0, 0);
         // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
         // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
-        double omegaDegPerSec = Math.abs(Math.toDegrees(getState().Speeds.omegaRadiansPerSecond));
+        double omegaDegPerSec = Math.abs(yawRateDegsPerSec);
         if (omegaDegPerSec < 720) {
-            // Use cached alliance — avoids a redundant DriverStation.getAlliance() call every loop
-            LimelightHelpers.PoseEstimate left = m_isBlue
-                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left")
-                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
-             LimelightHelpers.PoseEstimate forward = m_isBlue
-                ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front")
-                : LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-front");
+            // Always use _wpiBlue — the CTRE pose estimator works in blue-origin coordinates
+            // regardless of alliance. Using _wpiRed on Red causes teleporting/wrong positions.
+            LimelightHelpers.PoseEstimate left =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
             if (left != null) {
                 this.field2d.getObject("Left").setPose(left.pose);
             }
-            if (forward != null) {
-                this.field2d.getObject("Front").setPose(forward.pose);
-            }
-            savePose(blendEstimates(left , forward));
+            savePose(left);
         }
+        // Keep the main robot marker in sync with the fused odometry pose
+        field2d.setRobotPose(getState().Pose);
     }
     
     private void configureAutoBuilder(){
@@ -389,55 +387,33 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * Blends two PoseEstimates weighted by tagCount * avgTagArea.
-     * Returns the higher-quality estimate alone if the other has no tags.
-     */
-    private LimelightHelpers.PoseEstimate blendEstimates(LimelightHelpers.PoseEstimate a, LimelightHelpers.PoseEstimate b) {
-        double qualityA = (a != null) ? a.tagCount * a.avgTagArea : 0;
-        double qualityB = (b != null) ? b.tagCount * b.avgTagArea : 0;
-        double totalQuality = qualityA + qualityB;
-        if (totalQuality == 0) return null;
-        if (qualityA == 0) return b;
-        if (qualityB == 0) return a;
-
-        double wA = qualityA / totalQuality;
-        double wB = qualityB / totalQuality;
-
-        double x = wA * a.pose.getX() + wB * b.pose.getX();
-        double y = wA * a.pose.getY() + wB * b.pose.getY();
-        Rotation2d rotation = a.pose.getRotation().interpolate(b.pose.getRotation(), wB);
-
-        // Use the timestamp and latency from whichever camera has the higher quality —
-        // they must stay paired so the Kalman filter gets a consistent observation time.
-        boolean aWins = qualityA >= qualityB;
-        double timestamp = aWins ? a.timestampSeconds : b.timestampSeconds;
-        double latency   = aWins ? a.latency          : b.latency;
-
-        return new LimelightHelpers.PoseEstimate(
-            new Pose2d(x, y, rotation),
-            timestamp,
-            latency,
-            a.tagCount + b.tagCount,
-            Math.max(a.tagSpan, b.tagSpan),
-            Math.min(a.avgTagDist, b.avgTagDist),
-            (qualityA * a.avgTagArea + qualityB * b.avgTagArea) / totalQuality,
-            new LimelightHelpers.RawFiducial[]{},
-            true
-        );
-    }
-
-    /**
      * Injects a fresh MegaTag2 pose into the Kalman filter.
-     * Rejects null, zero-tag, origin-coordinate, and out-of-bounds estimates
-     * so a bad Limelight reading can never pull the displayed pose off the field.
+     * Rejects null, zero-tag, origin-coordinate, out-of-bounds, and low-quality estimates.
+     * Uses distance-scaled std devs so far/small tags get less trust than close ones.
      */
     private void savePose(LimelightHelpers.PoseEstimate mt2) {
-        if (mt2 == null || mt2.tagCount == 0) return;
+        if (mt2 == null) { SmartDashboard.putString("LL/Reject", "null"); return; }
+        if (mt2.tagCount == 0) { SmartDashboard.putString("LL/Reject", "no tags"); return; }
         double x = mt2.pose.getX();
         double y = mt2.pose.getY();
-        if (x == 0 && y == 0) return;
-        if (x < 0 || x > kFieldWidthMeters || y < 0 || y > kFieldHeightMeters) return;
-        super.addVisionMeasurement(mt2.pose, Utils.fpgaToCurrentTime(mt2.timestampSeconds));
+        SmartDashboard.putNumber("LL/TagCount", mt2.tagCount);
+        SmartDashboard.putNumber("LL/PoseX", x);
+        SmartDashboard.putNumber("LL/PoseY", y);
+        SmartDashboard.putNumber("LL/TagArea", mt2.avgTagArea);
+        SmartDashboard.putNumber("LL/TagDist", mt2.avgTagDist);
+        SmartDashboard.putNumber("LL/Heading", getState().Pose.getRotation().getDegrees());
+        if (x == 0 && y == 0) { SmartDashboard.putString("LL/Reject", "origin"); return; }
+        if (x < 0 || x > kFieldWidthMeters || y < 0 || y > kFieldHeightMeters) { SmartDashboard.putString("LL/Reject", "out of bounds"); return; }
+        if (mt2.avgTagArea < 0.1) { SmartDashboard.putString("LL/Reject", "area too small"); return; }
+        if (mt2.avgTagDist > 4.0) { SmartDashboard.putString("LL/Reject", "too far"); return; }
+        SmartDashboard.putString("LL/Reject", "ACCEPTED");
+        // Scale x/y trust by distance: close tag = tight std dev, far tag = looser std dev
+        double xyStdDev = 0.4 + mt2.avgTagDist * mt2.avgTagDist * 0.05;
+        super.addVisionMeasurement(
+            mt2.pose,
+            Utils.fpgaToCurrentTime(mt2.timestampSeconds),
+            VecBuilder.fill(xyStdDev, xyStdDev, 9999999)
+        );
     }
 
 }

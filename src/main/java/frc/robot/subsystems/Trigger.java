@@ -19,12 +19,12 @@ public class Trigger extends SubsystemBase {
   }
 
   public void shoot() {
-    kickUpMotor.set(Constants.Trigger.SHOOT_SPEED);
+    kickUpMotor.set(-Constants.Trigger.SHOOT_SPEED);
     indexMotor.set(Constants.Trigger.SHOOT_SPEED);
   }
 
   public void reverseShoot() {
-    kickUpMotor.set(Constants.Trigger.REVERSE_SPEED);
+    kickUpMotor.set(-Constants.Trigger.REVERSE_SPEED);
     indexMotor.set(Constants.Trigger.REVERSE_SPEED);
   }
 
