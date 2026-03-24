@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:github.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(grep -v \"^[^:]*\\\\.java:[[:space:]]*\\\\*\\\\|^[^:]*\\\\.java:[[:space:]]*//\")",
+      "Bash(grep -n \"^\\\\s*//\" /c/Users/atlee/Documents/GitHub/Rebuilt-new/src/main/java/frc/robot/RobotContainer.java)",
+      "Bash(for cmd:*)",
+      "Bash(do echo:*)",
+      "Bash(grep -c \"new $cmd\" /c/Users/atlee/Documents/GitHub/Rebuilt-new/src/main/java/frc/robot -r --include=\"*.java\")",
+      "Bash(done)"
     ]
   }
 }

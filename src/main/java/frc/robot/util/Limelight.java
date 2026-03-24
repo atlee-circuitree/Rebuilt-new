@@ -49,7 +49,7 @@ public class Limelight {
     }
 
     public static double getDistance(String limelightName) {
-        double ta = getTA();
+        double ta = getTA(limelightName);
         if (ta > Constants.LimelightConstants.MAX_TA_FOR_DISTANCE || ta == 0) {
             return 0;
         }

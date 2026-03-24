@@ -1655,18 +1655,6 @@ public class LimelightHelpers {
 
         LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         return mt2;
-        // if our angular velocity is greater than 360 degrees per second, ignore vision updates
-        /*boolean doRejectUpdate = false;
-        if(Math.abs(m_gyro.getRate()) > 360)
-        {
-            doRejectUpdate = true;
-        }
-        if(mt2.tagCount == 0)
-        {
-            doRejectUpdate = true;
-        }
-        if(!doRejectUpdate)
-        {*/
-        //}
-    }//d=(0.629)/(tan(30)+Ty)
+        
+    }
 }
