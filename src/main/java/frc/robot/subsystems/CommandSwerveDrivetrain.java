@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.function.Supplier;
 
+import javax.xml.crypto.dsig.Transform;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -20,6 +22,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -282,6 +285,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+        LimelightHelpers.PoseEstimate left = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+        LimelightHelpers.PoseEstimate right = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+        if (Math.abs(left.pose.getX()) > 0.2 && Math.abs(left.pose.getY()) > 0.2 &&
+            Math.abs(right.pose.getX()) > 0.2 && Math.abs(right.pose.getY()) > 0.2)
+        {
+            Pose2d fin = new Pose2d(new Translation2d(
+                (left.pose.getX() + right.pose.getX()) / 2, 
+                (left.pose.getY() + right.pose.getY()) / 2), 
+                left.pose.getRotation().plus(right.pose.getRotation()).div(2)
+            );
+            resetPose(fin);
+        }
+        else if (Math.abs(left.pose.getX()) > 0.2 && Math.abs(left.pose.getY()) > 0.2)
+            resetPose(left.pose);
+        else if (Math.abs(right.pose.getX()) > 0.2 && Math.abs(right.pose.getY()) > 0.2)
+            resetPose(right.pose);
+        
+
+        /*
         // Feed MegaTag2 pose estimate from limelight-left.
         // MT2 needs the RAW gyro yaw, not the fused pose heading — using fused heading
         // creates a feedback loop since the fused pose already includes vision corrections.
@@ -300,7 +322,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 this.field2d.getObject("Left").setPose(left.pose);
             }
             savePose(left);
-        }
+        }*/
         // Keep the main robot marker in sync with the fused odometry pose
         field2d.setRobotPose(getState().Pose);
     }
