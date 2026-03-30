@@ -25,6 +25,11 @@ public class Limelight {
         return limelight.getEntry("ta").getDouble(0.0);
     }
 
+    public static double getTA(String limelightName) {
+        return NetworkTableInstance.getDefault()
+            .getTable(limelightName).getEntry("ta").getDouble(0.0);
+    }
+
     public static double getTX() {
         return limelight.getEntry("tx").getDouble(0.0);
     }
@@ -36,6 +41,15 @@ public class Limelight {
     //magic number 46.39986 no documentation
     public static double getDistance() {
         double ta = getTA();
+        if (ta > Constants.LimelightConstants.MAX_TA_FOR_DISTANCE || ta == 0) {
+            return 0;
+        }
+        return Constants.LimelightConstants.DISTANCE_SCALE
+                * Math.pow(ta, Constants.LimelightConstants.DISTANCE_EXPONENT);
+    }
+
+    public static double getDistance(String limelightName) {
+        double ta = getTA(limelightName);
         if (ta > Constants.LimelightConstants.MAX_TA_FOR_DISTANCE || ta == 0) {
             return 0;
         }

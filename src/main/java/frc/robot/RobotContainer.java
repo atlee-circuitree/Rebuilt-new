@@ -113,7 +113,7 @@ public class RobotContainer {
         mapEventsToCommands();
 
         //autoChooser = AutoBuilder.buildAutoChooser("Ribakov1");
-        autoChooser = AutoCommands.buildAutoChooser(drivetrain, drive, MaxSpeed, turret, trigger, intake);
+        autoChooser = AutoCommands.buildAutoChooser(this, drivetrain, drive, MaxSpeed, turret, trigger, intake);
 
         //autoChooser = new SendableChooser<>();
 
@@ -137,12 +137,12 @@ public class RobotContainer {
         ));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(12.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
-        NamedCommands.registerCommand("deploy intake", new DeployIntake(intake));
-        NamedCommands.registerCommand("retract intake", new RetractIntake(intake));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
-        // NamedCommands.registerCommand("line up climb", new LineUpClimb(drivetrain));
-        // NamedCommands.registerCommand("climb up", new ClimbUp(climber));
-        // NamedCommands.registerCommand("climb down", new ClimbDown(climber));
+    }
+
+    //field orient
+    public void seedFieldOrient() {
+        drivetrain.seedFieldCentric();
     }
 
     public Command getAutonomousCommand() {
@@ -160,9 +160,6 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
         
-        // Player1.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-Player1.getLeftY(), -Player1.getLeftX()))
-        // ));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -173,6 +170,7 @@ public class RobotContainer {
         turret.stopShooter();
         intake.stopWheels();
         intake.stopDeploy();
+        seedFieldOrient();
     }
 
     //player 1 and 2 stick getters.
@@ -241,9 +239,10 @@ public class RobotContainer {
             new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
             new Shoot(turret, trigger)
         )); 
-        Player1.y().onTrue(new RetractIntake(intake)); // retract
         Player1.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
         Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
+
+        
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
@@ -254,6 +253,12 @@ public class RobotContainer {
         Player1.povUp().onTrue(new StopTurretWheels(turret));
         Player1.rightBumper().whileTrue(new ReverseShoot(trigger));
 
+        
+
+        //Manual Turret
+        Player1.povRight().whileTrue(new ManualTurret(turret, () -> 1.)); //left
+        Player1.povLeft().whileTrue(new ManualTurret(turret, () -> -1.)); //left
+
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
         Player1.leftBumper().whileTrue(new TurnTurret(turret));
 
@@ -263,7 +268,6 @@ public class RobotContainer {
             new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
             new Shoot(turret, trigger)
         )); // deploy
-        Player2.y().onTrue(new RetractIntake(intake)); // retract
 
         Player2.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
         Player2.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
@@ -291,7 +295,6 @@ public class RobotContainer {
                 new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
                 new Shoot(turret, trigger)
             ));
-            buttonY.onTrue(new RetractIntake(intake));
             buttonA.whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED));
             buttonB.whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED));
 
