@@ -303,6 +303,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         // Keep the main robot marker in sync with the fused odometry pose
         field2d.setRobotPose(getState().Pose);
+
+        LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetIMUMode("limelight-left", 3);
     }
     
     private void configureAutoBuilder(){
