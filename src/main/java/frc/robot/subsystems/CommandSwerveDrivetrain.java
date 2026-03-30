@@ -287,8 +287,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         LimelightHelpers.PoseEstimate left = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         LimelightHelpers.PoseEstimate right = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
-        if (Math.abs(left.pose.getX()) > 0.2 && Math.abs(left.pose.getY()) > 0.2 &&
-            Math.abs(right.pose.getX()) > 0.2 && Math.abs(right.pose.getY()) > 0.2)
+        if (left != null && Math.abs(left.pose.getX()) > 0.2 && Math.abs(left.pose.getY()) > 0.2 &&
+            right != null && Math.abs(right.pose.getX()) > 0.2 && Math.abs(right.pose.getY()) > 0.2)
         {
             Pose2d fin = new Pose2d(new Translation2d(
                 (left.pose.getX() + right.pose.getX()) / 2, 
@@ -297,9 +297,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             );
             resetPose(fin);
         }
-        else if (Math.abs(left.pose.getX()) > 0.2 && Math.abs(left.pose.getY()) > 0.2)
+        else if (left != null && Math.abs(left.pose.getX()) > 0.2 && Math.abs(left.pose.getY()) > 0.2)
             resetPose(left.pose);
-        else if (Math.abs(right.pose.getX()) > 0.2 && Math.abs(right.pose.getY()) > 0.2)
+        else if (right != null && Math.abs(right.pose.getX()) > 0.2 && Math.abs(right.pose.getY()) > 0.2)
             resetPose(right.pose);
         
 
