@@ -306,6 +306,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
         LimelightHelpers.SetIMUMode("limelight-left", 3);
+
+        LimelightHelpers.PoseEstimate blue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+        LimelightHelpers.PoseEstimate red = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
+
+        if (blue != null)
+        {
+            String sum = blue.pose.getX() + ", " + blue.pose.getY();
+            SmartDashboard.putString("blue estimate", sum);
+            this.field2d.getObject("blue").setPose(blue.pose);
+        }
+        if (red != null)
+        {
+            String sum2 = red.pose.getX() + ", " + red.pose.getY();
+            SmartDashboard.putString("red estimate", sum2);
+            this.field2d.getObject("red").setPose(red.pose);
+        }
     }
     
     private void configureAutoBuilder(){
