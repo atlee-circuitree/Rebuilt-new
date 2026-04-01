@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.exceptions.NoMegaTagException;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -290,8 +291,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // creates a feedback loop since the fused pose already includes vision corrections.
         double heading = getPigeon2().getYaw().getValueAsDouble();
         double yawRateDegsPerSec = getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
-        LimelightHelpers.SetRobotOrientation("limelight-left", heading + 180, yawRateDegsPerSec, 0, 0, 0, 0);
-        LimelightHelpers.SetRobotOrientation("limelight-turret", heading + 180, yawRateDegsPerSec, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-left", heading, yawRateDegsPerSec, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-turret", heading, yawRateDegsPerSec, 0, 0, 0, 0);
         // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
         // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
         double omegaDegPerSec = Math.abs(yawRateDegsPerSec);
@@ -320,7 +321,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetIMUMode("limelight-turret", 3);
 
         LimelightHelpers.PoseEstimate e = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left");
-        SmartDashboard.putNumber("mt1 pose", e.pose.getRotation().getDegrees());
+        //SmartDashboard.putNumber("mt1 pose", e.pose.getRotation().getDegrees());
         ArrayList<LimelightHelpers.PoseEstimate> poses = new ArrayList<>();
         poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left"));
         poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret"));
@@ -335,8 +336,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-turret"));
         }
         savePose(poses);
-        double newHeading = getCamHeading(mtlist);
-        getPigeon2().setYaw(newHeading);
+        try {
+            double newHeading = getCamHeading(mtlist);
+            SmartDashboard.putNumber("new Heading", newHeading);
+            seedFieldCentric(new Rotation2d(Math.toRadians(newHeading)));
+        } catch (NoMegaTagException ex) {
+            // do nothing, dont need to update rotation
+        }
         field2d.setRobotPose(getState().Pose);
     }
     
@@ -460,16 +466,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
-     private double getCamHeading(ArrayList<LimelightHelpers.PoseEstimate> mt) {
+     private double getCamHeading(ArrayList<LimelightHelpers.PoseEstimate> mt) throws NoMegaTagException {
         double r = 0;
         int cr = 0;
 
-         for (LimelightHelpers.PoseEstimate mtp : mt)
+        for (LimelightHelpers.PoseEstimate mtp : mt)
         {
             if (mtp != null) {
                 Pose2d p = mtp.pose;
                 if (Math.abs(p.getX()) > 0.01 || (Math.abs(p.getY())) > 0.01) {
-                    
+                    System.out.println("   rotation " + p.getRotation().getDegrees());
                     r += p.getRotation().getDegrees();
                    
                     cr++;
@@ -479,6 +485,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         if (cr > 0)
             r /= cr;
+        else
+            throw new NoMegaTagException();
+
+        System.out.println("final rotation " + r);
         return r;
     }
 }

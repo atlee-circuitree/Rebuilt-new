@@ -170,7 +170,7 @@ public class RobotContainer {
         turret.stopShooter();
         intake.stopWheels();
         intake.stopDeploy();
-        seedFieldOrient();
+        //seedFieldOrient();
     }
 
     //player 1 and 2 stick getters.
