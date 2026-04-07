@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -112,8 +113,8 @@ public class RobotContainer {
         // NamedCommands must be registered before AutoBuilder loads autos
         mapEventsToCommands();
 
-        //autoChooser = AutoBuilder.buildAutoChooser("Ribakov1");
-        autoChooser = AutoCommands.buildAutoChooser(this, drivetrain, drive, MaxSpeed, turret, trigger, intake);
+        autoChooser = AutoBuilder.buildAutoChooser("Ribakov1");
+        //autoChooser = AutoCommands.buildAutoChooser(this, drivetrain, drive, MaxSpeed, turret, trigger, intake);
 
         //autoChooser = new SendableChooser<>();
 
@@ -138,6 +139,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(12.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
+        NamedCommands.registerCommand("stop intake",  new StopIntake(intake));
+
     }
 
     //field orient
@@ -170,7 +173,7 @@ public class RobotContainer {
         turret.stopShooter();
         intake.stopWheels();
         intake.stopDeploy();
-        seedFieldOrient();
+        //seedFieldOrient();
     }
 
     //player 1 and 2 stick getters.
@@ -250,7 +253,8 @@ public class RobotContainer {
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
 
-        Player1.povUp().onTrue(new StopTurretWheels(turret));
+        //Player1.povUp().onTrue(new StopTurretWheels(turret));
+        Player1.povUp().whileTrue(new TurretTo(turret, 90));
         Player1.rightBumper().whileTrue(new ReverseShoot(trigger));
 
         
@@ -258,6 +262,12 @@ public class RobotContainer {
         //Manual Turret
         Player1.povRight().whileTrue(new ManualTurret(turret, () -> 1.)); //left
         Player1.povLeft().whileTrue(new ManualTurret(turret, () -> -1.)); //left
+        /*Player1.povRight().onTrue(new InstantCommand(() -> {
+            turret.incVoltage();
+        })); //left
+        Player1.povLeft().onTrue(new InstantCommand(() -> {
+            turret.stopRotator();
+        })); //left*/
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
         Player1.leftBumper().whileTrue(new TurnTurret(turret));

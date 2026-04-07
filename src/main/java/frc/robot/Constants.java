@@ -65,11 +65,11 @@ public class Constants {
         /** Motor-to-encoder gear ratio for the rotator. */
         public static final double GEAR_RATIO       = 10.0;
         /** Minimum allowed turret angle in degrees (soft limit). */
-        public static final double MIN_ANGLE_DEG    = 1.0;
+        public static final double MIN_ANGLE_DEG    = 5.0;
         /** Maximum allowed turret angle in degrees (soft limit). */
-        public static final double MAX_ANGLE_DEG    = 120.0;
+        public static final double MAX_ANGLE_DEG    = 175.0;
         /** Angle tolerance for "at setpoint" checks (degrees). */
-        public static final double ANGLE_THRESHOLD_DEG = 2.0;
+        public static final double ANGLE_THRESHOLD_DEG = 0.5;
 
         // --- Flywheel speed ---
         /** Minimum flywheel velocity (RPS) before the trigger may fire. */
@@ -90,7 +90,7 @@ public class Constants {
 
 
         // --- Rotator PID  (CTRE Slot 0) ---
-        public static final double ROTATOR_KP = 0.1;
+        public static final double ROTATOR_KP = 3.35;
         public static final double ROTATOR_KI = 0.0;
         public static final double ROTATOR_KD = 0.0;
 
@@ -101,7 +101,7 @@ public class Constants {
 
         // --- Manual rotation ---
         /** Duty-cycle scalar applied to joystick input for manual rotation. */
-        public static final double ROTATE_OUTPUT_SCALE = 0.15;
+        public static final double ROTATE_OUTPUT_SCALE = 0.3;
         /** Joystick deadband — inputs below this magnitude are ignored. */
         public static final double MANUAL_DEADBAND     = 0.08;
 

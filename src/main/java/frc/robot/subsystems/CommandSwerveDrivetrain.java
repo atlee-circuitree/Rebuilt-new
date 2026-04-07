@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -20,6 +21,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -32,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.exceptions.NoMegaTagException;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -288,40 +292,58 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double heading = getPigeon2().getYaw().getValueAsDouble();
         double yawRateDegsPerSec = getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
         LimelightHelpers.SetRobotOrientation("limelight-left", heading, yawRateDegsPerSec, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-turret", heading, yawRateDegsPerSec, 0, 0, 0, 0);
         // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
         // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
         double omegaDegPerSec = Math.abs(yawRateDegsPerSec);
         if (omegaDegPerSec < 720) {
             // Always use _wpiBlue — the CTRE pose estimator works in blue-origin coordinates
             // regardless of alliance. Using _wpiRed on Red causes teleporting/wrong positions.
-            LimelightHelpers.PoseEstimate left =
+              LimelightHelpers.PoseEstimate left =
                 LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-            if (left != null) {
+            /*if (left != null) {
                 this.field2d.getObject("Left").setPose(left.pose);
-            }
-            savePose(left);
+            }*/
+           // savePose(left);
+           LimelightHelpers.PoseEstimate turret =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret");
+            /*if (turret != null) {
+                this.field2d.getObject("Left").setPose(left.pose);
+            }*/
         }
         // Keep the main robot marker in sync with the fused odometry pose
-        field2d.setRobotPose(getState().Pose);
+        
 
-        LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
+        /*LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
         LimelightHelpers.SetIMUMode("limelight-left", 3);
 
-        LimelightHelpers.PoseEstimate blue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-        LimelightHelpers.PoseEstimate red = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left");
+        LimelightHelpers.SetRobotOrientation("limelight-turret", heading, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetIMUMode("limelight-turret", 3);
 
-        if (blue != null)
+        LimelightHelpers.PoseEstimate e = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left");
+        //SmartDashboard.putNumber("mt1 pose", e.pose.getRotation().getDegrees());
+        ArrayList<LimelightHelpers.PoseEstimate> poses = new ArrayList<>();
+        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left"));
+        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret"));
+        
+        ArrayList<LimelightHelpers.PoseEstimate> mtlist = new ArrayList<>();
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
         {
-            String sum = blue.pose.getX() + ", " + blue.pose.getY();
-            SmartDashboard.putString("blue estimate", sum);
-            this.field2d.getObject("blue").setPose(blue.pose);
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left"));
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-turret"));
+        } else {
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left"));
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-turret"));
         }
-        if (red != null)
-        {
-            String sum2 = red.pose.getX() + ", " + red.pose.getY();
-            SmartDashboard.putString("red estimate", sum2);
-            this.field2d.getObject("red").setPose(red.pose);
-        }
+        savePose(poses);
+        try {
+            double newHeading = getCamHeading(mtlist);
+            SmartDashboard.putNumber("new Heading", newHeading);
+            seedFieldCentric(new Rotation2d(Math.toRadians(newHeading)));
+        } catch (NoMegaTagException ex) {
+            // do nothing, dont need to update rotation
+        }*/
+        field2d.setRobotPose(getState().Pose);
     }
     
     private void configureAutoBuilder(){
@@ -410,29 +432,63 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Rejects null, zero-tag, origin-coordinate, out-of-bounds, and low-quality estimates.
      * Uses distance-scaled std devs so far/small tags get less trust than close ones.
      */
-    private void savePose(LimelightHelpers.PoseEstimate mt2) {
-        if (mt2 == null) { SmartDashboard.putString("LL/Reject", "null"); return; }
-        if (mt2.tagCount == 0) { SmartDashboard.putString("LL/Reject", "no tags"); return; }
-        double x = mt2.pose.getX();
-        double y = mt2.pose.getY();
-        SmartDashboard.putNumber("LL/TagCount", mt2.tagCount);
-        SmartDashboard.putNumber("LL/PoseX", x);
-        SmartDashboard.putNumber("LL/PoseY", y);
-        SmartDashboard.putNumber("LL/TagArea", mt2.avgTagArea);
-        SmartDashboard.putNumber("LL/TagDist", mt2.avgTagDist);
-        SmartDashboard.putNumber("LL/Heading", getState().Pose.getRotation().getDegrees());
-        if (x == 0 && y == 0) { SmartDashboard.putString("LL/Reject", "origin"); return; }
-        if (x < 0 || x > kFieldWidthMeters || y < 0 || y > kFieldHeightMeters) { SmartDashboard.putString("LL/Reject", "out of bounds"); return; }
-        if (mt2.avgTagArea < 0.1) { SmartDashboard.putString("LL/Reject", "area too small"); return; }
-        if (mt2.avgTagDist > 4.0) { SmartDashboard.putString("LL/Reject", "too far"); return; }
-        SmartDashboard.putString("LL/Reject", "ACCEPTED");
-        // Scale x/y trust by distance: close tag = tight std dev, far tag = looser std dev
-        double xyStdDev = 0.4 + mt2.avgTagDist * mt2.avgTagDist * 0.05;
-        super.addVisionMeasurement(
-            mt2.pose,
-            Utils.fpgaToCurrentTime(mt2.timestampSeconds),
-            VecBuilder.fill(xyStdDev, xyStdDev, 9999999)
-        );
+    private void savePose(ArrayList<LimelightHelpers.PoseEstimate> mt2) {
+        double x = 0;
+        double y = 0;
+        double r = 0;
+        int c = 0;
+
+
+        // loop through list of all poses
+        for (LimelightHelpers.PoseEstimate mtp : mt2)
+        {
+            if (mtp != null) {
+                Pose2d p = mtp.pose;
+                if (Math.abs(p.getX()) > 0.01 || (Math.abs(p.getY())) > 0.01) {
+                    x += p.getX();
+                    y += p.getY();
+                    c++;
+                }
+            }
+        }
+
+        // average them together if there were any poses
+        if (c > 0)
+        {
+            x /= c;
+            y /= c;
+            Pose2d finalPose = new Pose2d(x, y, new Rotation2d(r));
+            setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+            addVisionMeasurement(
+                finalPose,
+                mt2.get(0).timestampSeconds // there was at least one pose, use first pose timestamp
+            );
+        }
     }
 
+     private double getCamHeading(ArrayList<LimelightHelpers.PoseEstimate> mt) throws NoMegaTagException {
+        double r = 0;
+        int cr = 0;
+
+        for (LimelightHelpers.PoseEstimate mtp : mt)
+        {
+            if (mtp != null) {
+                Pose2d p = mtp.pose;
+                if (Math.abs(p.getX()) > 0.01 || (Math.abs(p.getY())) > 0.01) {
+                    System.out.println("   rotation " + p.getRotation().getDegrees());
+                    r += p.getRotation().getDegrees();
+                   
+                    cr++;
+                }
+            }
+        }
+
+        if (cr > 0)
+            r /= cr;
+        else
+            throw new NoMegaTagException();
+
+        System.out.println("final rotation " + r);
+        return r;
+    }
 }

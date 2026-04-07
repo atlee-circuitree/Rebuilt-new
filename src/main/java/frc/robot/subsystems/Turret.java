@@ -21,6 +21,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -49,8 +50,8 @@ public class Turret extends SubsystemBase {
 
   private boolean hoodUp = false;
   private double targetVelocity = 0;
-  private double targetAngleDeg = 0;   // setpoint for CTRE closed-loop rotation
   private double realZero = 0;
+  private double targetPosition = 0;
   private boolean zeroing = false;
   /** Last commanded rotator direction — used for software safety backstop. */
   private double commandedDirection = 0;
@@ -95,6 +96,8 @@ public class Turret extends SubsystemBase {
     conf.Slot0.kP = Constants.Turret.ROTATOR_KP;
     conf.Slot0.kI = Constants.Turret.ROTATOR_KI;
     conf.Slot0.kD = Constants.Turret.ROTATOR_KD;
+    conf.Voltage.PeakForwardVoltage = 5;
+    conf.Voltage.PeakReverseVoltage = -5;
     motorRotator.getConfigurator().apply(conf);
 
     // Cache signal references — avoids repeated object allocation in hot path
@@ -127,16 +130,24 @@ public class Turret extends SubsystemBase {
     }
   }
 
-  /** Set the target angle (degrees) for CTRE closed-loop position control via rotateTo(). */
-  public void setSetpoint(double degree) {
-    targetAngleDeg = degree;
+  public void incVoltage()
+  {
+    motorRotator.set(motorRotator.get() - 0.002);
   }
 
   /** Drive the rotator to the last angle set by setSetpoint() using CTRE onboard PID. */
-  public void rotateTo() {
-    double targetRotations = realZero + (targetAngleDeg / 360.0) * Constants.Turret.GEAR_RATIO;
-    commandedDirection = Math.signum(targetAngleDeg - getAngle());
-    motorRotator.setControl(m_rotatorPositionRequest.withPosition(targetRotations));
+  public void rotateTo(double target) {
+    double targetRotations = realZero + (target / 360.0) * Constants.Turret.GEAR_RATIO;
+    targetPosition = target;
+    double feed = 0.22;
+    if (target < getAngle())
+      feed = -0.22;
+    motorRotator.setControl(m_rotatorPositionRequest.withPosition(targetRotations).withFeedForward(feed));
+  }
+
+  public boolean isAtAngle()
+  {
+    return Math.abs(getAngle() - targetPosition) < Constants.Turret.ANGLE_THRESHOLD_DEG;
   }
 
   public void autoRotate() {
@@ -269,6 +280,7 @@ public class Turret extends SubsystemBase {
     SmartDashboard.putNumber("Turret/angle_deg",    getAngle());
     SmartDashboard.putNumber("Turret/current_amps", m_rotatorCurrent.getValueAsDouble());
     SmartDashboard.putNumber("Turret/velocity_rps", getVelocity());
+    SmartDashboard.putNumber("Turret/voltage", motorRotator.getMotorVoltage().getValueAsDouble());
 
     // Software safety backstop: stop if commanded direction has been unsafe for 4 consecutive cycles
     if (!zeroing && m_unsafeDebouncer.calculate(!isSafe(commandedDirection))) {
