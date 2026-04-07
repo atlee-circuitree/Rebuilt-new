@@ -65,7 +65,7 @@ public class Constants {
         /** Motor-to-encoder gear ratio for the rotator. */
         public static final double GEAR_RATIO       = 10.0;
         /** Minimum allowed turret angle in degrees (soft limit). */
-        public static final double MIN_ANGLE_DEG    = 8.0;
+        public static final double MIN_ANGLE_DEG    = 1.0;
         /** Maximum allowed turret angle in degrees (soft limit). */
         public static final double MAX_ANGLE_DEG    = 120.0;
         /** Angle tolerance for "at setpoint" checks (degrees). */
