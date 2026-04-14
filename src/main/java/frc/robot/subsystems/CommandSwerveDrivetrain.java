@@ -233,7 +233,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
     }
 
-
     /**
      * Returns a command that applies the specified control request to this swerve drivetrain.
      *
@@ -314,7 +313,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // Keep the main robot marker in sync with the fused odometry pose
         
 
-        /*LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
         LimelightHelpers.SetIMUMode("limelight-left", 3);
 
         LimelightHelpers.SetRobotOrientation("limelight-turret", heading, 0, 0, 0, 0, 0);
@@ -342,7 +341,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             seedFieldCentric(new Rotation2d(Math.toRadians(newHeading)));
         } catch (NoMegaTagException ex) {
             // do nothing, dont need to update rotation
-        }*/
+        }
         field2d.setRobotPose(getState().Pose);
     }
     

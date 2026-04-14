@@ -260,8 +260,8 @@ public class RobotContainer {
         
 
         //Manual Turret
-        Player1.povRight().whileTrue(new ManualTurret(turret, () -> 1.)); //left
-        Player1.povLeft().whileTrue(new ManualTurret(turret, () -> -1.)); //left
+        Player1.povRight().whileTrue(new ManualTurret(turret, () -> .3)); //left
+        Player1.povLeft().whileTrue(new ManualTurret(turret, () -> -.3)); //left
         /*Player1.povRight().onTrue(new InstantCommand(() -> {
             turret.incVoltage();
         })); //left
