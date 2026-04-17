@@ -617,7 +617,7 @@ public class LimelightHelpers {
 
     static final String sanitizeName(String name) {
         if (name == "" || name == null) {
-            return "limelight-turret";
+            return "";
         }
         return name;
     }
@@ -1644,17 +1644,5 @@ public class LimelightHelpers {
         }
 
         return results;
-    }
-  
-    public static LimelightHelpers.PoseEstimate localize(CommandSwerveDrivetrain drivetrain)
-    {
-        int[] validIDs = {1};
-        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
-
-        LimelightHelpers.SetRobotOrientation("limelight-left", drivetrain.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-        return mt2;
-        
     }
 }

@@ -6,7 +6,7 @@ import frc.robot.Constants;
 
 public class Limelight {
     private static final NetworkTable limelight = NetworkTableInstance.getDefault()
-            .getTable(Constants.LimelightConstants.TURRET_LIMELIGHT_NAME);
+            .getTable(Constants.LimelightConstants.LEFT_LIMELIGHT_NAME);
 
     public static double getTurretSpeed() {
         double tx = getTX();

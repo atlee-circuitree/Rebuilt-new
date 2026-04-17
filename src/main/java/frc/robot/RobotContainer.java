@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
 
 public class RobotContainer {
 
@@ -119,6 +120,8 @@ public class RobotContainer {
         //autoChooser = new SendableChooser<>();
 
         SmartDashboard.putData("Field", field);
+
+        new EventTrigger("intake").onTrue(new RunIntake(intake));
 
         // Do all other initialization
         configureBindings();
