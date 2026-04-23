@@ -22,9 +22,9 @@ public class Robot extends TimedRobot {
 
   // Cached NetworkTable references to avoid repeated traversal in robotPeriodic()
   private final NetworkTable m_limelightTurretTable =
-      NetworkTableInstance.getDefault().getTable(Constants.LimelightConstants.LEFT_LIMELIGHT_NAME);
+      NetworkTableInstance.getDefault().getTable(Constants.LimelightConstants.TURRET_LIMELIGHT_NAME);
   private final NetworkTable m_limelightLeftTable =
-      NetworkTableInstance.getDefault().getTable(Constants.LimelightConstants.FRONT_LIMELIGHT_NAME);
+      NetworkTableInstance.getDefault().getTable("limelight-left");
 
   public Robot() {
     m_robotContainer = new RobotContainer();

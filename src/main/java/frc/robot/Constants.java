@@ -197,8 +197,7 @@ public class Constants {
     // =========================================================================
     public static class LimelightConstants {
         /** NetworkTables name of the turret-facing Limelight. */
-        public static final String LEFT_LIMELIGHT_NAME = "limelight-left";
-        public static final String FRONT_LIMELIGHT_NAME = "limelight-front";
+        public static final String TURRET_LIMELIGHT_NAME = "limelight-turret";
 
         // --- Distance model:  distance = DISTANCE_SCALE * ta ^ DISTANCE_EXPONENT ---
         public static final double DISTANCE_SCALE      = 46.39986;

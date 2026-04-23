@@ -35,8 +35,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
-import frc.robot.Constants.Drive;
 import frc.robot.exceptions.NoMegaTagException;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
@@ -287,38 +285,60 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-        // Feed MegaTag2 pose estimate from limelight-front.
+        // Feed MegaTag2 pose estimate from limelight-left.
         // MT2 needs the RAW gyro yaw, not the fused pose heading — using fused heading
         // creates a feedback loop since the fused pose already includes vision corrections.
         double heading = getPigeon2().getYaw().getValueAsDouble();
+        double yawRateDegsPerSec = getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
+        LimelightHelpers.SetRobotOrientation("limelight-left", heading, yawRateDegsPerSec, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-turret", heading, yawRateDegsPerSec, 0, 0, 0, 0);
+        // Skip pose injection when rotating fast — MegaTag2 is unreliable above ~720 deg/s
+        // and skipping the NT reads reduces periodic runtime during aggressive maneuvers.
+        double omegaDegPerSec = Math.abs(yawRateDegsPerSec);
+        if (omegaDegPerSec < 720) {
+            // Always use _wpiBlue — the CTRE pose estimator works in blue-origin coordinates
+            // regardless of alliance. Using _wpiRed on Red causes teleporting/wrong positions.
+              LimelightHelpers.PoseEstimate left =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+            /*if (left != null) {
+                this.field2d.getObject("Left").setPose(left.pose);
+            }*/
+           // savePose(left);
+           LimelightHelpers.PoseEstimate turret =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret");
+            /*if (turret != null) {
+                this.field2d.getObject("Left").setPose(left.pose);
+            }*/
+        }
+        // Keep the main robot marker in sync with the fused odometry pose
         
-        LimelightHelpers.SetRobotOrientation(Constants.LimelightConstants.FRONT_LIMELIGHT_NAME, heading, 0, 0, 0, 0, 0);
-        LimelightHelpers.SetIMUMode(Constants.LimelightConstants.FRONT_LIMELIGHT_NAME, 3);
 
-        LimelightHelpers.SetRobotOrientation(Constants.LimelightConstants.LEFT_LIMELIGHT_NAME, heading, 0, 0, 0, 0, 0);
-        LimelightHelpers.SetIMUMode(Constants.LimelightConstants.LEFT_LIMELIGHT_NAME, 3);
+        LimelightHelpers.SetRobotOrientation("limelight-left", heading, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetIMUMode("limelight-left", 3);
 
+        LimelightHelpers.SetRobotOrientation("limelight-turret", heading, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetIMUMode("limelight-turret", 3);
+
+        LimelightHelpers.PoseEstimate e = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left");
+        //SmartDashboard.putNumber("mt1 pose", e.pose.getRotation().getDegrees());
         ArrayList<LimelightHelpers.PoseEstimate> poses = new ArrayList<>();
-        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimelightConstants.FRONT_LIMELIGHT_NAME));
-        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimelightConstants.LEFT_LIMELIGHT_NAME));
+        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left"));
+        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret"));
         
         ArrayList<LimelightHelpers.PoseEstimate> mtlist = new ArrayList<>();
         if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
         {
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed(Constants.LimelightConstants.FRONT_LIMELIGHT_NAME));
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed(Constants.LimelightConstants.LEFT_LIMELIGHT_NAME));
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left"));
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-turret"));
         } else {
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.LimelightConstants.FRONT_LIMELIGHT_NAME));
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.LimelightConstants.LEFT_LIMELIGHT_NAME));
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left"));
+            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-turret"));
         }
         savePose(poses);
         try {
-            if (DriverStation.isDisabled())
-            {
-                double newHeading = getCamHeading(mtlist);
-                SmartDashboard.putNumber("new Heading", newHeading);
-                seedFieldCentric(new Rotation2d(Math.toRadians(newHeading)));
-            }
+            double newHeading = getCamHeading(mtlist);
+            SmartDashboard.putNumber("new Heading", newHeading);
+            seedFieldCentric(new Rotation2d(Math.toRadians(newHeading)));
         } catch (NoMegaTagException ex) {
             // do nothing, dont need to update rotation
         }

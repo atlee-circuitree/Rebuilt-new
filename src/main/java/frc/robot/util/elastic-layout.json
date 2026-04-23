@@ -38,6 +38,19 @@
             }
           },
           {
+            "title": "limelight-turret",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 1024.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/limelight-turret",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
+          },
+          {
             "title": "Limelight Distance",
             "x": 0.0,
             "y": 128.0,

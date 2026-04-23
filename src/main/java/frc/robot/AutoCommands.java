@@ -68,7 +68,7 @@ public class AutoCommands {
                 drive.withVelocityX(0)
                 .withVelocityY(0.6 * maxSpeed)
                 .withRotationalRate(0)
-                ).onlyWhile(() -> Limelight.getDistance(Constants.LimelightConstants.FRONT_LIMELIGHT_NAME) < 20) //drivetrain request
+                ).onlyWhile(() -> Limelight.getDistance("limelight-left") < 20) //drivetrain request
             ) // parallel
         ));
 
