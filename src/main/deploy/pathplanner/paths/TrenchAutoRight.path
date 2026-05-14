@@ -3,34 +3,50 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.4999397590361445,
-        "y": 7.247746987951807
+        "x": 4.467156626506024,
+        "y": 0.4725662650602419
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.783602409638554,
-        "y": 7.400734939759036
+        "x": 6.663626506024097,
+        "y": 0.3086506024096388
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.494132530120482,
-        "y": 4.603240963855422
+        "x": 7.8219638554216875,
+        "y": 1.8494578313253012
       },
       "prevControl": {
-        "x": 7.800108433734941,
-        "y": 5.4228192771084345
+        "x": 7.526164011208131,
+        "y": 1.3400247662908433
+      },
+      "nextControl": {
+        "x": 8.01866265060241,
+        "y": 2.1882168674698788
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.6580481927710835,
+        "y": 3.641602409638554
+      },
+      "prevControl": {
+        "x": 8.024126506024096,
+        "y": 3.1116084337349394
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Trench Left"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.11037344398340457,
+      "waypointRelativePos": 0.15767634854771223,
       "rotationDegrees": 180.0
     }
   ],
@@ -39,14 +55,14 @@
   "eventMarkers": [
     {
       "name": "deploy intake",
-      "waypointRelativePos": 0.1856079404466488,
+      "waypointRelativePos": 0.23622828784119848,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "intake",
-      "waypointRelativePos": 0.2590570719603015,
-      "endWaypointRelativePos": 1.0,
+      "waypointRelativePos": 0.4704714640198556,
+      "endWaypointRelativePos": 2.0,
       "command": null
     }
   ],
@@ -60,7 +76,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 72.6459753637387
+    "rotation": -50.4403320310056
   },
   "reversed": false,
   "folder": null,

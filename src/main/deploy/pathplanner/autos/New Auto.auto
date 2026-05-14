@@ -7,37 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "MiddleHumanAuto"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
+            "pathName": "HumanPlayerPt2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "BottomStart",
+  "folder": null,
   "choreoAuto": false
 }

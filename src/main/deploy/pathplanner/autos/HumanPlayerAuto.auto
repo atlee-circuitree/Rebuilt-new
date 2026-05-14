@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "HumanPlayer"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "TopStarting",
+  "folder": null,
   "choreoAuto": false
 }
