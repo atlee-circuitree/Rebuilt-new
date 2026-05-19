@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "HumanPlayer"
+            "pathName": "TrenchAutoRight"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HumanPlayerPt2"
+            "pathName": "RightToHuman"
           }
         }
       ]

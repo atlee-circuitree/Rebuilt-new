@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TrenchAutoLeft"
+            "pathName": "TrenchAutoRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightTrenchpt2"
           }
         }
       ]

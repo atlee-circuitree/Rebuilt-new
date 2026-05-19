@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.663626506024097,
-        "y": 0.3086506024096388
+        "x": 6.663626506024096,
+        "y": 0.3086506024096389
       },
       "isLocked": false,
       "linkedName": null
@@ -41,7 +41,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Right Trench"
     }
   ],
   "rotationTargets": [
