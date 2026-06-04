@@ -5,15 +5,21 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "manual deploy"
+            "commands": []
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "HumanPlayer"
+            "pathName": "1 Meter"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot distance"
           }
         }
       ]

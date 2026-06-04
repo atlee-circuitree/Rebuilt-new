@@ -5,6 +5,9 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
+import java.util.jar.Attributes.Name;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -133,13 +136,15 @@ public class RobotContainer {
         NamedCommands.registerCommand("intake", new RunIntake(intake).withTimeout(3.0));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
         NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
-            new SpinToDistanceSpeed(turret),
+            new SpinToSpeed(turret, MaxSpeed),
+            new DeployJumpCommand(intake),
             new AutoShoot(turret, trigger)
-        ));
-        NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(12.0));
+        ).withTimeout(10));
+        NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(2.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
         NamedCommands.registerCommand("stop intake",  new StopIntake(intake));
+        NamedCommands.registerCommand("manual deploy", new ManualDeploy(intake, MaxSpeed).withTimeout(.08));
 
     }
 
