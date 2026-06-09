@@ -13,6 +13,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,6 +29,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.events.TriggerEvent;
 
 public class RobotContainer {
 
@@ -123,6 +126,9 @@ public class RobotContainer {
 
         SmartDashboard.putData("Field", field);
 
+        new EventTrigger("intake").whileTrue(new RunIntake(intake));
+        new EventTrigger("deploy intake").whileTrue(new ManualDeploy(intake, MaxSpeed).withTimeout(.08));
+        new EventTrigger("kick up").whileTrue(new Shoot(turret, trigger));
         // Do all other initialization
         configureBindings();
         SmartDashboard.putNumber("velocity", 1.0);
@@ -136,10 +142,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("intake", new RunIntake(intake).withTimeout(3.0));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
         NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
-            new SpinToSpeed(turret, MaxSpeed),
+            new SpinToSpeed(turret, MaxSpeed),new ParallelCommandGroup(
             new DeployJumpCommand(intake),
             new AutoShoot(turret, trigger)
-        ).withTimeout(10));
+        )).withTimeout(10));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(2.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
