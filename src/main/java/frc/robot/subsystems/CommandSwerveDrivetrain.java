@@ -319,28 +319,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetRobotOrientation("limelight-turret", heading, 0, 0, 0, 0, 0);
         LimelightHelpers.SetIMUMode("limelight-turret", 3);
 
-        LimelightHelpers.PoseEstimate e = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left");
-        //SmartDashboard.putNumber("mt1 pose", e.pose.getRotation().getDegrees());
-        ArrayList<LimelightHelpers.PoseEstimate> poses = new ArrayList<>();
-        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left"));
-        poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret"));
-        
-        ArrayList<LimelightHelpers.PoseEstimate> mtlist = new ArrayList<>();
-        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+
+        if (DriverStation.isDisabled())
         {
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left"));
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-turret"));
-        } else {
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left"));
-            mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-turret"));
-        }
-        savePose(poses);
-        try {
-            double newHeading = getCamHeading(mtlist);
-            SmartDashboard.putNumber("new Heading", newHeading);
-            seedFieldCentric(new Rotation2d(Math.toRadians(newHeading)));
-        } catch (NoMegaTagException ex) {
-            // do nothing, dont need to update rotation
+            LimelightHelpers.PoseEstimate e = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left");
+            //SmartDashboard.putNumber("mt1 pose", e.pose.getRotation().getDegrees());
+            ArrayList<LimelightHelpers.PoseEstimate> poses = new ArrayList<>();
+            poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left"));
+            poses.add(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-turret"));
+            
+            ArrayList<LimelightHelpers.PoseEstimate> mtlist = new ArrayList<>();
+            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+            {
+                mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-left"));
+                mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiRed("limelight-turret"));
+            } else {
+                mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left"));
+                mtlist.add(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-turret"));
+            }
+            savePose(poses);
+            try {
+                double newHeading = getCamHeading(mtlist);
+                SmartDashboard.putNumber("new Heading", newHeading);
+                seedFieldCentric(new Rotation2d(Math.toRadians(newHeading)));
+            } catch (NoMegaTagException ex) {
+                // do nothing, dont need to update rotation
+            }
         }
         field2d.setRobotPose(getState().Pose);
     }

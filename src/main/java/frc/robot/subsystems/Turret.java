@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.geometry.Pose2d;
+
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -21,8 +23,11 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.HiTecServo;
@@ -31,6 +36,7 @@ import frc.robot.util.LinearServo;
 
 public class Turret extends SubsystemBase {
 
+  private final CommandSwerveDrivetrain driveRef; // DO NOT ISSUE COMMANDS TO DRIVE, READ ONLY USAGE
   private final TalonFX flywheelLeft;
   private final TalonFX flywheelRight;
   private final TalonFX motorRotator;
@@ -65,11 +71,12 @@ public class Turret extends SubsystemBase {
   private final edu.wpi.first.math.filter.Debouncer m_unsafeDebouncer =
       new edu.wpi.first.math.filter.Debouncer(4 * 0.02, edu.wpi.first.math.filter.Debouncer.DebounceType.kRising);
 
-  public Turret() {
+  public Turret(CommandSwerveDrivetrain drive) {
     flywheelLeft    = new TalonFX(Constants.CAN_IDS.flywheelMotorLeft,   "FRC 1599B");
     flywheelRight   = new TalonFX(Constants.CAN_IDS.flywheelMotorRight,  "FRC 1599B");
     motorRotator = new TalonFX(Constants.CAN_IDS.turretMotorRotator,  "FRC 1599B");
     turretEncoder = new CANcoder(Constants.CAN_IDS.turretEncoder,     "FRC 1599B");
+    driveRef = drive;
 
     // Flywheel motors
     MotorOutputConfigs coastConfig = new MotorOutputConfigs();
@@ -96,8 +103,8 @@ public class Turret extends SubsystemBase {
     conf.Slot0.kP = Constants.Turret.ROTATOR_KP;
     conf.Slot0.kI = Constants.Turret.ROTATOR_KI;
     conf.Slot0.kD = Constants.Turret.ROTATOR_KD;
-    conf.Voltage.PeakForwardVoltage = 5;
-    conf.Voltage.PeakReverseVoltage = -5;
+    conf.Voltage.PeakForwardVoltage = 3; //5;
+    conf.Voltage.PeakReverseVoltage = -3; //-5;
     motorRotator.getConfigurator().apply(conf);
 
     // Cache signal references — avoids repeated object allocation in hot path
@@ -142,12 +149,37 @@ public class Turret extends SubsystemBase {
     double feed = 0.22;
     if (target < getAngle())
       feed = -0.22;
-    motorRotator.setControl(m_rotatorPositionRequest.withPosition(targetRotations).withFeedForward(feed));
+
+      System.out.printf("rotate to %f %f = %f %f \n", getAngle(), target, Constants.Turret.MIN_ANGLE_DEG, Constants.Turret.MAX_ANGLE_DEG);
+
+    if (target < Constants.Turret.MIN_ANGLE_DEG && target < getAngle())
+      stopRotator();
+    else if (target > Constants.Turret.MAX_ANGLE_DEG && target > getAngle())
+      stopRotator();
+    else
+      motorRotator.setControl(m_rotatorPositionRequest.withPosition(targetRotations).withFeedForward(feed));
   }
 
   public boolean isAtAngle()
   {
     return Math.abs(getAngle() - targetPosition) < Constants.Turret.ANGLE_THRESHOLD_DEG;
+  }
+
+  public double getAngleToGoal()
+  {
+    // red goal position
+    int[] target = {468, 158};
+    if (DriverStation.getAlliance().get() == Alliance.Blue)
+    { // blue goal posiition
+      target[0] = 181;
+      target[1] = 158;
+    }
+    Pose2d p = driveRef.getPose();
+    double x = p.getX()*39.37;
+    double y = p.getY()*39.37;
+    System.out.printf("%f %f something %d %d \n", x, y, target[0], target[1]);
+
+    return Math.toDegrees(Math.atan2(target[1] - y, target[0] - x) - p.getRotation().getRadians() + (Math.PI*1.5))-180;
   }
 
   public void autoRotate() {

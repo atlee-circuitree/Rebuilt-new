@@ -7,13 +7,19 @@
         {
           "type": "named",
           "data": {
-            "name": "manual deploy"
+            "name": "auto deploy"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "HumanPlayer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot distance"
           }
         }
       ]

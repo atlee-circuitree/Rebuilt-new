@@ -114,7 +114,7 @@ public class RobotContainer {
         // climber = new Elevator();
         intake = new Intake();
         trigger = new Trigger();
-        turret = new Turret();
+        turret = new Turret(drivetrain);
         
         // NamedCommands must be registered before AutoBuilder loads autos
         mapEventsToCommands();
@@ -142,16 +142,19 @@ public class RobotContainer {
         NamedCommands.registerCommand("intake", new RunIntake(intake).withTimeout(3.0));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
         NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
-            new SpinToSpeed(turret, MaxSpeed),new ParallelCommandGroup(
-            new DeployJumpCommand(intake),
-            new AutoShoot(turret, trigger)
-        )).withTimeout(10));
+            new SpinToSpeed(turret, Constants.Turret.SPEED_FAR_RPS),
+            new ParallelCommandGroup(
+                new DeployJumpCommand(intake),
+                new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
+                new Shoot(turret, trigger)
+            )
+        ).withTimeout(10));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(2.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
         NamedCommands.registerCommand("stop intake",  new StopIntake(intake));
-        NamedCommands.registerCommand("manual deploy", new ManualDeploy(intake, MaxSpeed).withTimeout(.08));
-
+        NamedCommands.registerCommand("auto deploy", new ManualDeploy(intake, MaxSpeed).withTimeout(.08));
+        
     }
 
     //field orient
@@ -252,10 +255,10 @@ public class RobotContainer {
             new DeployJumpCommand(intake),
             new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
             new Shoot(turret, trigger)
-        )); 
+        ));
         Player1.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
-        Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
-
+        //Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
+        Player1.b().whileTrue(new AutoTrackGoal(turret));
         
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
