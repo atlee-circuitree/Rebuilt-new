@@ -139,7 +139,7 @@ public class RobotContainer {
     {
         // replace null with command instance
         // do this for all commands
-        NamedCommands.registerCommand("intake", new RunIntake(intake).withTimeout(3.0));
+        NamedCommands.registerCommand("intake", new RunIntake(intake).withTimeout(3.6));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
         NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
             new SpinToSpeed(turret, Constants.Turret.SPEED_FAR_RPS),

@@ -51,12 +51,6 @@
         {
           "type": "named",
           "data": {
-            "name": "auto turret"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "shoot distance"
           }
         }

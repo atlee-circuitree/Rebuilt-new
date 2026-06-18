@@ -168,7 +168,7 @@ public class Turret extends SubsystemBase {
   public double getAngleToGoal()
   {
     // red goal position
-    int[] target = {468, 158};
+    int[] target = {468, 158}; 
     if (DriverStation.getAlliance().get() == Alliance.Blue)
     { // blue goal posiition
       target[0] = 181;
@@ -177,9 +177,12 @@ public class Turret extends SubsystemBase {
     Pose2d p = driveRef.getPose();
     double x = p.getX()*39.37;
     double y = p.getY()*39.37;
+    double a = (target[0]-x) * (target[0]-x);
+    double b = (target[1]-y) * (target[1]-y);
+    double c = Math.sqrt(a + b);
     System.out.printf("%f %f something %d %d \n", x, y, target[0], target[1]);
 
-    return Math.toDegrees(Math.atan2(target[1] - y, target[0] - x) - p.getRotation().getRadians() + (Math.PI*1.5))-180;
+    return Math.toDegrees(Math.atan2(target[1] - y, target[0] - x) - p.getRotation().getRadians() + (Math.PI*1.5)) - 90;
   }
 
   public void autoRotate() {

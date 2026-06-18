@@ -8,33 +8,49 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.352072289159455,
-        "y": 1.1063734939697278
+        "x": 7.28666191155492,
+        "y": 1.0008844507845938
       },
       "isLocked": false,
       "linkedName": "Right Trench"
     },
     {
       "anchor": {
-        "x": 3.8333493975941355,
-        "y": 0.6801927710910991
+        "x": 4.5307275320970035,
+        "y": 0.5609700427960058
       },
       "prevControl": {
-        "x": 8.521337349404185,
-        "y": 0.4834939759041993
+        "x": 7.247845934379456,
+        "y": 0.6127246790299581
+      },
+      "nextControl": {
+        "x": 4.2199866413069245,
+        "y": 0.5550511686857185
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.4346647646219686,
+        "y": 1.1949643366619125
+      },
+      "prevControl": {
+        "x": 2.745192582025677,
+        "y": 0.5480313837375185
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "update human"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.14356846473029097,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 1.5054095826893286,
       "rotationDegrees": 0.0
     }
   ],
@@ -51,7 +67,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 36.869897645844155
   },
   "reversed": false,
   "folder": null,

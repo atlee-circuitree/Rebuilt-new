@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.122182596291013,
-        "y": 0.4574607703281026
+        "x": 6.3938944365192585,
+        "y": 0.5868473609129818
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.8219638554216875,
-        "y": 1.8494578313253012
+        "x": 8.502895863052782,
+        "y": 2.0230385164051357
       },
       "prevControl": {
-        "x": 7.526164011208131,
-        "y": 1.3400247662908433
+        "x": 8.218245363766048,
+        "y": 1.1173323823109853
       },
       "nextControl": {
-        "x": 8.01866265060241,
-        "y": 2.1882168674698788
+        "x": 8.620345293136767,
+        "y": 2.3967412484905433
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 3.641602409638554
       },
       "prevControl": {
-        "x": 8.024126506024096,
-        "y": 3.1116084337349394
+        "x": 8.25706134094151,
+        "y": 3.135763195435093
       },
       "nextControl": null,
       "isLocked": false,
@@ -52,20 +52,7 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "deploy intake",
-      "waypointRelativePos": 0.23622828784119848,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "intake",
-      "waypointRelativePos": 0.4704714640198556,
-      "endWaypointRelativePos": 2.0,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
