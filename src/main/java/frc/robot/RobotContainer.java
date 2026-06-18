@@ -257,8 +257,8 @@ public class RobotContainer {
             new Shoot(turret, trigger)
         ));
         Player1.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
-        //Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
-        Player1.b().whileTrue(new AutoTrackGoal(turret));
+        Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
+        Player1.povDown().whileTrue(new AutoTrackGoal(turret));
         
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
