@@ -291,10 +291,11 @@ public class RobotContainer {
             new DeployJumpCommand(intake),
             new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
             new Shoot(turret, trigger)
-        )); // deploy
-
+        ));
         Player2.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
         Player2.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
+        Player2.povDown().whileTrue(new AutoTrackGoal(turret));
+        
 
         Player2.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
@@ -302,13 +303,18 @@ public class RobotContainer {
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
 
-        Player2.povUp().onTrue(new StopTurretWheels(turret));
+        //Player1.povUp().onTrue(new StopTurretWheels(turret));
+        Player2.povUp().whileTrue(new TurretTo(turret, 90));
         Player2.rightBumper().whileTrue(new ReverseShoot(trigger));
 
-        Player2.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
+        
 
-        //TODO: manual hood, and turret rotator
-        Player2.leftBumper().toggleOnTrue(new TurnTurret(turret));
+        //Manual Turret
+        Player2.povRight().whileTrue(new ManualTurret(turret, () -> .3)); //left
+        Player2.povLeft().whileTrue(new ManualTurret(turret, () -> -.3)); //left
+
+        Player2.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
+        Player2.leftBumper().whileTrue(new TurnTurret(turret));
 
 
         //Stadia Controller Test
