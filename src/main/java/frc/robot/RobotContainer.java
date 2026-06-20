@@ -148,7 +148,7 @@ public class RobotContainer {
                 new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
                 new Shoot(turret, trigger)
             )
-        ).withTimeout(10));
+        ).withTimeout(5));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(2.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
