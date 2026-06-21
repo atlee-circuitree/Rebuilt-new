@@ -9,15 +9,22 @@ import frc.robot.subsystems.Intake;
 
 public class RunIntake extends Command {
   Intake intake;
+  boolean reverse = false;
   
   public RunIntake(Intake in) {
    intake = in;
    addRequirements(in);
   }
 
+  public RunIntake(Intake in, boolean reverse) {
+   intake = in;
+   this.reverse = reverse;
+   addRequirements(in);
+  }
+
   @Override
   public void execute() {
-    intake.intake();
+    intake.intake(reverse);
   }
 
   @Override

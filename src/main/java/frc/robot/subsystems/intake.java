@@ -74,8 +74,11 @@ public class Intake extends SubsystemBase {
     runToPosition(Constants.Intake.RETRACT_POS_ROT);
   }
 
-  public void intake() {
-    feedMotor.set(Constants.Intake.INTAKE_SPEED);
+  public void intake(boolean reverse) {
+    int i = 1;
+    if (reverse) {i=i * -1;}
+    feedMotor.set(i * Constants.Intake.INTAKE_SPEED);
+    //deployMotor.set(.05);
   }
 
   public void deployManual(double speed) {
@@ -92,6 +95,7 @@ public class Intake extends SubsystemBase {
     motorOutput.NeutralMode = NeutralModeValue.Brake;
     deployMotor.getConfigurator().apply(motorOutput, 0.0); // 0 s timeout = non-blocking
   }
+
 
   public void runToPosition(double positionRotations) {
     int slot = (Math.abs(positionRotations) < Constants.Intake.SLOT_SELECT_THRESHOLD) ? 0 : 1;
@@ -111,6 +115,7 @@ public class Intake extends SubsystemBase {
 
   public void stopWheels() {
     feedMotor.setControl(m_voltageOut.withOutput(0));
+    //stopDeploy();
   }
 
   @Override

@@ -142,13 +142,13 @@ public class RobotContainer {
         NamedCommands.registerCommand("intake", new RunIntake(intake).withTimeout(3.6));
         NamedCommands.registerCommand("shoot",  new SpinToDistanceSpeed(turret));
         NamedCommands.registerCommand("shoot distance", new SequentialCommandGroup(
-            new SpinToSpeed(turret, Constants.Turret.SPEED_FAR_RPS),
+            new SpinToSpeed(turret, Constants.Turret.SPEED_CLOSE_RPS),
             new ParallelCommandGroup(
                 new DeployJumpCommand(intake),
-                new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
+                new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
                 new Shoot(turret, trigger)
             )
-        ).withTimeout(5));
+        ).withTimeout(7));
         NamedCommands.registerCommand("kickup", new Shoot(turret, trigger).withTimeout(2.0));
         NamedCommands.registerCommand("auto shoot", new AutoShoot(turret, trigger));
         NamedCommands.registerCommand("auto turret", new AutoTurret(turret, trigger, drivetrain).withTimeout(5.0));
@@ -249,6 +249,9 @@ public class RobotContainer {
         Player1.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         Player2.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+        //Player1.y().whileTrue(new AutoTrackGoal(turret));
+        //Player2.y().whileTrue(new AutoTrackGoal(turret));
+
         //Button Map
 
         Player1.x().whileTrue(new ParallelCommandGroup(
@@ -258,7 +261,7 @@ public class RobotContainer {
         ));
         Player1.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
         Player1.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
-        Player1.povDown().whileTrue(new AutoTrackGoal(turret));
+        Player1.leftBumper().whileTrue(new RunIntake(intake, true)); //true boolean means reverse
         
 
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
@@ -284,7 +287,6 @@ public class RobotContainer {
         })); //left*/
 
         Player1.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
-        Player1.leftBumper().whileTrue(new TurnTurret(turret));
 
         //Player 2 controls
         Player2.x().whileTrue(new ParallelCommandGroup(
@@ -294,8 +296,7 @@ public class RobotContainer {
         ));
         Player2.a().whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED)); // down
         Player2.b().whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED)); // up
-        Player2.povDown().whileTrue(new AutoTrackGoal(turret));
-        
+        Player2.leftBumper().whileTrue(new RunIntake(intake, true));        
 
         Player2.rightTrigger().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
@@ -314,31 +315,7 @@ public class RobotContainer {
         Player2.povLeft().whileTrue(new ManualTurret(turret, () -> -.3)); //left
 
         Player2.leftTrigger().whileTrue(new RunIntake(intake)); // intake in
-        Player2.leftBumper().whileTrue(new TurnTurret(turret));
 
-
-        //Stadia Controller Test
-
-        if (enableStadiaDrive) {
-            buttonX.whileTrue(new ParallelCommandGroup(
-                new DeployJumpCommand(intake),
-                new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_CLOSE_RPS),
-                new Shoot(turret, trigger)
-            ));
-            buttonA.whileTrue(new ManualDeploy(intake, Constants.Intake.DEPLOY_MANUAL_SPEED));
-            buttonB.whileTrue(new ManualDeploy(intake, -Constants.Intake.DEPLOY_MANUAL_SPEED));
-
-            buttonRightTrigger.whileTrue(new ParallelCommandGroup(
-                new DeployJumpCommand(intake),
-                new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
-                new Shoot(turret, trigger)
-            ));
-
-            buttonStart.onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-            buttonRightBumper.whileTrue(new ReverseShoot(trigger));
-            buttonLeftTrigger.whileTrue(new RunIntake(intake));
-            buttonLeftBumper.toggleOnTrue(new TurnTurret(turret));
-        }
 
 
     }   
