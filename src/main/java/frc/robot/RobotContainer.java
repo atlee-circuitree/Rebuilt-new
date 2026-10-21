@@ -270,6 +270,16 @@ public class RobotContainer {
             new Shoot(turret, trigger)
         )); // shoot and kick up, shooter first then kickup
 
+         Player1.y().whileTrue(new ParallelCommandGroup(
+            new DeployJumpCommand(intake),
+            new SpinToDistanceInterrupt(turret),
+            new Shoot(turret, trigger)
+        )); // distance-based shot
+         Player2.y().whileTrue(new ParallelCommandGroup(
+            new DeployJumpCommand(intake),
+            new SpinToDistanceInterrupt(turret),
+            new Shoot(turret, trigger)
+        )); // distance-based shot
         //Player1.povUp().onTrue(new StopTurretWheels(turret));
         Player1.povUp().whileTrue(new TurretTo(turret, 90));
         Player1.rightBumper().whileTrue(new ReverseShoot(trigger));

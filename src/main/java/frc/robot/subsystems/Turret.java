@@ -33,6 +33,9 @@ import frc.robot.Constants;
 import frc.robot.util.HiTecServo;
 import frc.robot.util.Limelight;
 import frc.robot.util.LinearServo;
+import java.util.OptionalDouble;
+import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Turret extends SubsystemBase {
 
@@ -43,6 +46,9 @@ public class Turret extends SubsystemBase {
   private final LinearServo motorHoodLeft;
   private final CANcoder turretEncoder;
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
+  private final MedianFilter m_distanceFilter = new MedianFilter(5);
+  private double m_lastDistanceTime = Double.NEGATIVE_INFINITY;
+  private double m_lastSpeedRps = Constants.Turret.AUTO_FALLBACK_RPS;
 
   // Reusable CTRE control request objects (never allocate in hot path)
   private final VelocityVoltage m_velocityRequest = new VelocityVoltage(0).withFeedForward(0).withSlot(0);
@@ -114,9 +120,9 @@ public class Turret extends SubsystemBase {
     m_rotatorCurrent  = motorRotator.getSupplyCurrent();
 
     // Distance-to-speed interpolation table
-    shooterSpeedMap.put(Constants.Turret.DIST_CLOSE_FT, Constants.Turret.SPEED_CLOSE_RPS);
-    shooterSpeedMap.put(Constants.Turret.DIST_MID_FT,   Constants.Turret.SPEED_MID_RPS);
-    shooterSpeedMap.put(Constants.Turret.DIST_FAR_FT,   Constants.Turret.SPEED_FAR_RPS);
+    for (double[] row : Constants.Turret.SHOT_TABLE) {
+      shooterSpeedMap.put(row[0], row[1]);
+    }
 
     SmartDashboard.putNumber("Shooter/distClose",  Constants.Turret.DIST_CLOSE_FT);
     SmartDashboard.putNumber("Shooter/speedClose", Constants.Turret.SPEED_CLOSE_RPS);
@@ -204,16 +210,20 @@ public class Turret extends SubsystemBase {
     return m_filteredVelocity;
   }
 
+   /** Call every loop while shooting. Spins to the speed for the current Limelight distance. */
   public void spinAtDistance() {
-    double distance = Limelight.getDistance();
-    if (distance >= 0)
-      spin(Constants.Turret.SPEED_CLOSE_RPS); // no valid target — use mid-range default
-    else if (distance >= Constants.Turret.DIST_MID_FT)
-      spin(Constants.Turret.SPEED_MID_RPS);
-    else if (distance >= Constants.Turret.DIST_FAR_FT)
-      spin(Constants.Turret.SPEED_FAR_RPS);
-    else
-      spin(shooterSpeedMap.get(distance));
+    OptionalDouble raw = Limelight.getHubDistanceMeters();
+    double now = Timer.getFPGATimestamp();
+    if (raw.isPresent()) {
+      double d = m_distanceFilter.calculate(raw.getAsDouble());
+      m_lastDistanceTime = now;
+      m_lastSpeedRps = shooterSpeedMap.get(d);
+      SmartDashboard.putNumber("Shooter/distance_m", d);
+    } else if (now - m_lastDistanceTime > Constants.LimelightConstants.TARGET_HOLD_SECONDS) {
+      m_distanceFilter.reset(); // lost the tag; keep the last speed so a blink doesn't drop the shot
+    }
+    SmartDashboard.putNumber("Shooter/auto_target_rps", m_lastSpeedRps);
+    spin(m_lastSpeedRps);
   }
 
   public void spin(double speed) {

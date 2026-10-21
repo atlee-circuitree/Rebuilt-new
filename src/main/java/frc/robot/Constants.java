@@ -87,6 +87,14 @@ public class Constants {
         public static final double DIST_FAR_FT    = 35.0;
         public static final double SPEED_FAR_RPS  = 70.0;
 
+        /** Shot table rows: {distance to HUB tag in METERS, flywheel RPS}. PLACEHOLDERS - tune on the robot. */
+        public static final double[][] SHOT_TABLE = {
+            {3.05, 55.0},
+            {6.10, 58.0},
+            {10.67, 70.0},
+        };
+        /** Flywheel speed used until a HUB tag has been seen. */
+        public static final double AUTO_FALLBACK_RPS = 58.0;
 
 
         // --- Rotator PID  (CTRE Slot 0) ---
@@ -216,6 +224,18 @@ public class Constants {
         public static final double TURRET_SPEED_FAST   = 0.15;
         /** Rotation speed when tx error ≤ TX_THRESHOLD_LARGE. */
         public static final double TURRET_SPEED_SLOW   = 0.07;
+
+                // --- Tag-based ranging (MEASURE these on the robot) ---
+        public static final double CAMERA_LENS_HEIGHT_METERS = 0.50;  // floor to camera lens
+        public static final double CAMERA_PITCH_DEGREES      = 30.0;  // camera tilt up from horizontal
+        public static final double HUB_TAG_HEIGHT_METERS     = 1.124; // center of HUB tag
+        public static final double MAX_VALID_DISTANCE_METERS = 12.0;
+        public static final double TARGET_HOLD_SECONDS       = 0.3;
+        /** Set true if the camera is mounted upside down (distance reads backwards). */
+        public static final boolean CAMERA_FLIP_TY = false;
+        // Centered HUB tags only (2026 field)
+        public static final int[] HUB_TAG_IDS_RED  = {2, 4, 5, 10};
+        public static final int[] HUB_TAG_IDS_BLUE = {18, 20, 21, 26};
     }
 
     // =========================================================================
