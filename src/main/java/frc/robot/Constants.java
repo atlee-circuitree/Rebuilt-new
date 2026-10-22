@@ -89,12 +89,12 @@ public class Constants {
 
         /** Shot table rows: {distance to HUB tag in METERS, flywheel RPS}. PLACEHOLDERS - tune on the robot. */
         public static final double[][] SHOT_TABLE = {
-            {3.05, 55.0},
-            {6.10, 58.0},
-            {10.67, 70.0},
+            {1.05, 55.0},
+            {2.10, 62.0},
+            {3.07, 70.0},
         };
         /** Flywheel speed used until a HUB tag has been seen. */
-        public static final double AUTO_FALLBACK_RPS = 58.0;
+        public static final double AUTO_FALLBACK_RPS = 62.0;
 
 
         // --- Rotator PID  (CTRE Slot 0) ---

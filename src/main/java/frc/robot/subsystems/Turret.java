@@ -218,11 +218,11 @@ public class Turret extends SubsystemBase {
       double d = m_distanceFilter.calculate(raw.getAsDouble());
       m_lastDistanceTime = now;
       m_lastSpeedRps = shooterSpeedMap.get(d);
-      SmartDashboard.putNumber("Shooter/distance_m", d);
+      SmartDashboard.putNumber("Shooter distance_m", d);
     } else if (now - m_lastDistanceTime > Constants.LimelightConstants.TARGET_HOLD_SECONDS) {
       m_distanceFilter.reset(); // lost the tag; keep the last speed so a blink doesn't drop the shot
     }
-    SmartDashboard.putNumber("Shooter/auto_target_rps", m_lastSpeedRps);
+    SmartDashboard.putNumber("Shooter auto_target_rps", m_lastSpeedRps);
     spin(m_lastSpeedRps);
   }
 
