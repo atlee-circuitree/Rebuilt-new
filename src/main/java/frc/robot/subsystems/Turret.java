@@ -193,6 +193,8 @@ public class Turret extends SubsystemBase {
     if (isSafe(position)) {
       commandedDirection = position;
       motorRotator.set(position);
+    } else {
+      stopRotator();
     }
   }
 
@@ -318,12 +320,21 @@ public class Turret extends SubsystemBase {
     double rawVelocity = (m_flywheelLeftVelocity.getValueAsDouble() + m_flywheelRightVelocity.getValueAsDouble()) / 2.0;
     m_filteredVelocity = m_velocityFilter.calculate(rawVelocity);
 
-    SmartDashboard.putNumber("Turret/position_rot", m_rotatorPosition.getValueAsDouble());
-    SmartDashboard.putNumber("Turret/angle_deg",    getAngle());
-    SmartDashboard.putNumber("Turret/current_amps", m_rotatorCurrent.getValueAsDouble());
-    SmartDashboard.putNumber("Turret/velocity_rps", getVelocity());
-    SmartDashboard.putNumber("Turret/voltage", motorRotator.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber("Turret position_rot", m_rotatorPosition.getValueAsDouble());
+    SmartDashboard.putNumber("Turret angle_deg",    getAngle());
+    SmartDashboard.putNumber("Turret current_amps", m_rotatorCurrent.getValueAsDouble());
+    SmartDashboard.putNumber("Turret velocity_rps", getVelocity());
+    SmartDashboard.putNumber("Turret Position Rot", m_rotatorPosition.getValueAsDouble());
+    SmartDashboard.putNumber("Turret voltage", motorRotator.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putBoolean("Hub Tag Visible", Limelight.hasHubTarget());
+    SmartDashboard.putNumber("Hub Tag ID", Limelight.getTID());
+    SmartDashboard.putNumber("Hub TX", Limelight.getTX());
+    SmartDashboard.putNumber("Turret Aim Output", Limelight.getTurretSpeed());
+    SmartDashboard.putNumber("Turret Angle Deg", getAngle());
+    SmartDashboard.putNumber("Flywheel Velocity RPS", getVelocity());
+    SmartDashboard.putNumber("Flywheel Target RPS", targetVelocity);
 
+      
     // Software safety backstop: stop if commanded direction has been unsafe for 4 consecutive cycles
     if (!zeroing && m_unsafeDebouncer.calculate(!isSafe(commandedDirection))) {
       stopRotator();

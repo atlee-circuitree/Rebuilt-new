@@ -12,8 +12,12 @@ public class Limelight {
     private static final NetworkTable limelight = NetworkTableInstance.getDefault()
             .getTable(Constants.LimelightConstants.TURRET_LIMELIGHT_NAME);
 
-    public static double getTurretSpeed() {
-        double tx = getTX();
+        public static double getTurretSpeed() {
+        // Only steer toward one of OUR alliance's centered HUB tags
+        if (!hasHubTarget()) {
+            return 0;
+        }
+        double tx = getTXNC();
         if (tx > Constants.LimelightConstants.TX_THRESHOLD_LARGE)
             return Constants.LimelightConstants.TURRET_SPEED_FAST;
         if (tx > Constants.LimelightConstants.TX_THRESHOLD_SMALL)
@@ -36,6 +40,9 @@ public class Limelight {
 
     public static double getTX() {
         return limelight.getEntry("tx").getDouble(0.0);
+    }
+        public static double getTXNC() {
+        return limelight.getEntry("txnc").getDouble(0.0);
     }
 
     public static double getTY() {

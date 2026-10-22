@@ -264,22 +264,31 @@ public class RobotContainer {
         Player1.leftBumper().whileTrue(new RunIntake(intake, true)); //true boolean means reverse
         
 
+        // Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
+        //     new DeployJumpCommand(intake),
+        //     new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
+        //     new Shoot(turret, trigger)
+        //)); // shoot and kick up, shooter first then kickup
         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
+            new AimAndSpinToSpeed(turret, Constants.Turret.SPEED_FAR_RPS),
             new DeployJumpCommand(intake),
-            new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
             new Shoot(turret, trigger)
-        )); // shoot and kick up, shooter first then kickup
+        ));
 
          Player1.y().whileTrue(new ParallelCommandGroup(
+    
             new DeployJumpCommand(intake),
-            new SpinToDistanceInterrupt(turret),
+            new AimAndSpinAtHub(turret),
             new Shoot(turret, trigger)
         )); // distance-based shot
          Player2.y().whileTrue(new ParallelCommandGroup(
             new DeployJumpCommand(intake),
-            new SpinToDistanceInterrupt(turret),
+            new AimAndSpinAtHub(turret),
             new Shoot(turret, trigger)
         )); // distance-based shot
+        //aim at tag only button
+        Player1.povDown().whileTrue(new TurnTurret(turret)); 
+        Player2.povDown().whileTrue(new TurnTurret(turret));
         //Player1.povUp().onTrue(new StopTurretWheels(turret));
         Player1.povUp().whileTrue(new TurretTo(turret, 90));
         Player1.rightBumper().whileTrue(new ReverseShoot(trigger));

@@ -235,7 +235,7 @@ public class Constants {
         public static final boolean CAMERA_FLIP_TY = false;
         // Centered HUB tags only (2026 field)
         public static final int[] HUB_TAG_IDS_RED  = {2, 4, 5, 10};
-        public static final int[] HUB_TAG_IDS_BLUE = {18, 20, 21, 26};
+        public static final int[] HUB_TAG_IDS_BLUE = {18, 20, 21, 26,27};
     }
 
     // =========================================================================
