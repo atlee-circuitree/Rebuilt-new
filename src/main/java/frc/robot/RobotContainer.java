@@ -269,13 +269,13 @@ public class RobotContainer {
         //     new SpinToSpeedInterrupt(turret, Constants.Turret.SPEED_FAR_RPS),
         //     new Shoot(turret, trigger)
         //)); // shoot and kick up, shooter first then kickup
-        Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
+        Player1.y().whileTrue(new ParallelCommandGroup(
             new AimAndSpinToSpeed(turret, Constants.Turret.SPEED_FAR_RPS),
             new DeployJumpCommand(intake),
             new Shoot(turret, trigger)
         ));
 
-         Player1.y().whileTrue(new ParallelCommandGroup(
+         Player1.rightTrigger().whileTrue(new ParallelCommandGroup(
     
             new DeployJumpCommand(intake),
             new AimAndSpinAtHub(turret),
